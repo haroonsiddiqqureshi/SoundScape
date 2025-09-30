@@ -18,9 +18,7 @@ class AdminSeeder extends Seeder
             'name' => env('ADMIN_NAME'),
             'email' => env('ADMIN_EMAIL'),
             'password' => Hash::make(env('ADMIN_PASSWORD')),
-            'email_verified_at' => now(),
             'phone' => env('ADMIN_PHONE'),
-            'line_id' => env('ADMIN_LINE_ID'),
             'context_info' => env('ADMIN_CONTEXT_INFO'),
         ]);
     }

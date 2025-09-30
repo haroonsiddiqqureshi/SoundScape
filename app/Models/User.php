@@ -43,14 +43,27 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_preferences' => 'array',
         ];
     }
 
-    /**
-     * Get the promoter profile associated with the user.
-     */
     public function promoter(): HasOne
     {
         return $this->hasOne(Promoter::class);
+    }
+
+    public function follows()
+    {
+        return $this->hasMany(Follow::class);
+    }
+
+    public function followedConcerts()
+    {
+        return $this->belongsToMany(Concert::class, 'follows');
+    }
+
+    public function notifications()
+    {
+        return $this->hasManyThrough(Notification::class, Follow::class);
     }
 }

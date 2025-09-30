@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
             $table->string('fullname');
-            $table->string('business_category')->nullable();
-            $table->text('proof_of_identity')->nullable();
-            $table->text('context_info')->nullable();
+            $table->string('business_category');
+            $table->text('proof_of_identity');
+            $table->text('context_info');
             $table->text('logo_url')->nullable();
             $table->string('bio', 500)->nullable();
             $table->boolean('verified')->default(false);

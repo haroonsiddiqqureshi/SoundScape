@@ -9,15 +9,16 @@ use Illuminate\Notifications\Notifiable;
 
 class Promoter extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected $fillable = [
         'user_id',
         'fullname',
         'business_category',
         'proof_of_identity',
-        'context_info',
         'logo_url',
+        'context_info',
         'bio',
     ];
 
@@ -32,5 +33,10 @@ class Promoter extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(Promoter_Log::class);
     }
 }
