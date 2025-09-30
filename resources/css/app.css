@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+:root {
+    /* Light Mode */
+    --color-primary: #007bff;
+    --color-background: #f3f4f6;
+    --color-text: #000;
+    --color-card: #fff;
+}
+
+.dark {
+    /* Dark Mode */
+    --color-primary: #ff1493;
+    --color-background: #1a1a2e;
+    --color-text: #fff;
+    --color-card: #1c1423;
+}
