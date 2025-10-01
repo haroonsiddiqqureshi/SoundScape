@@ -1,10 +1,10 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 import Welcome from '@/Pages/Admin/Welcome.vue';
 </script>
 
 <template>
-    <AppLayout title="Dashboard">
+    <AdminLayout title="Dashboard">
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -13,5 +13,5 @@ import Welcome from '@/Pages/Admin/Welcome.vue';
                 </div>
             </div>
         </div>
-    </AppLayout>
+    </AdminLayout>
 </template>
