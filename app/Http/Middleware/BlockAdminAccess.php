@@ -7,22 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class RoleRedirectMiddleware
+class BlockAdminAccess
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $guard): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        $otherGuard = ($guard === 'admin') ? 'web' : 'admin';
-
-        if (!Auth::guard($guard)->check()) {
-            if (Auth::guard($otherGuard)->check()) {
-                Auth::guard($otherGuard)->logout();
-            }
-            return redirect('/');
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);

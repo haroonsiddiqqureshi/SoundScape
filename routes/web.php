@@ -4,24 +4,31 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+Route::middleware([
+    'block_admin'
+])->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+
+    // Add other routes accessible to both users and guests here...
 });
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    'block_admin',
     'role:web'
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/user/profile', function () {
+        return Inertia::render('Profile/Show', [
+            'confirmsTwoFactorAuthentication' => false,
+            'sessions' => [],
+        ]);
+    })->name('profile.show');
+
+    // Add other user-only routes here...
 });
 
 Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
