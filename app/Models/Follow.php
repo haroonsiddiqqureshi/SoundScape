@@ -14,6 +14,11 @@ class Follow extends Model
         'concert_id',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'concert_id' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

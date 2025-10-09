@@ -22,6 +22,12 @@ class Concert_Log extends Model
         'new_value',
     ];
 
+    protected $casts = [
+        'admin_id' => 'integer',
+        'promoter_id' => 'integer',
+        'concert_id' => 'integer',
+    ];
+
     public function admin()
     {
         return $this->belongsTo(Admin::class);

@@ -21,9 +21,6 @@ class Concert extends Model
         'price',
         'picture_url',
         'ticket_link',
-    ];
-
-    protected $hidden = [
         'admin_id',
         'promoter_id',
     ];
@@ -31,6 +28,10 @@ class Concert extends Model
     protected $casts = [
         'admin_id' => 'integer',
         'promoter_id' => 'integer',
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'concert_datetime' => 'datetime',
+        'price' => 'decimal:2',
     ];
 
     public function admin()

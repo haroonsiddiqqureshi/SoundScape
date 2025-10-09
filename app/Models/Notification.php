@@ -10,15 +10,17 @@ class Notification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'follow_id',
-        'concert_log_id',
         'message',
         'type',
         'is_sent',
+        'follow_id',
+        'concert_log_id',
     ];
 
     protected $casts = [
         'is_sent' => 'boolean',
+        'follow_id' => 'integer',
+        'concert_log_id' => 'integer',
     ];
 
     public function follow()

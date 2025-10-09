@@ -15,19 +15,17 @@ class Promoter extends Model
     protected $fillable = [
         'user_id',
         'fullname',
+        'business_name',
         'business_category',
-        'proof_of_identity',
-        'logo_url',
-        'context_info',
+        'business_address',
+        'social_links',
         'bio',
-    ];
-
-    protected $hidden = [
-        'verified',
+        'is_verified',
     ];
 
     protected $casts = [
-        'verified' => 'boolean',
+        'is_verified' => 'boolean',
+        'social_links' => 'array',
     ];
 
     public function user(): BelongsTo

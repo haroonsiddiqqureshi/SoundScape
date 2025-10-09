@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleRedirectMiddleware::class,
             'block_admin' => \App\Http\Middleware\BlockAdminAccess::class,
+            'check_promoter' => \App\Http\Middleware\CheckPromoterAccount::class,
+            'verified_promoter' => \App\Http\Middleware\CheckPromoterVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

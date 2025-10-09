@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
             $table->string('fullname');
+            $table->string('business_name');
             $table->string('business_category');
-            $table->text('proof_of_identity');
-            $table->text('context_info');
-            $table->text('logo_url')->nullable();
+            $table->text('business_address');
+            $table->json('social_links')->nullable();
             $table->string('bio', 500)->nullable();
-            $table->boolean('verified')->default(false);
+            $table->boolean('is_verified')->default(false);
             $table->timestamps();
         });
     }

@@ -13,9 +13,13 @@ class Promoter_Log extends Model
 
     protected $fillable = [
         'promoter_id',
+        'new_value',
         'field_name',
         'old_value',
-        'new_value',
+    ];
+
+    protected $casts = [
+        'promoter_id' => 'integer',
     ];
 
     public function promoter()

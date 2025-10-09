@@ -38,31 +38,28 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'notification_preferences' => 'array',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'notification_preferences' => 'array',
+    ];
 
     public function promoter(): HasOne
     {
         return $this->hasOne(Promoter::class);
     }
 
-    public function follows()
+    public function follow()
     {
         return $this->hasMany(Follow::class);
     }
 
-    public function followedConcerts()
+    public function followedConcert()
     {
         return $this->belongsToMany(Concert::class, 'follows');
     }
 
-    public function notifications()
+    public function notification()
     {
         return $this->hasManyThrough(Notification::class, Follow::class);
     }
