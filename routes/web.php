@@ -23,7 +23,6 @@ Route::middleware([
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
     'block_admin',
     'role:web'
 ])->group(function () {
@@ -38,18 +37,22 @@ Route::middleware([
     Route::middleware('check_promoter')->group(function () {
         Route::get('/promoter', [PromoterController::class, 'index'])->name('promoter.index');
 
-        Route::middleware('verified_promoter')->prefix('promoter')->name('promoter.')->group(function () {
+        Route::middleware(['verified_promoter'])->prefix('promoter')->name('promoter.')->group(function () {
             Route::get('/concert', [PromoterConcertController::class, 'index'])->name('concert.index');
             Route::get('/concert/create', [PromoterConcertController::class, 'create'])->name('concert.create');
             Route::post('/concert', [PromoterConcertController::class, 'store'])->name('concert.store');
             Route::get('/concert/{concert}', [PromoterConcertController::class, 'detail'])->name('concert.detail');
-            
+            Route::get('/concert/edit/{concert}', [PromoterConcertController::class, 'edit'])->name('concert.edit');
+            Route::post('/concert/{concert}', [PromoterConcertController::class, 'update'])->name('concert.update');
+
             // Add other promoter-only routes here...
         });
     });
-    Route::get('/promoter/create', [PromoterController::class, 'create'])->name('promoter.create');
-    Route::post('/promoter', [PromoterController::class, 'store'])->name('promoter.store');
-    
+    Route::middleware(['verified'])->group(function () {
+        Route::get('/promoter/create', [PromoterController::class, 'create'])->name('promoter.create');
+        Route::post('/promoter', [PromoterController::class, 'store'])->name('promoter.store');
+    });
+
     // Add other user-only routes here...
 });
 
@@ -68,12 +71,13 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/concert', [AdminConcertController::class, 'index'])->name('concert.index');
     Route::get('/concert/create', [AdminConcertController::class, 'create'])->name('concert.create');
     Route::post('/concert', [AdminConcertController::class, 'store'])->name('concert.store');
+    Route::get('/concert/{concert}', [AdminConcertController::class, 'detail'])->name('concert.detail');
+    Route::get('/concert/edit/{concert}', [AdminConcertController::class, 'edit'])->name('concert.edit');
+    Route::post('/concert/{concert}', [AdminConcertController::class, 'update'])->name('concert.update');
 
     Route::get('/promoter', [AdminPromoterController::class, 'index'])->name('promoter.index');
     Route::get('/promoter/{promoter}', [AdminPromoterController::class, 'detail'])->name('promoter.detail');
     Route::put('/promoter/{promoter}', [AdminPromoterController::class, 'updateVerificationStatus'])->name('promoter.updateVerificationStatus');
 
     Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
-
-    Route::get('/concert/{concert}', [AdminConcertController::class, 'detail'])->name('concert.detail');
 });

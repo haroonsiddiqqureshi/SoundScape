@@ -1,7 +1,8 @@
 <script setup>
 import PromoterLayout from "@/Layouts/PromoterLayout.vue";
 import { useForm } from "@inertiajs/vue3";
-import CreateConcertForm from "@/Components/CreateConcertForm.vue";
+import CreateConcertForm from "@/Components/ConcertCreateForm.vue";
+import ConcertCreateForm from "@/Components/ConcertCreateForm.vue";
 
 const form = useForm({
     name: "",
@@ -11,7 +12,7 @@ const form = useForm({
     city: "",
     latitude: null,
     longitude: null,
-    concert_datetime: "",
+    start_datetime: "",
     price: null,
     picture_url: "",
     ticket_link: "",
@@ -24,6 +25,6 @@ const submit = () => {
 
 <template>
     <PromoterLayout title="Create Concert">
-        <CreateConcertForm :form="form" @submit="submit" />
+        <ConcertCreateForm :form="form" @submit="submit" />
     </PromoterLayout>
 </template>

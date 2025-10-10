@@ -9,6 +9,6 @@ defineProps({
 
 <template>
     <AdminLayout title="Concert Detail">
-        <ConcertDetail :concert="concert" />
+        <ConcertDetail :concert="concert" role="admin" />
     </AdminLayout>
 </template>

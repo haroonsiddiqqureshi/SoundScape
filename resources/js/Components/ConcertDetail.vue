@@ -1,8 +1,18 @@
 <script setup>
 import { defineProps, computed } from "vue";
+import { Link } from "@inertiajs/vue3";
+import { PencilIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     concert: Object,
+    role: String,
+});
+
+const editHref = computed(() => {
+    if (props.role === 'admin') {
+        return route('admin.concert.edit', { concert: props.concert.id });
+    }
+    return route('promoter.concert.edit', { concert: props.concert.id });
 });
 
 const imageUrl = computed(() => {
@@ -16,8 +26,8 @@ const imageUrl = computed(() => {
 });
 
 const showDate = computed(() => {
-    if (!props.concert.concert_datetime) return "TBA";
-    const date = new Date(props.concert.concert_datetime);
+    if (!props.concert.start_datetime) return "TBA";
+    const date = new Date(props.concert.start_datetime);
     return date.toLocaleDateString("en-US", {
         weekday: "long",
         year: "numeric",
@@ -27,8 +37,8 @@ const showDate = computed(() => {
 });
 
 const showTime = computed(() => {
-    if (!props.concert.concert_datetime) return "";
-    const date = new Date(props.concert.concert_datetime);
+    if (!props.concert.start_datetime) return "";
+    const date = new Date(props.concert.start_datetime);
     return date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
@@ -84,20 +94,32 @@ const statusClass = computed(() => {
 
                 <!-- Right Column: Details -->
                 <div class="md:w-2/3 p-6 md:p-8">
-                    <span
-                        :class="statusClass"
-                        class="text-sm font-semibold mr-2 px-2.5 py-0.5 rounded-full mb-2 inline-block"
-                    >
-                        {{
-                            concert.status.charAt(0).toUpperCase() +
-                            concert.status.slice(1)
-                        }}
-                    </span>
-                    <h1
-                        class="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
-                    >
-                        {{ concert.name }}
-                    </h1>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span
+                                :class="statusClass"
+                                class="text-sm font-semibold mr-2 px-2.5 py-0.5 rounded-full mb-2 inline-block"
+                            >
+                                {{
+                                    concert.status.charAt(0).toUpperCase() +
+                                    concert.status.slice(1)
+                                }}
+                            </span>
+                            <h1
+                                class="text-xl md:text-2xl font-bold text-gray-900 mb-4 break-all"
+                            >
+                                {{ concert.name }}
+                            </h1>
+                        </div>
+                        <Link
+                            v-if="concert.id"
+                            :href="editHref"
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700"
+                        >
+                            <PencilIcon class="h-4 w-4 mr-2" />
+                            Edit
+                        </Link>
+                    </div>
 
                     <div class="space-y-5 text-gray-700">
                         <div class="flex items-center">
@@ -152,14 +174,14 @@ const statusClass = computed(() => {
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                                 ></path>
                             </svg>
-                            <div>
+                            <div class="flex justify-between w-full">
                                 <p>
                                     {{ concert.venue_name }}, {{ concert.city }}
                                 </p>
                                 <a
                                     :href="googleMapsLink"
                                     target="_blank"
-                                    class="text-blue-600 hover:underline text-sm"
+                                    class="text-blue-600 hover:underline"
                                 >
                                     View on Google Maps
                                 </a>

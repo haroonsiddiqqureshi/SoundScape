@@ -12,13 +12,16 @@ class Concert extends Model
     protected $fillable = [
         'name',
         'description',
+        'artists',
+        'genre',
         'status',
         'venue_name',
         'city',
+        'price',
+        'start_datetime',
+        'end_datetime',
         'latitude',
         'longitude',
-        'concert_datetime',
-        'price',
         'picture_url',
         'ticket_link',
         'admin_id',
@@ -30,7 +33,8 @@ class Concert extends Model
         'promoter_id' => 'integer',
         'latitude' => 'float',
         'longitude' => 'float',
-        'concert_datetime' => 'datetime',
+        'start_datetime' => 'datetime',
+        'end_datetime' => 'datetime',
         'price' => 'decimal:2',
     ];
 
