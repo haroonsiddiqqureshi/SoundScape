@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ConcertController as AdminConcertController;
 use App\Http\Controllers\Admin\PromoterController as AdminPromoterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\HighlightController as AdminHighlightController;
 use App\Http\Controllers\Promoter\PromoterController;
 use App\Http\Controllers\Promoter\ConcertController as PromoterConcertController;
-use App\Models\Admin;
 use Inertia\Inertia;
 
 Route::middleware([
@@ -38,6 +38,7 @@ Route::middleware([
         Route::get('/promoter', [PromoterController::class, 'index'])->name('promoter.index');
 
         Route::middleware(['verified_promoter'])->prefix('promoter')->name('promoter.')->group(function () {
+            // --- Promoter Concert Management Routes ---
             Route::get('/concert', [PromoterConcertController::class, 'index'])->name('concert.index');
             Route::get('/concert/create', [PromoterConcertController::class, 'create'])->name('concert.create');
             Route::post('/concert', [PromoterConcertController::class, 'store'])->name('concert.store');
@@ -68,6 +69,7 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
         ]);
     })->name('profile.show');
 
+    // --- Admin Concert Management Routes ---
     Route::get('/concert', [AdminConcertController::class, 'index'])->name('concert.index');
     Route::get('/concert/create', [AdminConcertController::class, 'create'])->name('concert.create');
     Route::post('/concert', [AdminConcertController::class, 'store'])->name('concert.store');
@@ -75,9 +77,21 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/concert/edit/{concert}', [AdminConcertController::class, 'edit'])->name('concert.edit');
     Route::post('/concert/{concert}', [AdminConcertController::class, 'update'])->name('concert.update');
 
+    // --- Admin Promoter Management Routes ---
     Route::get('/promoter', [AdminPromoterController::class, 'index'])->name('promoter.index');
     Route::get('/promoter/{promoter}', [AdminPromoterController::class, 'detail'])->name('promoter.detail');
     Route::put('/promoter/{promoter}', [AdminPromoterController::class, 'updateVerificationStatus'])->name('promoter.updateVerificationStatus');
 
+    // --- Admin User Management Routes ---
     Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
+
+    // --- Admin Highlight Management Routes ---
+    Route::get('/highlight', [AdminHighlightController::class, 'index'])->name('highlight.index');
+    Route::get('/highlight/create', [AdminHighlightController::class, 'create'])->name('highlight.create');
+    Route::post('/highlight', [AdminHighlightController::class, 'store'])->name('highlight.store');
+    Route::get('/highlight/{highlight}', [AdminHighlightController::class, 'detail'])->name('highlight.detail');
+    Route::get('/highlight/edit/{highlight}', [AdminHighlightController::class, 'edit'])->name('highlight.edit');
+    Route::post('/highlight/{highlight}', [AdminHighlightController::class, 'update'])->name('highlight.update');
+
+    // Add other admin-only routes here...
 });

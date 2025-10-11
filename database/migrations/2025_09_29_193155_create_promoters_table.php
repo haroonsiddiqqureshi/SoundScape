@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('promoters', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
-            $table->string('fullname');
-            $table->string('business_name');
-            $table->string('business_category');
-            $table->text('business_address');
-            $table->json('social_links')->nullable();
-            $table->string('bio', 500)->nullable();
-            $table->boolean('is_verified')->default(false);
+            $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade'); // Link to users table
+            $table->string('fullname'); // Full name of the promoter
+            $table->string('business_name'); // Name of the business
+            $table->string('business_category'); // Category of the business
+            $table->text('business_address'); // Address of the business
+            $table->json('social_links')->nullable(); // Social media links
+            $table->string('bio', 500)->nullable(); // Short biography
+            $table->boolean('is_verified')->default(false); // Verification status
             $table->timestamps();
         });
     }

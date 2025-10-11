@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('follows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('concert_id')->constrained('concerts')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Follower
+            $table->foreignId('concert_id')->constrained('concerts')->onDelete('cascade'); // Followed concert
+            $table->unique(['user_id', 'concert_id']); // Ensure a user can follow a concert only once
             $table->timestamps();
         });
     }

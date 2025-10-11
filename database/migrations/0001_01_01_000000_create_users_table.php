@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->char('password', 97);
-            $table->string('phone', 20);
-            $table->string('line_id', 20)->nullable();
+            $table->string('name'); // Username
+            $table->string('email')->unique(); // Email address
+            $table->char('password', 97); // Hashed password
+            $table->string('phone', 20); // Phone number
+            $table->string('line_id', 20)->nullable(); // Line ID (optional)
 
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();

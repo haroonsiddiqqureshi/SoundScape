@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Add notification preference columns to users table
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->json('notification_preferences')->nullable();
         });
     }
 

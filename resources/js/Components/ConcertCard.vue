@@ -5,7 +5,7 @@ const props = defineProps({
     concert: Object,
 });
 
-const imageUrl = computed(() => {
+const pictureUrl = computed(() => {
     if (props.concert?.picture_url) {
         if (props.concert.picture_url.startsWith("http")) {
             return props.concert.picture_url;
@@ -55,7 +55,7 @@ const statusClass = computed(() => {
         <div class="relative">
             <img
                 class="w-full h-36 object-cover"
-                :src="imageUrl"
+                :src="pictureUrl"
                 :alt="`Flyer for ${props.concert?.name}`"
             />
             <div

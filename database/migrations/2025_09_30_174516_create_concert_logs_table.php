@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('concert_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('cascade');
-            $table->foreignId('promoter_id')->nullable()->constrained('promoters')->onDelete('cascade');
-            $table->foreignId('concert_id')->constrained('concerts')->onDelete('cascade');
-            $table->string('field_name');
-            $table->text('old_value');
-            $table->text('new_value');
+            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('cascade'); // Admin who made the change
+            $table->foreignId('promoter_id')->nullable()->constrained('promoters')->onDelete('cascade'); // Promoter who made the change
+            $table->foreignId('concert_id')->constrained('concerts')->onDelete('cascade'); // Associated concert
+            $table->string('field_name'); // Name of the field that was changed
+            $table->text('old_value'); // Previous value
+            $table->text('new_value'); // New value
             $table->timestamps();
         });
     }

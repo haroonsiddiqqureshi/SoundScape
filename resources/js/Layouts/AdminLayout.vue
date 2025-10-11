@@ -95,6 +95,12 @@ const logout = () => {
                         >
                             Users
                         </NavLink>
+                        <NavLink
+                            :href="route('admin.highlight.index')"
+                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                            Highlights
+                        </NavLink>
                     </nav>
                 </div>
                 <div class="p-2 mt-auto">

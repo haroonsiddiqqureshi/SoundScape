@@ -24,6 +24,8 @@ class Concert extends Model
         'longitude',
         'picture_url',
         'ticket_link',
+        'view_count',
+        'like_count',
         'admin_id',
         'promoter_id',
     ];
@@ -36,6 +38,9 @@ class Concert extends Model
         'start_datetime' => 'datetime',
         'end_datetime' => 'datetime',
         'price' => 'decimal:2',
+        'artists' => 'array',
+        'view_count' => 'integer',
+        'like_count' => 'integer',
     ];
 
     public function admin()

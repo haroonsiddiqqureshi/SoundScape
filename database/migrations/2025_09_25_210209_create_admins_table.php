@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->char('password', 97);
-            $table->string('phone', 20);
-            $table->text('context_info');
+            $table->string('name'); // Admin account name
+            $table->string('email')->unique(); // Email address
+            $table->char('password', 97); // Hashed password
+            $table->string('phone', 20); // Phone number
+            $table->text('context_info'); // Contextual information
             $table->rememberToken();
             $table->timestamps();
         });
