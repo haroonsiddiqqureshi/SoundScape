@@ -68,10 +68,10 @@ const statusClass = computed(() => {
                 class="absolute bottom-0 left-0 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-tr-lg flex flex-col items-center justify-center w-14"
             >
                 <span class="text-xs font-bold text-red-600">{{
-                    concertDate.month
+                    showDate.month
                 }}</span>
                 <span class="text-xl font-extrabold text-gray-800">{{
-                    concertDate.day
+                    showDate.day
                 }}</span>
             </div>
         </div>
