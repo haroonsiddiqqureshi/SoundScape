@@ -81,7 +81,7 @@ class ConcertController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate($this->validationRules());
+        $validated = $request->validate($this->validationRules(true));
 
         $originalData = $concert->getOriginal();
 

@@ -5,7 +5,7 @@ import ApplicationMark from "@/Components/ApplicationMark.vue";
 import Banner from "@/Components/Banner.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
-import NavLink from "@/Components/NavLink.vue";
+import NavLink from "@/Components/DashboardNavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 
 defineProps({
@@ -132,7 +132,7 @@ const logout = () => {
                                         </DropdownLink> -->
 
                                         <DropdownLink
-                                            :href="route('dashboard')"
+                                            :href="route('promoter.index')"
                                         >
                                             Switch to User Account
                                         </DropdownLink>

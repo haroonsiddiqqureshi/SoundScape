@@ -63,7 +63,7 @@ watchEffect(() => {
                     <div class="flex justify-between h-16">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <Link :href="route('dashboard')">
+                            <Link :href="route('index')">
                                 <ApplicationMark />
                             </Link>
                         </div>
@@ -73,8 +73,8 @@ watchEffect(() => {
                             class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex pt-1"
                         >
                             <NavLink
-                                :href="route('dashboard')"
-                                :active="route().current('dashboard')"
+                                :href="route('index')"
+                                :active="route().current('index')"
                             >
                                 <p class="font-bold">Home</p>
                             </NavLink>
@@ -190,8 +190,8 @@ watchEffect(() => {
                 >
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
+                            :href="route('index')"
+                            :active="route().current('index')"
                         >
                             Home
                         </ResponsiveNavLink>

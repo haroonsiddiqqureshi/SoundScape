@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm } from "@inertiajs/vue3";
-import ConcertCreateForm from "@/Components/ConcertCreateForm.vue";
+import ConcertCreateForm from "@/Components/Concerts/ConcertCreateForm.vue";
 
 const form = useForm({
     name: "",

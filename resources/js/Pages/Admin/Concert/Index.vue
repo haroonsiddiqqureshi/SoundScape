@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import ConcertCard from "@/Components/ConcertCard.vue";
+import ConcertCard from "@/Components/Concerts/ConcertCard.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 const props = defineProps({

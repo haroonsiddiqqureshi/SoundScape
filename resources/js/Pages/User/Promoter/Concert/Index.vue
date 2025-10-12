@@ -1,6 +1,6 @@
 <script setup>
 import PromoterLayout from "@/Layouts/PromoterLayout.vue";
-import ConcertCard from "@/Components/ConcertCard.vue";
+import ConcertCard from "@/Components/Concerts/ConcertCard.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 const props = defineProps({

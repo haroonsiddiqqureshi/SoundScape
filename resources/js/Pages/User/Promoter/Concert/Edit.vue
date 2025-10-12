@@ -1,6 +1,6 @@
 <script setup>
 import PromoterLayout from "@/Layouts/PromoterLayout.vue";
-import ConcertEditForm from "@/Components/ConcertEditForm.vue";
+import ConcertEditForm from "@/Components/Concerts/ConcertEditForm.vue";
 import { useForm } from "@inertiajs/vue3";
 import { defineProps } from "vue";
 

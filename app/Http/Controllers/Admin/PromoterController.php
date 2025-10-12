@@ -19,7 +19,7 @@ class PromoterController extends Controller
 
     public function detail(Promoter $promoter)
     {
-        $promoter->load('user');
+        $promoter->load(['user:id,name,email,phone']);
         return Inertia::render('Admin/Promoter/Detail', [
             'promoter' => $promoter,
         ]);
@@ -34,7 +34,5 @@ class PromoterController extends Controller
         $promoter = Promoter::findOrFail($id);
         $promoter->is_verified = $request->input('is_verified');
         $promoter->save();
-
-        return redirect()->route('admin.promoter.index')->with('success', 'Promoter verification status updated successfully.');
     }
 }

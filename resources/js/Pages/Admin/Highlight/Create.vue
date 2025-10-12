@@ -1,13 +1,19 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import HighlightCreateForm from '@/Components/HighlightCreateForm.vue';
+import HighlightCreateForm from '@/Components/Highlights/HighlightCreateForm.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+
+const props = defineProps({
+    concerts: Array,
+});
 
 const form = useForm({
     title: '',
     description: '',
     picture_url: '',
+    link: '',
+    concert_id: null,
+    is_active: false,
 });
 
 const submit = () => {
@@ -17,6 +23,6 @@ const submit = () => {
 
 <template>
     <AdminLayout title="Create Highlight">
-        <HighlightCreateForm :form="form" @submit="submit" />
+        <HighlightCreateForm :form="form" :concerts="concerts" @submit="submit" />
     </AdminLayout>
 </template>

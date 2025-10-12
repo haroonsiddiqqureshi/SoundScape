@@ -1,8 +1,8 @@
 <script setup>
 import PromoterLayout from "@/Layouts/PromoterLayout.vue";
 import { useForm } from "@inertiajs/vue3";
-import CreateConcertForm from "@/Components/ConcertCreateForm.vue";
-import ConcertCreateForm from "@/Components/ConcertCreateForm.vue";
+import CreateConcertForm from "@/Components/Concerts/ConcertCreateForm.vue";
+import ConcertCreateForm from "@/Components/Concerts/ConcertCreateForm.vue";
 
 const form = useForm({
     name: "",

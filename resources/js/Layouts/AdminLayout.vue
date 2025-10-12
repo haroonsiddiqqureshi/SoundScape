@@ -5,7 +5,7 @@ import ApplicationMark from "@/Components/ApplicationMark.vue";
 import Banner from "@/Components/Banner.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
-import NavLink from "@/Components/NavLink.vue";
+import NavLink from "@/Components/DashboardNavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 
 defineProps({
@@ -59,7 +59,7 @@ const logout = () => {
                         class="p-4 border-b border-gray-200 dark:border-gray-700"
                     >
                         <Link
-                            :href="route('dashboard')"
+                            :href="route('admin.dashboard')"
                             class="flex items-center"
                         >
                             <ApplicationMark class="block h-9 w-auto" />
@@ -71,32 +71,36 @@ const logout = () => {
                     </div>
                     <nav class="mt-4 flex-1 flex flex-col space-y-2 px-2">
                         <NavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
+                            :href="route('admin.dashboard')"
+                            :active="route().current('admin.dashboard')"
                             class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Dashboard
                         </NavLink>
                         <NavLink
                             :href="route('admin.concert.index')"
+                            :active="route().current('admin.concert.index')"
                             class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Concerts
                         </NavLink>
                         <NavLink
                             :href="route('admin.promoter.index')"
+                            :active="route().current('admin.promoter.index')"
                             class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Promoters
                         </NavLink>
                         <NavLink
                             :href="route('admin.user.index')"
+                            :active="route().current('admin.user.index')"
                             class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Users
                         </NavLink>
                         <NavLink
                             :href="route('admin.highlight.index')"
+                            :active="route().current('admin.highlight.index')"
                             class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Highlights

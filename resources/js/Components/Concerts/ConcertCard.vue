@@ -56,23 +56,13 @@ const statusClass = computed(() => {
             <img
                 class="w-full h-36 object-cover"
                 :src="pictureUrl"
-                :alt="`Flyer for ${props.concert?.name}`"
+                :alt="`${props.concert?.name}`"
             />
             <div
                 class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
                 :class="statusClass"
             >
                 {{ props.concert?.status }}
-            </div>
-            <div
-                class="absolute bottom-0 left-0 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-tr-lg flex flex-col items-center justify-center w-14"
-            >
-                <span class="text-xs font-bold text-red-600">{{
-                    showDate.month
-                }}</span>
-                <span class="text-xl font-extrabold text-gray-800">{{
-                    showDate.day
-                }}</span>
             </div>
         </div>
         <div class="p-3">
@@ -91,7 +81,7 @@ const statusClass = computed(() => {
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <span>{{ showDate }}</span>
+                        <span>{{ showDate.day }} {{ showDate.month }}</span>
                     </div>
                     <div
                         class="flex items-center font-semibold text-indigo-600"

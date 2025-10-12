@@ -67,7 +67,7 @@ class ConcertController extends Controller
 
     public function update(Request $request, Concert $concert)
     {
-        $validated = $request->validate($this->validationRules());
+        $validated = $request->validate($this->validationRules(true));
 
         $originalData = $concert->getOriginal();
 

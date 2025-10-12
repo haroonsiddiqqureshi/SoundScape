@@ -2,20 +2,27 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+
+// --- Admin Controllers ---
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ConcertController as AdminConcertController;
 use App\Http\Controllers\Admin\PromoterController as AdminPromoterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\HighlightController as AdminHighlightController;
+
+// --- Promoter Controllers ---
 use App\Http\Controllers\Promoter\PromoterController;
 use App\Http\Controllers\Promoter\ConcertController as PromoterConcertController;
-use Inertia\Inertia;
+
+// --- User Controllers ---
+use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\ProfileController as UserProfileController;
 
 Route::middleware([
     'block_admin'
 ])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/', [HomeController::class, 'index'])->name('index');
 
     // Add other routes accessible to both users and guests here...
 });
@@ -26,13 +33,9 @@ Route::middleware([
     'block_admin',
     'role:web'
 ])->group(function () {
-    Route::get('/user/profile', function () {
-        return Inertia::render('User/Profile/Show', [
-            'confirmsTwoFactorAuthentication' => false,
-            'sessions' => [],
-        ]);
-    })->name('user.profile.show');
+    Route::get('/user/profile', [UserProfileController::class, 'show'])->name('user.profile.show');
 
+    // Add other user-only routes here...
 
     Route::middleware('check_promoter')->group(function () {
         Route::get('/promoter', [PromoterController::class, 'index'])->name('promoter.index');
@@ -53,21 +56,12 @@ Route::middleware([
         Route::get('/promoter/create', [PromoterController::class, 'create'])->name('promoter.create');
         Route::post('/promoter', [PromoterController::class, 'store'])->name('promoter.store');
     });
-
-    // Add other user-only routes here...
 });
 
 Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
-
-    Route::get('/profile', function () {
-        return Inertia::render('Admin/Profile/Show', [
-            'confirmsTwoFactorAuthentication' => false,
-            'sessions' => [],
-        ]);
-    })->name('profile.show');
+    Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile.show');
+    Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
 
     // --- Admin Concert Management Routes ---
     Route::get('/concert', [AdminConcertController::class, 'index'])->name('concert.index');
@@ -82,16 +76,13 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/promoter/{promoter}', [AdminPromoterController::class, 'detail'])->name('promoter.detail');
     Route::put('/promoter/{promoter}', [AdminPromoterController::class, 'updateVerificationStatus'])->name('promoter.updateVerificationStatus');
 
-    // --- Admin User Management Routes ---
-    Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
-
     // --- Admin Highlight Management Routes ---
     Route::get('/highlight', [AdminHighlightController::class, 'index'])->name('highlight.index');
     Route::get('/highlight/create', [AdminHighlightController::class, 'create'])->name('highlight.create');
     Route::post('/highlight', [AdminHighlightController::class, 'store'])->name('highlight.store');
-    Route::get('/highlight/{highlight}', [AdminHighlightController::class, 'detail'])->name('highlight.detail');
     Route::get('/highlight/edit/{highlight}', [AdminHighlightController::class, 'edit'])->name('highlight.edit');
     Route::post('/highlight/{highlight}', [AdminHighlightController::class, 'update'])->name('highlight.update');
+    Route::patch('highlight/{highlight}/toggle-active', [AdminHighlightController::class, 'updateActiveStatus'])->name('highlight.updateActiveStatus');
 
     // Add other admin-only routes here...
 });

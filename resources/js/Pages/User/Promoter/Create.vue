@@ -1,5 +1,5 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue";
+import UserLayout from "@/Layouts/UserLayout.vue";
 import { useForm } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -30,7 +30,7 @@ const submit = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Promoter Account">
+    <UserLayout title="Create Promoter Account">
         <div class="py-12">
             <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
@@ -118,5 +118,5 @@ const submit = () => {
                 </div>
             </div>
         </div>
-    </AppLayout>
+    </UserLayout>
 </template>

@@ -1,5 +1,5 @@
 <script setup>
-import ConcertDetail from "@/Components/ConcertDetail.vue";
+import ConcertDetail from "@/Components/Concerts/ConcertDetail.vue";
 import PromoterLayout from "@/Layouts/PromoterLayout.vue";
 
 defineProps({
