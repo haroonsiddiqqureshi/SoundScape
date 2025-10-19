@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted , inject} from "vue";
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
@@ -9,6 +9,8 @@ const props = defineProps({
     highlights: Object,
 });
 
+const isDarkMode = inject("isDarkMode");
+
 const getPictureUrl = (highlight) => {
     if (highlight?.picture_url) {
         if (highlight.picture_url.startsWith("http")) {
@@ -16,7 +18,9 @@ const getPictureUrl = (highlight) => {
         }
         return `/storage/${highlight.picture_url}`;
     }
-    return "https://placehold.co/600x400?text=SoundScape";
+    return isDarkMode.value
+        ? "https://placehold.co/600x400/1a1a2e/ffffff?text=SoundScape"
+        : "https://placehold.co/600x400/ffffff/000000?text=SoundScape";
 };
 
 const currentIndex = ref(0);

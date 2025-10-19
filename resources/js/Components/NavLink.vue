@@ -10,7 +10,7 @@ const props = defineProps({
 const classes = computed(() => {
     return props.active
         ? 'inline-flex items-center px-1 border-b-2 border-primary leading-5 text-primary transition duration-150 ease-in-out'
-        : 'inline-flex items-center px-1 border-b-2 border-transparent leading-5 text-text-high transition duration-150 ease-in-out';
+        : 'inline-flex items-center px-1 border-b-2 border-transparent leading-5 transition duration-150 ease-in-out';
 });
 </script>
 

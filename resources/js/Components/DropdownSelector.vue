@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import {
     ChevronDownIcon,
-    CheckIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/vue/24/solid";
 

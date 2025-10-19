@@ -10,10 +10,8 @@ import {
     CalendarIcon,
     BanknotesIcon,
     MapIcon,
-    MapPinIcon as MapPinIconOutline,
     PlusIcon,
 } from "@heroicons/vue/24/outline";
-import { MapPinIcon as MapPinIconSolid } from "@heroicons/vue/24/solid";
 import DropdownSelector from "@/Components/DropdownSelector.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import TimePicker from "@/Components/TimePicker.vue";

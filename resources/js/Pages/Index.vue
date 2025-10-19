@@ -1,8 +1,6 @@
 <script setup>
 import { usePage, Link } from "@inertiajs/vue3";
-import { computed } from "vue";
-import UserLayout from "@/Layouts/UserLayout.vue";
-import GuestLayout from "@/Layouts/GuestLayout.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 import HighlightBanner from "@/Components/Highlights/HighlightBanner.vue";
 import ConcertCard from "@/Components/Concerts/ConcertCard.vue";
 
@@ -14,25 +12,19 @@ defineProps({
     provinces: Object,
 });
 
-const layout = computed(() => {
-    return page.props.auth.user ? UserLayout : GuestLayout;
-});
 </script>
 
 <template>
-    <component
-        :is="layout"
+    <AppLayout
         title="Home"
         :can-login="$page.props.canLogin"
         :can-register="$page.props.canRegister"
     >
         <div class="py-12 mx-4 sm:mx-0 bg-background">
-            <!-- Highlights Section -->
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <HighlightBanner :highlights="page.props.highlights" />
             </div>
 
-            <!-- Concerts Section -->
             <div class="mt-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <h2 class="text-2xl font-semibold text-text mb-4">
                     All Concerts
@@ -67,5 +59,5 @@ const layout = computed(() => {
                 </div>
             </div>
         </div>
-    </component>
+    </AppLayout>
 </template>

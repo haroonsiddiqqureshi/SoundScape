@@ -44,6 +44,18 @@ const formattedDate = computed(() => {
     return "N/A";
 });
 
+const formattedPrice = computed(() => {
+    if (props.concert && props.concert.price_min != null) {
+        return new Intl.NumberFormat("th-TH", {
+            style: "currency",
+            currency: "THB",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(props.concert.price_min);
+    }
+    return "ฟรี";
+});
+
 const followConcert = (follow) => {
     router.post(
         route("concert.follow", props.concert.id),
@@ -56,13 +68,13 @@ const followConcert = (follow) => {
 </script>
 
 <template>
-    <div class="bg-card rounded-md">
+    <div class="bg-card rounded-md p-2 space-y-2 shadow-md">
         <img
             :src="pictureUrl"
             alt="Concert Picture"
             class="aspect-[2/3] rounded-md"
         />
-        <div class="flex flex-col p-4 space-y-2">
+        <div class="flex flex-col">
             <div class="flex justify-between relative">
                 <span class="font-semibold text-text-medium">{{
                     formattedDate
@@ -90,7 +102,7 @@ const followConcert = (follow) => {
             <span class="font-bold">{{ props.concert.name }}</span>
             <div class="flex justify-between text-sm text-text-medium">
                 <span> {{ provinceName }} </span>
-                <span> {{ props.concert.price_min }} </span>
+                <span> {{ formattedPrice }} </span>
             </div>
         </div>
     </div>

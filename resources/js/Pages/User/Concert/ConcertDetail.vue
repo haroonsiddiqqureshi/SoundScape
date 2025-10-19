@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
-import UserLayout from "@/Layouts/UserLayout.vue";
+import appLayout from "@/Layouts/appLayout.vue";
 
 const page = usePage();
 
@@ -11,7 +11,7 @@ const props = defineProps({
 });
 
 const layout = computed(() => {
-    return page.props.auth.user ? UserLayout : GuestLayout;
+    return page.props.auth.user ? appLayout : GuestLayout;
 });
 
 const pictureUrl = computed(() => {
