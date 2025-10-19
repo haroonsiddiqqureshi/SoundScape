@@ -88,11 +88,11 @@ const photoPreview = ref(initialImageUrl.value);
                     <InputError :message="form.errors.venue_name" class="mt-2" />
                 </div>
 
-                <!-- City -->
+                <!-- Province -->
                 <div>
-                    <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                    <input type="text" id="city" v-model="form.city" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                    <InputError :message="form.errors.city" class="mt-2" />
+                    <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                    <input type="text" id="province" v-model="form.province" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    <InputError :message="form.errors.province" class="mt-2" />
                 </div>
 
                 <!-- Latitude -->

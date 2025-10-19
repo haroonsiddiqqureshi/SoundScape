@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Highlight;
 use App\Models\Concert;
+use Carbon\Carbon;
 
 class HighlightController extends Controller
 {
@@ -55,27 +56,33 @@ class HighlightController extends Controller
     {
         $validated = $request->validate($this->validationRules(true));
 
-        if (isset($validated['picture_url'])) {
-            $highlight->picture_url = $validated['picture_url']->store('highlights', 'public');
+        if ($request->hasFile('picture_url')) {
+            $newPath = $request->file('picture_url')->store('highlights', 'public');
+            $validated['picture_url'] = $newPath;
+        } else {
+            unset($validated['picture_url']);
         }
 
-        $highlight->title = $validated['title'] ?? $highlight->title;
-        $highlight->description = $validated['description'] ?? $highlight->description;
-        $highlight->link = $validated['link'] ?? $highlight->link;
-        $highlight->concert_id = $validated['concert_id'] ?? $highlight->concert_id;
-        $highlight->is_active = $validated['is_active'] ?? $highlight->is_active;
+        $highlight->update($validated);
 
-        $highlight->save();
-
-        return redirect()->route('admin.highlight.index')->with('success', 'Highlight updated successfully.');
+        return redirect()->route('admin.highlight.index', $highlight)->with('success', 'Highlight updated successfully.');
     }
 
-    public function updateActiveStatus(Highlight $highlight)
+    public function updateActiveStatus(Request $request, $id)
     {
-        $highlight->is_active = !$highlight->is_active;
-        $highlight->save();
+        $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
 
-        return back()->with('success', 'Highlight status updated.');
+        $highlight = Highlight::findOrFail($id);
+        $highlight->is_active = $request->input('is_active');
+        $highlight->save();
+    }
+
+    public function destroy(Highlight $highlight)
+    {
+        $highlight->delete();
+        return redirect()->route('admin.highlight.index')->with('success', 'Highlight deleted successfully.');
     }
 
     private function validationRules($isUpdate = false)
@@ -84,6 +91,7 @@ class HighlightController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'concert_id' => 'nullable|exists:concerts,id',
+            'link' => 'nullable|url|max:255',
         ];
 
         if ($isUpdate) {

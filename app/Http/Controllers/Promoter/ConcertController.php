@@ -36,7 +36,7 @@ class ConcertController extends Controller
             'genre' => $validated['genre'] ?? null,
             'status' => $validated['status'],
             'venue_name' => $validated['venue_name'],
-            'city' => $validated['city'],
+            'province_id' => $validated['province_id'],
             'price' => $validated['price'] ?? null,
             'start_datetime' => $validated['start_datetime'],
             'end_datetime' => $validated['end_datetime'] ?? null,
@@ -136,18 +136,28 @@ class ConcertController extends Controller
     private function validationRules($isUpdate = false)
     {
         $rules = [
+            // Core Information
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'artists' => 'nullable|array',
+            'status' => 'required|in:upcoming,onsale,soldout,cancelled,ongoing,ended',
+            'event_type' => 'nullable|string|max:255',
             'genre' => 'nullable|string|max:255',
-            'status' => 'required|in:upcoming,completed,cancelled',
+
+            // Location
             'venue_name' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'price' => 'nullable|numeric|min:0',
-            'start_datetime' => 'required|date',
-            'end_datetime' => 'nullable|date',
+            'province_id' => 'required|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+            
+            // Prices
+            'price_min' => 'nullable|numeric|min:0',
+            'price_max' => 'nullable|numeric|min:0',
+            
+            // Dates and Times
+            'start_show' => 'required|date',
+            'end_show' => 'nullable|date',
+
+            // Additional Information
             'ticket_link' => 'nullable|url',
         ];
 

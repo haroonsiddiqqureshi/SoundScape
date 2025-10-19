@@ -15,6 +15,7 @@ const form = useForm({
     link: props.highlight.link,
     concert_id: props.highlight.concert_id,
     is_active: props.highlight.is_active,
+    picture_url: null, // Will be a file if changed
     _method: 'POST', // Inertia uses POST for updates with file uploads
 });
 

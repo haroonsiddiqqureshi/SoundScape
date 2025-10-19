@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import ApplicationMark from "@/Components/ApplicationMark.vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Banner from "@/Components/Banner.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
@@ -25,19 +25,15 @@ const logout = () => {
 
         <Banner />
 
-        <div
-            class="min-h-screen bg-background dark:bg-background text-text dark:text-text"
-        >
-            <nav
-                class="bg-card dark:bg-card text-text dark:text-text border-b border-gray-100"
-            >
+        <div class="min-h-screen bg-background text-text">
+            <nav class="bg-card text-text border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
                             <Link :href="route('index')">
-                                <ApplicationMark class="block h-9 w-auto" />
+                                <ApplicationLogo class="block h-9 w-auto" />
                             </Link>
                         </div>
 

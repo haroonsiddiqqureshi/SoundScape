@@ -4,9 +4,23 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import HighlightTable from "@/Components/Highlights/HighlightTable.vue";
 import { ref } from "vue";
 
-const props = defineProps({
+defineProps({
     highlights: Object,
+    is_actove: Boolean,
 });
+
+const updateActiveStatus = (highlight) => {
+    router.put(
+        route("admin.highlight.updateActiveStatus", highlight.id),
+        {
+            is_active: !highlight.is_active,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        }
+    );
+};
 
 const showModal = ref(false);
 const modalImageUrl = ref("");
@@ -35,6 +49,7 @@ const closeModal = () => {
             </div>
             <HighlightTable
                 :highlights="highlights"
+                @update-active-status="updateActiveStatus"
                 @open-image-modal="openImageModal"
             />
         </div>

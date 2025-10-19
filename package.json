@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",
-        "@heroicons/vue": "^2.2.0"
+        "@heroicons/vue": "^2.2.0",
+        "@vuepic/vue-datepicker": "^11.0.2"
     }
 }

@@ -9,10 +9,10 @@ const props = defineProps({
 
 const classes = computed(() => {
     return props.active
-        ? 'inline-flex items-center px-1 font-bold border-primary leading-5 text-primary focus:outline-none focus:border-primary transition duration-150 ease-in-out'
-        : 'inline-flex items-center px-1 leading-5 text-text hover:text-text hover:border-text-low focus:outline-none focus:text-text focus:border-text-low transition duration-150 ease-in-out';
+        ? 'w-full flex items-center py-2 px-4 block text-xl rounded-md font-black text-white bg-primary'
+        : 'w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-black hover:bg-card transition-all duration-200';
 });
-</script>
+</script> 
 
 <template>
     <Link :href="href" :class="classes">

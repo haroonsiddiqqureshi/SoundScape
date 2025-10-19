@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Concert;
+use App\Models\Artist;
+use App\Models\Province;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,14 +18,19 @@ class ConcertController extends Controller
     public function index()
     {
         $concerts = Concert::all();
+        $provinces = Province::all()->keyBy('id');
         return Inertia::render('Admin/Concert/Index', [
             'concerts' => $concerts,
+            'provinces' => $provinces,
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Admin/Concert/Create');
+        $artists = Artist::all();
+        return Inertia::render('Admin/Concert/Create', [
+            'artists' => $artists,
+        ]);
     }
 
     public function store(Request $request)
@@ -33,18 +40,23 @@ class ConcertController extends Controller
         Concert::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'artists' => $validated['artists'] ?? null,
-            'genre' => $validated['genre'] ?? null,
-            'status' => $validated['status'],
+            'status' => $validated['status'] ?? 'up_coming',
+            'genre' => $validated['genre'],
+            'event_type' => $validated['event_type'],
             'venue_name' => $validated['venue_name'],
-            'city' => $validated['city'],
-            'price' => $validated['price'] ?? null,
-            'start_datetime' => $validated['start_datetime'],
-            'end_datetime' => $validated['end_datetime'] ?? null,
-            'latitude' => $validated['latitude'] ?? null,
-            'longitude' => $validated['longitude'] ?? null,
+            'province_id' => $validated['province_id'],
+            'price_min' => $validated['price_min'],
+            'price_max' => $validated['price_max'],
+            'start_show_date' => $validated['start_show_date'],
+            'start_show_time' => $validated['start_show_time'],
+            'end_show_date' => $validated['end_show_date'],
+            'end_show_time' => $validated['end_show_time'],
+            'start_sale_date' => $validated['start_sale_date'],
+            'end_sale_date' => $validated['end_sale_date'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
             'picture_url' => $validated['picture_url']->store('concerts', 'public'),
-            'ticket_link' => $validated['ticket_link'] ?? null,
+            'ticket_link' => $validated['ticket_link'],
             'admin_id' => Auth::guard('admin')->id(),
         ]);
 
@@ -119,28 +131,48 @@ class ConcertController extends Controller
         return redirect()->route('admin.concert.detail', $concert)->with('success', 'Concert updated successfully.');
     }
 
+    public function destroy(Concert $concert)
+    {
+        $concert->delete();
+        return redirect()->route('admin.concert.index')->with('success', 'Concert deleted successfully.');
+    }
+
     private function validationRules($isUpdate = false)
     {
         $rules = [
+            // Core Information
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'artists' => 'nullable|array',
-            'genre' => 'nullable|string|max:255',
-            'status' => 'required|in:upcoming,completed,cancelled',
-            'venue_name' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'price' => 'nullable|numeric|min:0',
-            'start_datetime' => 'required|date',
-            'end_datetime' => 'nullable|date',
+            'status' => 'nullable|in:up_coming,on_sale,sold_out,cancelled,ongoing,ended',
+            'event_type' => 'nullable|in:music_festival,concert,club,fan_meeting,folk,other',
+            'genre' => 'nullable|in:pop,rock,hiphop,jazz,classical,country,edm,other',
+
+            // Location
+            'venue_name' => 'nullable|string|max:255',
+            'province_id' => 'required',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+
+            // Prices
+            'price_min' => 'nullable|numeric|min:0',
+            'price_max' => 'nullable|numeric|min:0|gte:price_min',
+
+            // Dates and Times
+            'start_show_date' => 'nullable|date|after_or_equal:today',
+            'start_show_time' => 'nullable|date_format:H:i',
+            'end_show_date' => 'nullable|date|after_or_equal:start_show_date',
+            'end_show_time' => 'nullable|date_format:H:i',
+            'start_sale_date' => 'nullable|date|after_or_equal:today',
+            'end_sale_date' => 'nullable|date|after_or_equal:start_sale_date',
+
+            // Additional Information
             'ticket_link' => 'nullable|url',
         ];
 
         if ($isUpdate) {
-            $rules['picture_url'] = 'nullable|image|max:1024';
+            $rules['picture_url'] = 'nullable|image|max:2048';
         } else {
-            $rules['picture_url'] = 'required|image|max:1024';
+            $rules['picture_url'] = 'required|image|max:2048';
         }
 
         return $rules;

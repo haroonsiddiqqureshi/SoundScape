@@ -5,16 +5,31 @@ import CreateConcertForm from "@/Components/Concerts/ConcertCreateForm.vue";
 import ConcertCreateForm from "@/Components/Concerts/ConcertCreateForm.vue";
 
 const form = useForm({
+    // Core Infomation
     name: "",
     description: "",
-    status: "upcoming",
+    status: "",
+    event_type: "",
+    genre: "",
+    picture_url: "",
+
+    // Location
     venue_name: "",
-    city: "",
+    province_id: null,
     latitude: null,
     longitude: null,
-    start_datetime: "",
-    price: null,
-    picture_url: "",
+
+    // Price
+    price_min: null,
+    price_max: null,
+
+    // Date & Time
+    start_show: "",
+    end_show: "",
+    start_sale: "To be announced",
+    end_sale: "",
+
+    // Additional Information
     ticket_link: "",
 });
 

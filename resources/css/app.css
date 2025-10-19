@@ -8,36 +8,78 @@
 
 :root {
     /* Light Mode */
-    --color-primary: #007bff;
-    --color-primary-low: #007bff33; /* 33 = 20% */
-    --color-secondary: #ff1493cc; /* CC = 80% */
-    --color-accent: #ffd700cc; /* CC = 80% */
-    --color-background: #f3f4f6;
+    --color-primary: #008be6; /* 100% */
+    --color-primary-high: #008be6bf; /* 75% */
+    --color-primary-medium: #008be680; /* 50% */
+    --color-primary-low: #008be640; /* 25% */
+
+    --color-secondary: #28a745; /* 100% */
+    --color-secondary-high: #28a745bf; /* 75% */
+    --color-secondary-medium: #28a74580; /* 50% */
+    --color-secondary-low: #28a74540; /* 25% */
+
+    --color-accent: #ff1493; /* 100% */
+    --color-accent-high: #ff1493bf; /* 75% */
+    --color-accent-medium: #ff149380; /* 50% */
+    --color-accent-low: #ff149340; /* 25% */
+
+    --color-background: #e5e7eb; /* 100% */
+    --color-background-high: #e5e7ebbf; /* 75% */
+    --color-background-medium: #e5e7eb80; /* 50% */
+    --color-background-low: #e5e7eb40; /* 25% */
+
     --color-text: #000000;
-    --color-text-low: #000000cc; /* CC = 80% */
-    --color-card: #ffffff;
+    --color-text-high: #000000bf; /* 75% */
+    --color-text-medium: #00000080; /* 50% */
+    --color-text-low: #00000040; /* 25% */
+
+    --color-card: #ffffff; /* 100% */
+    --color-card-high: #ffffffbf; /* 75% */
+    --color-card-medium: #ffffff80; /* 50% */
+    --color-card-low: #ffffff40; /* 25% */
 }
 
 .dark {
     /* Dark Mode */
-    --color-primary: #ff1493cc; /* CC = 80% */
-    --color-primary-low: #ff149333; /* 33 = 20% */
-    --color-secondary: #1069c7;
-    --color-accent: #ffd700cc; /* CC = 80% */
-    --color-background: #1a1a2e;
-    --color-text: #ffffff;
-    --color-text-low: #ffffffcc; /* CC = 80% */
-    --color-card: #1c1423;
+    --color-primary: #ff1493; /* 100% */
+    --color-primary-high: #ff1493bf; /* 75% */
+    --color-primary-medium: #ff149380; /* 50% */
+    --color-primary-low: #ff149340; /* 25% */
+
+    --color-secondary: #008be6; /* 100% */
+    --color-secondary-high: #008be6bf; /* 75% */
+    --color-secondary-medium: #008be680; /* 50% */
+    --color-secondary-low: #008be640; /* 25% */
+
+    --color-accent: #ffd700; /* 100% */
+    --color-accent-high: #ffd700bf; /* 75% */
+    --color-accent-medium: #ffd70080; /* 50% */
+    --color-accent-low: #ffd70040; /* 25% */
+
+    --color-background: #1c1423; /* 100% */
+    --color-background-high: #1c1423bf; /* 75% */
+    --color-background-medium: #1c142380; /* 50% */
+    --color-background-low: #1c142340; /* 25% */
+
+    --color-text: #ffffff; /* 100% */
+    --color-text-high: #ffffffbf; /* 75% */
+    --color-text-medium: #ffffff80; /* 50% */
+    --color-text-low: #ffffff40; /* 25% */
+
+    --color-card: #1a1a2e; /* 100% */
+    --color-card-high: #1a1a2ebf; /* 75% */
+    --color-card-medium: #1a1a2e80; /* 50% */
+    --color-card-low: #1a1a2e40; /* 25% */
 }
 
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
+input[type="number"] {
+    -moz-appearance: textfield;
 }

@@ -1,16 +1,25 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watchEffect, provide } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import ApplicationMark from "@/Components/ApplicationMark.vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Banner from "@/Components/Banner.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/DashboardNavLink.vue";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import DashboardCurrent from "@/Components/DashboardCurrent.vue";
+import {
+    SunIcon as SolidSunIcon,
+    MoonIcon as SolidMoonIcon,
+    Bars3Icon,
+} from "@heroicons/vue/24/solid";
+import {
+    SunIcon as OutlineSunIcon,
+    MoonIcon as OutlineMoonIcon,
+} from "@heroicons/vue/24/outline";
 
 defineProps({
     title: String,
 });
+
+const darkMode = ref(false);
 
 const showingNavigationDropdown = ref(false);
 
@@ -21,25 +30,54 @@ const toggleSidebar = () => {
 };
 
 const handleResize = () => {
-    if (window.innerWidth >= 640) {
+    if (window.innerWidth >= 768) {
         sidebarOpen.value = true;
     } else {
         sidebarOpen.value = false;
     }
 };
 
+const logout = () => {
+    router.post(route("logout"));
+};
+
+provide("isDarkMode", darkMode);
+
+const toggleDarkMode = () => {
+    darkMode.value = !darkMode.value;
+    if (darkMode.value) {
+        localStorage.theme = "dark";
+    } else {
+        localStorage.theme = "light";
+    }
+};
+
 onMounted(() => {
     handleResize();
     window.addEventListener("resize", handleResize);
+
+    if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+        darkMode.value = true;
+    } else {
+        darkMode.value = false;
+    }
 });
 
 onUnmounted(() => {
     window.removeEventListener("resize", handleResize);
 });
 
-const logout = () => {
-    router.post(route("logout"));
-};
+watchEffect(() => {
+    if (darkMode.value) {
+        document.documentElement.classList.add("dark");
+    } else {
+        document.documentElement.classList.remove("dark");
+    }
+});
 </script>
 
 <template>
@@ -48,71 +86,91 @@ const logout = () => {
 
         <Banner />
 
-        <div class="flex h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="flex h-screen bg-card">
             <!-- Sidebar -->
             <aside
                 :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                class="fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 text-gray-800 dark:text-white transform transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 flex flex-col"
+                class="fixed inset-y-0 left-0 z-30 w-48 bg-card transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col"
             >
                 <div>
-                    <div
-                        class="p-4 border-b border-gray-200 dark:border-gray-700"
-                    >
+                    <div class="p-4">
                         <Link
                             :href="route('admin.dashboard')"
                             class="flex items-center"
                         >
-                            <ApplicationMark class="block h-9 w-auto" />
-                            <span
-                                class="ml-2 text-xl font-bold text-gray-800 dark:text-white"
+                            <ApplicationLogo class="block h-9 w-auto" />
+                            <span class="ml-2 text-xl font-bold"
                                 >SoundScape</span
                             >
                         </Link>
                     </div>
-                    <nav class="mt-4 flex-1 flex flex-col space-y-2 px-2">
+                    <nav
+                        class="py-4 flex-1 flex flex-col space-y-2 px-2 overflow-hidden"
+                    >
                         <NavLink
                             :href="route('admin.dashboard')"
                             :active="route().current('admin.dashboard')"
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                            Dashboard
+                            <span class="w-full">Dashboard</span>
+                            <DashboardCurrent
+                                :active="route().current('admin.dashboard')"
+                            />
+                        </NavLink>
+                        <NavLink
+                            :href="route('admin.highlight.index')"
+                            :active="route().current('admin.highlight.*')"
+                        >
+                            <span class="w-full">Highlights</span>
+                            <DashboardCurrent
+                                :active="route().current('admin.highlight.*')"
+                            />
                         </NavLink>
                         <NavLink
                             :href="route('admin.concert.index')"
-                            :active="route().current('admin.concert.index')"
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            :active="route().current('admin.concert.*')"
                         >
-                            Concerts
+                            <span class="w-full">Concerts</span>
+                            <DashboardCurrent
+                                :active="route().current('admin.concert.*')"
+                            />
+                        </NavLink>
+                        <NavLink
+                            :href="route('admin.artist.index')"
+                            :active="route().current('admin.artist.*')"
+                        >
+                            <span class="w-full">Artists</span>
+                            <DashboardCurrent
+                                :active="route().current('admin.artist.*')"
+                            />
                         </NavLink>
                         <NavLink
                             :href="route('admin.promoter.index')"
                             :active="route().current('admin.promoter.index')"
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                            Promoters
+                            <span class="w-full">Promoters</span>
+                            <DashboardCurrent
+                                :active="
+                                    route().current('admin.promoter.index')
+                                "
+                            />
                         </NavLink>
                         <NavLink
                             :href="route('admin.user.index')"
-                            :active="route().current('admin.user.index')"
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            :active="route().current('admin.user.*')"
                         >
-                            Users
-                        </NavLink>
-                        <NavLink
-                            :href="route('admin.highlight.index')"
-                            :active="route().current('admin.highlight.index')"
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                            Highlights
+                            <span class="w-full">Users</span>
+                            <DashboardCurrent
+                                :active="route().current('admin.user.*')"
+                            />
                         </NavLink>
                     </nav>
                 </div>
                 <div class="p-2 mt-auto">
                     <form @submit.prevent="logout">
                         <button
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-black hover:bg-card transition-all duration-200"
                         >
-                            Logout
+                            <span>Logout</span>
                         </button>
                     </form>
                 </div>
@@ -121,56 +179,55 @@ const logout = () => {
             <!-- Main content -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 <!-- Top navigation -->
-                <header class="bg-white dark:bg-gray-800 shadow">
+                <header class="bg-card shadow-md shadow-primary">
                     <div
-                        class="py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+                        class="py-4 px-6 lg:px-8 flex justify-between items-center"
                     >
                         <div class="flex items-center">
                             <button
                                 @click.stop="toggleSidebar"
-                                class="text-gray-500 dark:text-gray-400 focus:outline-none focus:text-gray-700 dark:focus:text-gray-300 sm:hidden"
+                                class="text-primary md:hidden"
                             >
-                                <svg
-                                    class="size-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    ></path>
-                                </svg>
+                                <Bars3Icon class="h-6 w-6 stroke-current" />
                             </button>
                         </div>
 
-                        <div class="flex items-center sm:ms-6">
-                            <div class="ms-3 relative">
-                                <span class="inline-flex rounded-md">
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150"
-                                    >
-                                        <img
-                                            v-if="
-                                                $page.props.jetstream
-                                                    .managesProfilePhotos
-                                            "
-                                            class="size-8 rounded-full object-cover"
-                                            :src="
-                                                $page.props.auth.user
-                                                    .profile_photo_url
-                                            "
-                                            :alt="$page.props.auth.user.name"
-                                        />
-                                        <span class="ml-2 sm:inline">{{
-                                            $page.props.auth.user.name
-                                        }}</span>
-                                    </button>
-                                </span>
+                        <div
+                            class="flex items-center sm:ms-6 bg-primary relative"
+                        >
+                            <div
+                                class="absolute -left-3 bg-card p-2 rounded-full"
+                            />
+                            <div
+                                class="absolute -right-3 bg-card p-2 rounded-full"
+                            />
+                            <button
+                                @click="toggleDarkMode"
+                                class="group p-2 text-accent outline-dashed outline-2 outline-card bg-secondary"
+                            >
+                                <div
+                                    v-if="darkMode"
+                                    class="relative h-[20px] w-[20px]"
+                                >
+                                    <OutlineSunIcon
+                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2.5px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                    />
+                                    <SolidSunIcon
+                                        class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                    />
+                                </div>
+
+                                <div v-else class="relative h-[20px] w-[20px]">
+                                    <OutlineMoonIcon
+                                        class="absolute inset-0 h-full w-full stroke-current stroke-[3px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                    />
+                                    <SolidMoonIcon
+                                        class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                    />
+                                </div>
+                            </button>
+                            <div class="px-4 font-semibold text-white">
+                                {{ $page.props.auth.user.name }}
                             </div>
                         </div>
                     </div>
@@ -178,10 +235,12 @@ const logout = () => {
 
                 <!-- Page Content -->
                 <main
-                    class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 dark:bg-gray-900"
+                    class="flex-1 overflow-x-hidden overflow-y-auto bg-card md:bg-background"
                     @click="sidebarOpen = false"
                 >
-                    <div class="mx-auto sm:px-6 lg:px-8 py-6 lg:py-8">
+                    <div
+                        class="md:px-8 md:py-8 transition-all duration-300"
+                    >
                         <slot />
                     </div>
                 </main>
@@ -190,7 +249,7 @@ const logout = () => {
             <div
                 v-if="sidebarOpen"
                 @click="sidebarOpen = false"
-                class="fixed inset-0 bg-black opacity-50 z-20 sm:hidden"
+                class="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
             ></div>
         </div>
     </div>

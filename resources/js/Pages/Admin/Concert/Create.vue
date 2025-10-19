@@ -3,18 +3,40 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm } from "@inertiajs/vue3";
 import ConcertCreateForm from "@/Components/Concerts/ConcertCreateForm.vue";
 
+defineProps({
+    artists: Object,
+});
+
 const form = useForm({
+    // Core Infomation
     name: "",
     description: "",
-    status: "upcoming",
+    status: "",
+    event_type: "",
+    genre: "",
+    picture_url: "",
+
+    // Location
     venue_name: "",
-    city: "",
+    province_id: null,
     latitude: null,
     longitude: null,
-    start_datetime: "",
-    price: null,
-    picture_url: "",
+
+    // Price
+    price_min: null,
+    price_max: null,
+
+    // Date & Time
+    start_show_date: null,
+    start_show_time: null,
+    end_show_date: null,
+    end_show_time: null,
+    start_sale_date: null,
+    end_sale_date: null,
+
+    // Additional Information
     ticket_link: "",
+    artist_ids: [],
 });
 
 const submit = () => {
@@ -24,6 +46,6 @@ const submit = () => {
 
 <template>
     <AdminLayout title="Create Concert">
-        <ConcertCreateForm :form="form" @submit="submit" />
+        <ConcertCreateForm :form="form" :artists="artists" @submit="submit" />
     </AdminLayout>
 </template>

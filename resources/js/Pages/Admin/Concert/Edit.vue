@@ -13,7 +13,7 @@ const form = useForm({
     description: props.concert.description,
     status: props.concert.status,
     venue_name: props.concert.venue_name,
-    city: props.concert.city,
+    province: props.concert.province,
     latitude: props.concert.latitude,
     longitude: props.concert.longitude,
     start_datetime: props.concert.start_datetime

@@ -12,20 +12,25 @@ class Concert extends Model
     protected $fillable = [
         'name',
         'description',
-        'artists',
         'genre',
         'status',
+        'event_type',
         'venue_name',
-        'city',
-        'price',
-        'start_datetime',
-        'end_datetime',
+        'province_id',
+        'price_min',
+        'price_max',
+        'start_show_date',
+        'start_show_time',
+        'end_show_date',
+        'end_show_time',
+        'start_sale_date',
+        'end_sale_date',
         'latitude',
         'longitude',
         'picture_url',
-        'ticket_link',
         'view_count',
         'like_count',
+        'ticket_link',
         'admin_id',
         'promoter_id',
     ];
@@ -35,10 +40,12 @@ class Concert extends Model
         'promoter_id' => 'integer',
         'latitude' => 'float',
         'longitude' => 'float',
-        'start_datetime' => 'datetime',
-        'end_datetime' => 'datetime',
-        'price' => 'decimal:2',
-        'artists' => 'array',
+        'start_show_date' => 'date',
+        'end_show_date' => 'date',
+        'start_sale_date' => 'date',
+        'end_sale_date' => 'date',
+        'price_min' => 'integer',
+        'price_max' => 'integer',
         'view_count' => 'integer',
         'like_count' => 'integer',
     ];
@@ -51,6 +58,11 @@ class Concert extends Model
     public function promoter()
     {
         return $this->belongsTo(Promoter::class);
+    }
+
+    public function artists()
+    {
+        return $this->belongsToMany(Artist::class, 'artist_concerts');
     }
 
     public function follows()

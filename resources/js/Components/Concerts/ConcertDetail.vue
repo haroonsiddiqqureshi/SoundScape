@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, computed } from "vue";
 import { Link } from "@inertiajs/vue3";
-import { PencilIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     concert: Object,
@@ -9,10 +9,10 @@ const props = defineProps({
 });
 
 const editHref = computed(() => {
-    if (props.role === 'admin') {
-        return route('admin.concert.edit', { concert: props.concert.id });
+    if (props.role === "admin") {
+        return route("admin.concert.edit", { concert: props.concert.id });
     }
-    return route('promoter.concert.edit', { concert: props.concert.id });
+    return route("promoter.concert.edit", { concert: props.concert.id });
 });
 
 const imageUrl = computed(() => {
@@ -61,7 +61,7 @@ const googleMapsLink = computed(() => {
         return `https://www.google.com/maps/search/?api=1&query=${props.concert.latitude},${props.concert.longitude}`;
     }
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        props.concert.venue_name + ", " + props.concert.city
+        props.concert.venue_name + ", " + props.concert.province_id
     )}`;
 });
 
@@ -111,14 +111,29 @@ const statusClass = computed(() => {
                                 {{ concert.name }}
                             </h1>
                         </div>
-                        <Link
-                            v-if="concert.id"
-                            :href="editHref"
-                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700"
-                        >
-                            <PencilIcon class="h-4 w-4 mr-2" />
-                            Edit
-                        </Link>
+                        <div class="flex space-x-2">
+                            <Link
+                                v-if="concert.id"
+                                :href="editHref"
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700"
+                            >
+                                <PencilIcon class="h-4 w-4 mr-2" />
+                                Edit
+                            </Link>
+                            <Link
+                                v-if="concert.id && role === 'admin'"
+                                :href="
+                                    route('admin.concert.delete', {
+                                        concert: concert.id,
+                                    })
+                                "
+                                method="delete"
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700"
+                            >
+                                <TrashIcon class="h-4 w-4 mr-2" />
+                                Delete
+                            </Link>
+                        </div>
                     </div>
 
                     <div class="space-y-5 text-gray-700">
@@ -176,7 +191,7 @@ const statusClass = computed(() => {
                             </svg>
                             <div class="flex justify-between w-full">
                                 <p>
-                                    {{ concert.venue_name }}, {{ concert.city }}
+                                    {{ concert.venue_name }}, {{ concert.province_id }}
                                 </p>
                                 <a
                                     :href="googleMapsLink"

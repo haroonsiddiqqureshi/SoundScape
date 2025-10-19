@@ -5,11 +5,11 @@ use Illuminate\Support\Facades\Route;
 
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ConcertController as AdminConcertController;
 use App\Http\Controllers\Admin\PromoterController as AdminPromoterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\HighlightController as AdminHighlightController;
+use App\Http\Controllers\Admin\ArtistController as AdminArtistController;
 
 // --- Promoter Controllers ---
 use App\Http\Controllers\Promoter\PromoterController;
@@ -23,6 +23,7 @@ Route::middleware([
     'block_admin'
 ])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('index');
+    Route::get('/concert/{concert}', [HomeController::class, 'concertDetail'])->name('concert.detail');
 
     // Add other routes accessible to both users and guests here...
 });
@@ -34,6 +35,7 @@ Route::middleware([
     'role:web'
 ])->group(function () {
     Route::get('/user/profile', [UserProfileController::class, 'show'])->name('user.profile.show');
+    Route::post('/concert/{concert}', [HomeController::class, 'followConcert'])->name('concert.follow');
 
     // Add other user-only routes here...
 
@@ -60,9 +62,7 @@ Route::middleware([
 
 Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
-    Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile.show');
-    Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
-
+    
     // --- Admin Concert Management Routes ---
     Route::get('/concert', [AdminConcertController::class, 'index'])->name('concert.index');
     Route::get('/concert/create', [AdminConcertController::class, 'create'])->name('concert.create');
@@ -70,6 +70,10 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/concert/{concert}', [AdminConcertController::class, 'detail'])->name('concert.detail');
     Route::get('/concert/edit/{concert}', [AdminConcertController::class, 'edit'])->name('concert.edit');
     Route::post('/concert/{concert}', [AdminConcertController::class, 'update'])->name('concert.update');
+    Route::delete('/concert/{concert}', [AdminConcertController::class, 'destroy'])->name('concert.delete');
+    
+    // --- Admin User Management Routes ---
+    Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
 
     // --- Admin Promoter Management Routes ---
     Route::get('/promoter', [AdminPromoterController::class, 'index'])->name('promoter.index');
@@ -82,7 +86,11 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::post('/highlight', [AdminHighlightController::class, 'store'])->name('highlight.store');
     Route::get('/highlight/edit/{highlight}', [AdminHighlightController::class, 'edit'])->name('highlight.edit');
     Route::post('/highlight/{highlight}', [AdminHighlightController::class, 'update'])->name('highlight.update');
-    Route::patch('highlight/{highlight}/toggle-active', [AdminHighlightController::class, 'updateActiveStatus'])->name('highlight.updateActiveStatus');
+    Route::put('highlight/{highlight}', [AdminHighlightController::class, 'updateActiveStatus'])->name('highlight.updateActiveStatus');
+    Route::delete('/highlight/{highlight}', [AdminHighlightController::class, 'destroy'])->name('highlight.delete');
 
+    // --- Admin Artist Management Routes ---
+    Route::get('/artist', [AdminArtistController::class, 'index'])->name('artist.index');
+    
     // Add other admin-only routes here...
 });
