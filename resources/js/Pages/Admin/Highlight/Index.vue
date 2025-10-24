@@ -57,7 +57,7 @@ const closeModal = () => {
         <!-- Modal -->
         <div
             v-if="showModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-text-reverse bg-opacity-50"
             @click="closeModal"
         >
             <div class="p-2 bg-white rounded-lg" @click.stop>

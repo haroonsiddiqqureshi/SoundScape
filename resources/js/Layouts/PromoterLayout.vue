@@ -25,7 +25,7 @@ const logout = () => {
 
         <Banner />
 
-        <div class="min-h-screen bg-background text-text">
+        <div class="bg-background text-text">
             <nav class="bg-card text-text border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,7 +33,7 @@ const logout = () => {
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
                             <Link :href="route('promoter.index')">
-                                <ApplicationLogo class="block h-9 w-auto" />
+                                <ApplicationLogo class="block h-9 w-auto text-primary" />
                             </Link>
                         </div>
 

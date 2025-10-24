@@ -37,10 +37,9 @@ class ConcertController extends Controller
     {
         $validated = $request->validate($this->validationRules());
 
-        Concert::create([
+        $concert = Concert::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'status' => $validated['status'] ?? 'up_coming',
             'genre' => $validated['genre'],
             'event_type' => $validated['event_type'],
             'venue_name' => $validated['venue_name'],
@@ -60,13 +59,20 @@ class ConcertController extends Controller
             'admin_id' => Auth::guard('admin')->id(),
         ]);
 
+        if (isset($validated['artist_ids'])) {
+            $concert->artists()->attach($validated['artist_ids']);
+        }
+
         return redirect()->route('admin.concert.index')->with('success', 'Concert created successfully.');
     }
 
     public function detail(Concert $concert)
     {
+        $concert->load('artists');
+        $provinces = Province::all()->keyBy('id');
         return Inertia::render('Admin/Concert/Detail', [
             'concert' => $concert,
+            'provinces' => $provinces,
         ]);
     }
 
@@ -128,6 +134,10 @@ class ConcertController extends Controller
 
         $concert->update($validated);
 
+        if ($request->has('artist_ids')) {
+            $concert->artists()->sync($validated['artist_ids'] ?? []);
+        }
+
         return redirect()->route('admin.concert.detail', $concert)->with('success', 'Concert updated successfully.');
     }
 
@@ -143,13 +153,12 @@ class ConcertController extends Controller
             // Core Information
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'status' => 'nullable|in:up_coming,on_sale,sold_out,cancelled,ongoing,ended',
             'event_type' => 'nullable|in:music_festival,concert,club,fan_meeting,folk,other',
             'genre' => 'nullable|in:pop,rock,hiphop,jazz,classical,country,edm,other',
 
             // Location
             'venue_name' => 'nullable|string|max:255',
-            'province_id' => 'required',
+            'province_id' => 'nullable|exists:provinces,id',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
 
@@ -158,15 +167,18 @@ class ConcertController extends Controller
             'price_max' => 'nullable|numeric|min:0|gte:price_min',
 
             // Dates and Times
+            'start_sale_date' => 'nullable|date',
+            'end_sale_date' => 'nullable|date|after_or_equal:start_sale_date',
             'start_show_date' => 'nullable|date|after_or_equal:today',
             'start_show_time' => 'nullable|date_format:H:i',
             'end_show_date' => 'nullable|date|after_or_equal:start_show_date',
             'end_show_time' => 'nullable|date_format:H:i',
-            'start_sale_date' => 'nullable|date|after_or_equal:today',
-            'end_sale_date' => 'nullable|date|after_or_equal:start_sale_date',
 
             // Additional Information
             'ticket_link' => 'nullable|url',
+
+            'artist_ids' => 'nullable|array',
+            'artist_ids.*' => 'exists:artists,id',
         ];
 
         if ($isUpdate) {

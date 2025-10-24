@@ -1,12 +1,33 @@
 <script setup>
-import { defineProps, computed } from "vue";
+import { defineProps, computed, inject, ref } from "vue";
 import { Link } from "@inertiajs/vue3";
 import { PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
+import {
+    HeartIcon,
+    LinkIcon,
+    // TicketIcon,
+    // ClockIcon,
+    // CalendarIcon,
+    // BanknotesIcon,
+    // MapPinIcon,
+    ArrowTopRightOnSquareIcon,
+} from "@heroicons/vue/24/outline";
+import {
+    TicketIcon,
+    CalendarIcon,
+    ClockIcon,
+    BanknotesIcon,
+    MapPinIcon,
+} from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     concert: Object,
+    provinces: Object,
     role: String,
 });
+
+const isDarkMode = inject("isDarkMode", ref(false));
+const copied = ref(false);
 
 const editHref = computed(() => {
     if (props.role === "admin") {
@@ -15,219 +36,481 @@ const editHref = computed(() => {
     return route("promoter.concert.edit", { concert: props.concert.id });
 });
 
-const imageUrl = computed(() => {
+const copyUrlToClipboard = () => {
+    const url = window.location.href;
+    navigator.clipboard
+        .writeText(url)
+        .then(() => {
+            copied.value = true;
+            // Reset the 'copied' state after 2 seconds
+            setTimeout(() => {
+                copied.value = false;
+            }, 2000);
+        })
+        .catch((err) => {
+            console.error("Failed to copy URL: ", err);
+        });
+};
+
+// Computed property for the delete route name
+const deleteRouteName = computed(() => {
+    if (props.role === "admin") {
+        return "admin.concert.delete";
+    }
+    return "promoter.concert.delete";
+});
+
+// Data for mapping values to display names (from ConcertCreateForm)
+const eventTypes = [
+    { value: "music_festival", name: "เทศกาลดนตรี" },
+    { value: "concert", name: "คอนเสิร์ต" },
+    { value: "club", name: "คลับ / ผับ" },
+    { value: "fan_meeting", name: "แฟนมีตติ้ง" },
+    { value: "folk", name: "เพลงพื้นบ้าน / หมอลำ" },
+    { value: "other", name: "อื่นๆ" },
+];
+
+const genres = [
+    { value: "pop", name: "ป๊อป" },
+    { value: "rock", name: "ร็อก" },
+    { value: "hiphop", name: "ฮิปฮอป" },
+    { value: "jazz", name: "แจ๊ส" },
+    { value: "classical", name: "คลาสสิก" },
+    { value: "country", name: "ลูกทุ่ง / คันทรี่" },
+    { value: "edm", name: "อีดีเอ็ม (EDM)" },
+    { value: "other", name: "อื่นๆ" },
+];
+
+// Computed property for the event poster image
+const photoPreview = computed(() => {
     if (props.concert.picture_url) {
         if (props.concert.picture_url.startsWith("http")) {
             return props.concert.picture_url;
         }
+        // Assuming picture_url is a path from storage
         return `/storage/${props.concert.picture_url}`;
     }
-    return "https://via.placeholder.com/800x1200?text=No+Poster";
+    // Fallback placeholder
+    return isDarkMode.value
+        ? "https://placehold.co/800x1200/1c1423/ffffff80?text=No%5CnPicture"
+        : "https://placehold.co/800x1200/e5e7eb/00000080?text=No%5CnPicture";
 });
 
-const showDate = computed(() => {
-    if (!props.concert.start_datetime) return "TBA";
-    const date = new Date(props.concert.start_datetime);
-    return date.toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
+// Computed properties for display-friendly event type and genre
+const displayEventType = computed(() => {
+    const eventType = eventTypes.find(
+        (e) => e.value === props.concert.event_type
+    );
+    return eventType
+        ? eventType.name
+        : props.concert.event_type || "ไม่ระบุประเภท";
 });
 
-const showTime = computed(() => {
-    if (!props.concert.start_datetime) return "";
-    const date = new Date(props.concert.start_datetime);
-    return date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-    });
+const displayGenre = computed(() => {
+    const genre = genres.find((g) => g.value === props.concert.genre);
+    return genre ? genre.name : props.concert.genre || "ไม่ระบุแนวเพลง";
 });
 
-const ticketPrice = computed(() => {
-    if (props.concert.price) {
-        return `${new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "THB",
-        }).format(props.concert.price)}`;
+const formattedDate = (dateString) => {
+    if (!dateString) return null;
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "Invalid Date";
+        return date.toLocaleDateString("th-TH", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    } catch (e) {
+        return dateString; // Fallback
     }
-    return "Free";
+};
+
+const formattedTime = (timeString) => {
+    if (!timeString) return null;
+    const parts = timeString.split(":");
+    if (parts.length < 2) return timeString;
+    return `${parts[0]}:${parts[1]}`;
+};
+
+const formattedPrice = (price) => {
+    if (price == 0) return null;
+    return new Intl.NumberFormat("th-TH", {
+        maximumFractionDigits: 0,
+    }).format(price);
+};
+
+// Computed properties for all dates and times
+const startSaleDate = computed(() =>
+    formattedDate(props.concert.start_sale_date)
+);
+const endSaleDate = computed(() => formattedDate(props.concert.end_sale_date));
+const startShowDate = computed(() =>
+    formattedDate(props.concert.start_show_date)
+);
+const endShowDate = computed(() => formattedDate(props.concert.end_show_date));
+const startShowTime = computed(() =>
+    formattedTime(props.concert.start_show_time)
+);
+const endShowTime = computed(() => formattedTime(props.concert.end_show_time));
+const priceMin = computed(() => formattedPrice(props.concert.price_min));
+const priceMax = computed(() => formattedPrice(props.concert.price_max));
+
+// Computed property for artist avatar placeholders
+const artistPicturePlaceholder = computed(() => {
+    return (artist) => {
+        return isDarkMode.value
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  artist.name
+              )}&background=ff1493&color=ffffff`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  artist.name
+              )}&background=008be6&color=ffffff`;
+    };
 });
 
+const provinceName = computed(() => {
+    if (props.provinces && props.concert && props.concert.province_id) {
+        const province = props.provinces[props.concert.province_id];
+
+        return province ? province.name_th : "Unknown Province";
+    }
+    return "Loading...";
+});
+
+// Google Maps link
 const googleMapsLink = computed(() => {
     if (props.concert.latitude && props.concert.longitude) {
         return `https://www.google.com/maps/search/?api=1&query=${props.concert.latitude},${props.concert.longitude}`;
     }
+    const query = `${props.concert.venue_name}, ${
+        props.concert.province?.name || props.concert.province_id
+    }`;
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        props.concert.venue_name + ", " + props.concert.province_id
+        query
     )}`;
-});
-
-const statusClass = computed(() => {
-    switch (props.concert.status) {
-        case "upcoming":
-            return "bg-blue-100 text-blue-800";
-        case "completed":
-            return "bg-green-100 text-green-800";
-        case "cancelled":
-            return "bg-red-100 text-red-800";
-        default:
-            return "bg-gray-100 text-gray-800";
-    }
 });
 </script>
 
 <template>
-    <div class="container mx-auto p-4 md:p-8">
-        <div class="bg-white rounded-lg shadow-xl overflow-hidden">
-            <div class="md:flex">
-                <!-- Left Column: Image -->
-                <div class="md:w-1/3">
+    <div
+        class="mx-auto max-w-5xl lg:max-w-fit bg-card shadow-xl rounded-md space-y-2 lg:space-y-6"
+    >
+        <div class="lg:flex px-6 pt-6 space-y-2 lg:space-y-0">
+            <div class="flex-none w-fit lg:mr-4">
+                <div class="lg:h-[444px]">
                     <img
-                        :src="imageUrl"
-                        :alt="`Poster for ${concert.name}`"
-                        class="object-cover h-full w-full"
+                        :src="photoPreview"
+                        class="aspect-[2/3] h-full object-fill rounded-md"
+                        alt="Concert Poster"
                     />
                 </div>
+            </div>
 
-                <!-- Right Column: Details -->
-                <div class="md:w-2/3 p-6 md:p-8">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span
-                                :class="statusClass"
-                                class="text-sm font-semibold mr-2 px-2.5 py-0.5 rounded-full mb-2 inline-block"
-                            >
-                                {{
-                                    concert.status.charAt(0).toUpperCase() +
-                                    concert.status.slice(1)
-                                }}
-                            </span>
-                            <h1
-                                class="text-xl md:text-2xl font-bold text-gray-900 mb-4 break-all"
-                            >
-                                {{ concert.name }}
-                            </h1>
+            <div class="flex flex-col min-w-[300px] justify-between py-2">
+                <div class="flex flex-col">
+                    <div class="flex space-x-2">
+                        <div
+                            class="inline-flex items-center bg-primary rounded-full px-3 h-6 text-sm font-bold text-white"
+                        >
+                            {{ displayEventType }}
                         </div>
-                        <div class="flex space-x-2">
-                            <Link
-                                v-if="concert.id"
-                                :href="editHref"
-                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700"
-                            >
-                                <PencilIcon class="h-4 w-4 mr-2" />
-                                Edit
-                            </Link>
-                            <Link
-                                v-if="concert.id && role === 'admin'"
-                                :href="
-                                    route('admin.concert.delete', {
-                                        concert: concert.id,
-                                    })
-                                "
-                                method="delete"
-                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700"
-                            >
-                                <TrashIcon class="h-4 w-4 mr-2" />
-                                Delete
-                            </Link>
+                        <div
+                            class="inline-flex items-center bg-secondary rounded-full px-3 h-6 text-sm font-bold text-white"
+                        >
+                            {{ displayGenre }}
                         </div>
                     </div>
 
-                    <div class="space-y-5 text-gray-700">
-                        <div class="flex items-center">
-                            <svg
-                                class="w-6 h-6 mr-3 text-gray-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                    <h1
+                        class="custom-scrollbar mt-1 ml-2 font-semibold text-4xl text-text break-all line-clamp-2 py-1"
+                    >
+                        {{ props.concert.name }}
+                    </h1>
+
+                    <div
+                        class="flex items-center space-x-12 mx-auto lg:ml-12 mt-4"
+                    >
+                        <HeartIcon
+                            class="flex-none h-8 w-8 text-primary stroke-[3px]"
+                        />
+                        <div class="relative">
+                            <button
+                                @click="copyUrlToClipboard"
+                                type="button"
+                                class="flex items-center"
+                                aria-label="Copy page URL"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                ></path>
-                            </svg>
-                            <span>{{ showDate }}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg
-                                class="w-6 h-6 mr-3 text-gray-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                                <LinkIcon
+                                    class="flex-none h-8 w-8 text-secondary stroke-[2.5px]"
+                                />
+                            </button>
+                            <transition
+                                enter-active-class="transition-opacity duration-200"
+                                leave-active-class="transition-opacity duration-300"
+                                enter-from-class="opacity-0"
+                                leave-to-class="opacity-0"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                ></path>
-                            </svg>
-                            <span>{{ showTime }}</span>
-                        </div>
-                        <div class="flex items-start">
-                            <svg
-                                class="w-6 h-6 mr-3 text-gray-500 flex-shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                ></path>
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                ></path>
-                            </svg>
-                            <div class="flex justify-between w-full">
-                                <p>
-                                    {{ concert.venue_name }}, {{ concert.province_id }}
-                                </p>
-                                <a
-                                    :href="googleMapsLink"
-                                    target="_blank"
-                                    class="text-blue-600 hover:underline"
+                                <div
+                                    v-if="copied"
+                                    class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-background text-text text-xs rounded-md shadow-xl whitespace-nowrap"
                                 >
-                                    View on Google Maps
-                                </a>
-                            </div>
+                                    คัดลอกลิงก์แล้ว!
+                                </div>
+                            </transition>
                         </div>
-                        <div class="flex items-center">
-                            <svg
-                                class="w-6 h-6 mr-3 text-gray-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                        <a
+                            v-if="props.concert.ticket_link"
+                            :href="props.concert.ticket_link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <ArrowTopRightOnSquareIcon
+                                class="flex-none h-8 w-8 text-accent stroke-[2px]"
+                            />
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col mt-12 space-y-2 pl-2 text-base">
+                    <div class="flex items-center">
+                        <div class="flex items-center space-x-2 mr-2">
+                            <TicketIcon class="flex-none h-8 w-8 text-accent" />
+                            <span
+                                :class="{
+                                    'font-medium text-text-medium':
+                                        !props.concert.price_min,
+                                }"
+                                class="font-semibold text-accent text-center"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-                                ></path>
-                            </svg>
-                            <span>{{ ticketPrice }}</span>
+                                {{
+                                    props.concert.start_sale_date
+                                        ? "วันจำหน่ายบัตร |"
+                                        : "ไม่กำหนดวันจำหน่ายบัตร"
+                                }}
+                            </span>
                         </div>
+                        <div class="flex items-center font-semibold space-x-2">
+                            <span>{{ startSaleDate }}</span>
+                            <span v-if="props.concert.end_sale_date">-</span>
+                            <span v-if="props.concert.end_sale_date">
+                                {{ endSaleDate }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center lg:max-w-xl">
+                        <div class="flex items-center space-x-2 mr-2">
+                            <CalendarIcon
+                                class="flex-none h-8 w-8 text-secondary"
+                            />
+                            <span
+                                :class="{
+                                    'font-medium text-text-medium':
+                                        !props.concert.price_min,
+                                }"
+                                class="font-semibold text-secondary text-center"
+                            >
+                                {{
+                                    props.concert.start_show_date
+                                        ? "วันที่แสดง |"
+                                        : "ไม่กำหนดวันที่แสดง"
+                                }}
+                            </span>
+                        </div>
+                        <div class="flex items-center font-semibold space-x-2">
+                            <span>{{ startShowDate }}</span>
+                            <span v-if="props.concert.end_show_date">-</span>
+                            <span v-if="props.concert.end_show_date">
+                                {{ endShowDate }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center lg:max-w-xl">
+                        <div class="flex items-center space-x-2 mr-2">
+                            <ClockIcon class="flex-none h-8 w-8 text-primary" />
+                            <span
+                                :class="{
+                                    'font-medium text-text-medium':
+                                        !props.concert.price_min,
+                                }"
+                                class="font-semibold text-primary text-center"
+                            >
+                                {{
+                                    props.concert.start_show_time
+                                        ? "เวลาแสดง |"
+                                        : "ไม่กำหนดเวลาแสดง"
+                                }}
+                            </span>
+                        </div>
+                        <div class="flex items-center font-semibold space-x-2">
+                            <span>{{ startShowTime }}</span>
+                            <span v-if="props.concert.end_show_time">-</span>
+                            <span v-if="props.concert.end_show_time">
+                                {{ endShowTime }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center lg:max-w-xl">
+                        <div class="flex items-center space-x-2 mr-2">
+                            <BanknotesIcon
+                                class="flex-none h-8 w-8 text-accent"
+                            />
+                            <span
+                                :class="{
+                                    'font-medium text-text-medium':
+                                        !props.concert.price_min,
+                                }"
+                                class="font-semibold text-accent text-center"
+                            >
+                                {{
+                                    props.concert.price_min != null
+                                        ? "ราคาบัตร |"
+                                        : "ไม่ระบุราคาบัตร"
+                                }}
+                            </span>
+                        </div>
+                        <div class="flex items-center font-semibold space-x-2">
+                            <span v-if="props.concert.price_min">{{
+                                priceMin
+                            }}</span>
+                            <span v-if="props.concert.price_max">-</span>
+                            <span v-if="props.concert.price_max">
+                                {{ priceMax }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center lg:max-w-xl">
+                        <div class="flex items-center space-x-2 mr-2">
+                            <MapPinIcon
+                                class="flex-none h-8 w-8 text-secondary"
+                            />
+                            <span
+                                v-if="props.concert.province_id"
+                                class="font-semibold text-secondary text-center"
+                            >
+                                {{
+                                    props.concert.venue_name ||
+                                    [
+                                        props.concert.latitude,
+                                        props.concert.longitude,
+                                    ].every(Boolean)
+                                        ? provinceName + " |"
+                                        : provinceName
+                                }}
+                            </span>
+                        </div>
+                        <a
+                            :href="googleMapsLink"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="hover:underline"
+                            aria-label="View on map"
+                        >
+                            <span
+                                v-if="props.concert.venue_name"
+                                class="font-semibold text-text"
+                            >
+                                {{ props.concert.venue_name }}
+                                <ArrowTopRightOnSquareIcon
+                                    class="h-4 w-4 inline-block stroke-[2px] mb-2"
+                                />
+                            </span>
+                            <span
+                                v-else-if="
+                                    props.concert.latitude &&
+                                    props.concert.longitude
+                                "
+                                class="font-semibold text-text"
+                            >
+                                View On Google Map
+                                <ArrowTopRightOnSquareIcon
+                                    class="h-4 w-4 inline-block stroke-[2px] mb-2"
+                                />
+                            </span>
+                        </a>
                     </div>
                 </div>
             </div>
-            <!-- Description Section -->
-            <div class="p-6 md:p-8 border-t border-gray-200">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                    About this event
-                </h2>
-                <div class="prose max-w-none text-gray-600">
-                    <p>{{ concert.description }}</p>
+        </div>
+
+        <div class="px-6 pb-6">
+            <div class="flex flex-col">
+                <div class="lg:hidden bg-background w-full h-[1px] mb-2" />
+                <div class="w-full space-y-2">
+                    <div
+                        class="w-full px-2 py-4 bg-background rounded-md space-y-2"
+                    >
+                        <div
+                            v-if="props.concert.artists?.length"
+                            class="flex flex-wrap items-center gap-y-2 gap-x-1 mx-2"
+                        >
+                            <div
+                                v-for="artist in props.concert.artists"
+                                :key="artist.id"
+                                class="flex items-center space-x-2 bg-card py-1 px-2 rounded-full"
+                            >
+                                <img
+                                    :src="
+                                        artist.picture_url ||
+                                        artistPicturePlaceholder(artist)
+                                    "
+                                    :alt="artist.name"
+                                    class="w-5 h-5 rounded-full object-cover"
+                                />
+                                <span
+                                    class="text-sm font-medium uppercase text-text"
+                                    >{{ artist.name }}</span
+                                >
+                            </div>
+                        </div>
+
+                        <div
+                            :class="{
+                                'custom-scrollbar max-h-[32rem]':
+                                    props.role === 'admin' ||
+                                    props.role === 'promoter',
+                            }"
+                            class="text-center w-full min-h-[16rem] overflow-auto p-2 whitespace-pre-wrap"
+                        >
+                            {{
+                                props.concert.description ||
+                                "ไม่มีรายละเอียดงาน"
+                            }}
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="
+                            props.role === 'admin' || props.role === 'promoter'
+                        "
+                        class="flex space-x-2 justify-end"
+                    >
+                        <Link
+                            :href="editHref"
+                            class="flex px-2 items-center space-x-1 bg-[#008be6] hover:bg-[#007acc] text-md text-white font-semibold py-2 rounded-md transition-colors duration-200"
+                        >
+                            <PencilIcon class="w-5 h-5" />
+                            <span>แก้ไข</span>
+                        </Link>
+                        <Link
+                            :href="
+                                route(deleteRouteName, {
+                                    concert: props.concert.id,
+                                })
+                            "
+                            method="delete"
+                            as="button"
+                            preserve-scroll
+                            class="flex px-2 items-center space-x-1 bg-red-600 hover:bg-red-700 text-md text-white font-semibold py-2 rounded-md transition-colors duration-200"
+                        >
+                            <TrashIcon class="w-5 h-5" />
+                            <span>ลบ</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

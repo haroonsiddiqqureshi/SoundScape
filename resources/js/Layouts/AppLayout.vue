@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, provide, ref, watchEffect } from "vue";
+import { onMounted, provide, ref, watchEffect, watch } from "vue";
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Banner from "@/Components/Banner.vue";
@@ -7,6 +7,8 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import SearchResults from "@/Components/SearchResults.vue";
+import axios from "axios";
 import Footer from "@/Components/Footer.vue";
 import {
     Bars3Icon,
@@ -29,6 +31,75 @@ defineProps({
 const page = usePage();
 const showingNavigationDropdown = ref(false);
 const darkMode = ref(false);
+
+function debounce(fn, delay) {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
+}
+
+const search = ref(page.props.filters?.search || "");
+const searchResults = ref([]);
+const isSearchFocused = ref(false);
+const isLoadingSearch = ref(false);
+
+const submitSearch = () => {
+    let queryParams = { ...page.props.filters, search: search.value };
+
+    if (!search.value) {
+        delete queryParams.search;
+    }
+
+    router.get(route("index"), queryParams, {
+        preserveState: true,
+        replace: true,
+    });
+
+    isSearchFocused.value = false;
+};
+
+const fetchSearchResults = async () => {
+    if (search.value.length < 2) {
+        searchResults.value = [];
+        isLoadingSearch.value = false;
+        return;
+    }
+
+    isLoadingSearch.value = true;
+
+    try {
+        const response = await axios.get(route("api.search"), {
+            params: { q: search.value },
+        });
+        searchResults.value = response.data.data;
+    } catch (error) {
+        console.error("Error fetching search results:", error);
+        searchResults.value = [];
+    } finally {
+        isLoadingSearch.value = false;
+    }
+};
+
+watch(
+    () => page.props.filters?.search,
+    (newSearch) => {
+        search.value = newSearch || "";
+    }
+);
+
+watch(search, debounce(fetchSearchResults, 300));
+
+const onSearchFocus = () => {
+    isSearchFocused.value = true;
+};
+
+const onSearchBlur = () => {
+    setTimeout(() => {
+        isSearchFocused.value = false;
+    }, 200);
+};
 
 provide("isDarkMode", darkMode);
 
@@ -72,7 +143,7 @@ const logout = () => {
 
         <Banner />
 
-        <div class="min-h-screen bg-background text-text">
+        <div class="bg-background text-text z-0">
             <nav
                 class="sticky top-0 bg-card border-b border-primary-low shadow-md shadow-primary-low z-20"
             >
@@ -81,12 +152,14 @@ const logout = () => {
                         <div class="flex">
                             <div class="shrink-0 flex items-center">
                                 <Link :href="route('index')">
-                                    <ApplicationLogo />
+                                    <ApplicationLogo
+                                        class="block h-12 p-2 rounded-md w-auto bg-primary text-white"
+                                    />
                                 </Link>
                             </div>
 
                             <div
-                                class="hidden space-x-8 sm:-my-[2px] sm:ms-10 sm:flex font-semibold"
+                                class="hidden space-x-8 sm:-my-[2px] sm:ms-10 sm:flex font-semibold uppercase"
                             >
                                 <NavLink
                                     :href="route('index')"
@@ -95,8 +168,8 @@ const logout = () => {
                                     Home
                                 </NavLink>
                                 <NavLink
-                                    :href="route('index')"
-                                    :active="route().current('map')"
+                                    :href="route('map.index')"
+                                    :active="route().current('map.index')"
                                 >
                                     Map
                                 </NavLink>
@@ -104,10 +177,10 @@ const logout = () => {
                         </div>
 
                         <div
-                            class="flex-1 flex items-center justify-end px-2 ms-10 group"
+                            class="flex-1 flex items-center justify-end px-2 ms-2 group"
                         >
                             <div
-                                class="max-w-xs w-full lg:max-w-xs group-focus-within:max-w-full transition-all duration-300 ease-in-out"
+                                class="relative max-w-xs w-full lg:max-w-xs group-focus-within:max-w-full transition-all duration-300 ease-in-out"
                             >
                                 <label for="search" class="sr-only"
                                     >Search</label
@@ -124,59 +197,76 @@ const logout = () => {
                                     <input
                                         id="search"
                                         name="search"
-                                        class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-background text-text placeholder-text-medium focus:pl-12 focus:bg-card focus:border-primary focus:ring-primary sm:text-xs"
+                                        class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-background text-text placeholder-text-medium focus:pl-12 focus:border-primary focus:ring-primary sm:text-xs"
                                         placeholder="Search"
                                         type="search"
+                                        autocomplete="off"
+                                        v-model="search"
+                                        @focus="onSearchFocus"
+                                        @blur="onSearchBlur"
+                                        @keyup.enter="submitSearch"
                                     />
                                 </div>
+
+                                <SearchResults
+                                    v-if="
+                                        isSearchFocused && search.length > 1
+                                    "
+                                    :is-loading="isLoadingSearch"
+                                    :results="searchResults"
+                                />
                             </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center space-x-4">
                             <button
                                 @click="toggleDarkMode"
-                                :class="{'hidden': page.props.auth.user}"
+                                :class="{ hidden: page.props.auth.user }"
                                 class="ms-2 inline-flex items-center justify-center rounded-md text-primary hover:text-text focus:outline-none transition duration-150 ease-in-out"
                             >
                                 <SunIcon v-if="darkMode" class="h-6 w-6" />
                                 <MoonIcon v-else class="h-6 w-6" />
                             </button>
 
-                            <div v-if="page.props.auth.user"
-                            class="flex items-center sm:ms-6 bg-primary relative"
-                        >
                             <div
-                                class="absolute -left-3 bg-card p-2 rounded-full"
-                            />
-                            <div
-                                class="absolute -right-3 bg-card p-2 rounded-full"
-                            />
-                            <button
-                                @click="toggleDarkMode"
-                                class="group p-2 text-white outline-dashed outline-2 outline-card bg-secondary-high"
+                                v-if="page.props.auth.user"
+                                class="flex items-center sm:ms-6 bg-primary relative"
                             >
                                 <div
-                                    v-if="darkMode"
-                                    class="relative h-[20px] w-[20px]"
+                                    class="absolute -left-3 bg-card p-2 rounded-full"
+                                />
+                                <div
+                                    class="absolute -right-3 bg-card p-2 rounded-full"
+                                />
+                                <button
+                                    @click="toggleDarkMode"
+                                    class="group p-2 text-white outline-dashed outline-2 outline-card bg-secondary-high"
                                 >
-                                    <OutlineSunIcon
-                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
-                                    />
-                                    <SunIcon
-                                        class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                                    />
-                                </div>
+                                    <div
+                                        v-if="darkMode"
+                                        class="relative h-[20px] w-[20px]"
+                                    >
+                                        <OutlineSunIcon
+                                            class="absolute inset-0 h-full w-full stroke-current stroke-[2px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                        />
+                                        <SunIcon
+                                            class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                        />
+                                    </div>
 
-                                <div v-else class="relative h-[20px] w-[20px]">
-                                    <OutlineMoonIcon
-                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
-                                    />
-                                    <MoonIcon
-                                        class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                                    />
-                                </div>
-                            </button>
-                            <Dropdown align="right" width="48">
+                                    <div
+                                        v-else
+                                        class="relative h-[20px] w-[20px]"
+                                    >
+                                        <OutlineMoonIcon
+                                            class="absolute inset-0 h-full w-full stroke-current stroke-[2.5px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                        />
+                                        <MoonIcon
+                                            class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                        />
+                                    </div>
+                                </button>
+                                <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <button
                                             v-if="
@@ -203,7 +293,7 @@ const logout = () => {
                                         >
                                             <button
                                                 type="button"
-                                                class="inline-flex items-center px-3 py-2 border border-transparent leading-4 font-semibold text-white bg-transparent focus:outline-none"
+                                                class="inline-flex items-center px-3 py-2 border border-transparent leading-4 font-bold text-white bg-transparent focus:outline-none uppercase"
                                             >
                                                 {{ $page.props.auth.user.name }}
                                             </button>
@@ -217,7 +307,7 @@ const logout = () => {
                                             Manage Account
                                         </div>
                                         <DropdownLink
-                                            :href="route('user.profile.show')"
+                                            :href="route('profile.show')"
                                         >
                                             Profile
                                         </DropdownLink>
@@ -226,86 +316,9 @@ const logout = () => {
                                         >
                                             Promoter Account
                                         </DropdownLink>
-                                        <div class="border-t border-gray-200" />
-                                        <form @submit.prevent="logout">
-                                            <DropdownLink as="button">
-                                                Log Out
-                                            </DropdownLink>
-                                        </form>
-                                    </template>
-                                </Dropdown>
-                        </div>
-
-                            <!-- <div
-                                v-if="page.props.auth.user"
-                                class="relative"
-                            >
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <button
-                                            v-if="
-                                                $page.props.jetstream
-                                                    .managesProfilePhotos
-                                            "
-                                            class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
-                                        >
-                                            <img
-                                                class="size-8 rounded-full object-cover"
-                                                :src="
-                                                    $page.props.auth.user
-                                                        .profile_photo_url
-                                                "
-                                                :alt="
-                                                    $page.props.auth.user.name
-                                                "
-                                            />
-                                        </button>
-
-                                        <span
-                                            v-else
-                                            class="inline-flex rounded-md"
-                                        >
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-
-                                                <svg
-                                                    class="ms-2 -me-0.5 size-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke-width="1.5"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
                                         <div
-                                            class="block px-4 py-2 text-xs text-gray-400"
-                                        >
-                                            Manage Account
-                                        </div>
-                                        <DropdownLink
-                                            :href="route('user.profile.show')"
-                                        >
-                                            Profile
-                                        </DropdownLink>
-                                        <DropdownLink
-                                            :href="route('promoter.index')"
-                                        >
-                                            Promoter Account
-                                        </DropdownLink>
-                                        <div class="border-t border-gray-200" />
+                                            class="border-t border-2 border-background"
+                                        />
                                         <form @submit.prevent="logout">
                                             <DropdownLink as="button">
                                                 Log Out
@@ -313,18 +326,18 @@ const logout = () => {
                                         </form>
                                     </template>
                                 </Dropdown>
-                            </div> -->
+                            </div>
 
                             <template v-else>
                                 <Link
                                     :href="route('login')"
-                                    class="font-semibold"
+                                    class="font-semibold uppercase"
                                     >Log in</Link
                                 >
                                 <Link
                                     v-if="canRegister"
                                     :href="route('register')"
-                                    class="ms-4 font-semibold"
+                                    class="font-semibold uppercase"
                                     >Register</Link
                                 >
                             </template>
@@ -366,8 +379,8 @@ const logout = () => {
                             Home
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            :href="route('index')"
-                            :active="route().current('map')"
+                            :href="route('map.index')"
+                            :active="route().current('map.index')"
                         >
                             Map
                         </ResponsiveNavLink>
@@ -405,12 +418,15 @@ const logout = () => {
                         </div>
                         <div class="mt-3 space-y-1">
                             <ResponsiveNavLink
-                                :href="route('user.profile.show')"
-                                :active="route().current('user.profile.show')"
+                                :href="route('profile.show')"
+                                :active="route().current('profile.show')"
                             >
                                 Profile
                             </ResponsiveNavLink>
-                            <ResponsiveNavLink as="button" @click="toggleDarkMode">
+                            <ResponsiveNavLink
+                                as="button"
+                                @click="toggleDarkMode"
+                            >
                                 <span v-if="darkMode">Light Mode</span>
                                 <span v-else>Dark Mode</span>
                             </ResponsiveNavLink>
@@ -421,13 +437,13 @@ const logout = () => {
                             </form>
                         </div>
                     </div>
-                    
-                    <div
-                        v-else
-                        class="pt-4 pb-1 border-t border-gray-200"
-                    >
+
+                    <div v-else class="pt-4 pb-1 border-t border-gray-200">
                         <div class="space-y-1">
-                            <ResponsiveNavLink as="button" @click="toggleDarkMode">
+                            <ResponsiveNavLink
+                                as="button"
+                                @click="toggleDarkMode"
+                            >
                                 <span v-if="darkMode">Light Mode</span>
                                 <span v-else>Dark Mode</span>
                             </ResponsiveNavLink>
@@ -449,8 +465,12 @@ const logout = () => {
                 </div>
             </nav>
 
-            <main>
-                <slot />
+            <main class="py-12 mx-4 sm:mx-0 bg-background z-10">
+                <div
+                    class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-12"
+                >
+                    <slot />
+                </div>
             </main>
         </div>
 

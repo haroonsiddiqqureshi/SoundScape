@@ -13,7 +13,6 @@ class Concert extends Model
         'name',
         'description',
         'genre',
-        'status',
         'event_type',
         'venue_name',
         'province_id',
@@ -63,6 +62,11 @@ class Concert extends Model
     public function artists()
     {
         return $this->belongsToMany(Artist::class, 'artist_concerts');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
     }
 
     public function follows()

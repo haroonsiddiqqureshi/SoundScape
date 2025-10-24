@@ -9,12 +9,17 @@ const currentYear = computed(() => new Date().getFullYear());
     <footer>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center my-auto space-x-3">
                     <!-- Logo -->
-                    <div class="shrink-0 flex items-center">
-                        <ApplicationLogo />
+                    <div class="flex items-center space-x-2">
+                        <ApplicationLogo
+                            class="block h-8 rounded-md text-text"
+                        />
+                        <span
+                            class="flex justify-center text-text font-bold tracking-wide text-2xl uppercase"
+                            >SoundScape</span
+                        >
                     </div>
-                    <div class="text-2xl font-bold">SoundScape</div>
                     <div class="text-sm">© {{ currentYear }}</div>
                 </div>
                 <div class="flex items-center space-x-4">

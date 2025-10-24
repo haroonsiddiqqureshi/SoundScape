@@ -15,14 +15,14 @@ class ConcertController extends Controller
     public function index()
     {
         $concerts = Concert::where('promoter_id', auth('web')->user()->promoter->id)->get();
-        return inertia::render('User/Promoter/Concert/Index', [
+        return inertia::render('Promoter/Concert/Index', [
             'concerts' => $concerts,
         ]);
     }
 
     public function create()
     {
-        return inertia::render('User/Promoter/Concert/Create');
+        return inertia::render('Promoter/Concert/Create');
     }
 
     public function store(Request $request)
@@ -34,7 +34,6 @@ class ConcertController extends Controller
             'description' => $validated['description'],
             'artists' => $validated['artists'] ?? null,
             'genre' => $validated['genre'] ?? null,
-            'status' => $validated['status'],
             'venue_name' => $validated['venue_name'],
             'province_id' => $validated['province_id'],
             'price' => $validated['price'] ?? null,
@@ -57,7 +56,7 @@ class ConcertController extends Controller
             abort(403);
         }
 
-        return Inertia::render('User/Promoter/Concert/Detail', [
+        return Inertia::render('Promoter/Concert/Detail', [
             'concert' => $concert,
         ]);
     }
@@ -69,7 +68,7 @@ class ConcertController extends Controller
             abort(403);
         }
 
-        return Inertia::render('User/Promoter/Concert/Edit', [
+        return Inertia::render('Promoter/Concert/Edit', [
             'concert' => $concert,
         ]);
     }
@@ -139,7 +138,6 @@ class ConcertController extends Controller
             // Core Information
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'status' => 'required|in:upcoming,onsale,soldout,cancelled,ongoing,ended',
             'event_type' => 'nullable|string|max:255',
             'genre' => 'nullable|string|max:255',
 

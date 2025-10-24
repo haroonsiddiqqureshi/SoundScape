@@ -14,7 +14,7 @@ class ArtistSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('artists')->insert([
+        Artist::create([
             'name' => env('ARTIST_NAME'),
             'bio' => env('ARTIST_BIO'),
             'picture_url' => env('ARTIST_PICTURE_URL'),

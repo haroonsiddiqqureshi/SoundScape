@@ -22,7 +22,6 @@ const props = defineProps({
 
 const emit = defineEmits(["update:endValue"]);
 
-// 4. Add the watcher
 watch(
     () => props.triggerValue,
     (newTriggerValue) => {
@@ -37,13 +36,7 @@ watch(
     <div class="flex space-x-2 items-start text-sm font-semibold">
         <slot name="icon"></slot>
 
-        <div
-            :class="{
-                'flex flex-col lg:flex-row space-y-2 lg:space-y-0 space-x-0 lg:space-x-2':
-                    isLong,
-            }"
-            class="flex flex-1 space-x-2"
-        >
+        <div class="flex flex-1 space-x-2">
             <slot name="startInput"></slot>
 
             <Transition

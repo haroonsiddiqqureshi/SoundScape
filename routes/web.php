@@ -17,14 +17,15 @@ use App\Http\Controllers\Promoter\ConcertController as PromoterConcertController
 
 // --- User Controllers ---
 use App\Http\Controllers\User\HomeController;
-use App\Http\Controllers\User\ProfileController as UserProfileController;
+use App\Http\Controllers\User\MapController;
 
 Route::middleware([
     'block_admin'
 ])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('index');
     Route::get('/concert/{concert}', [HomeController::class, 'concertDetail'])->name('concert.detail');
-
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
+    Route::get('/search-query', [HomeController::class, 'searchQuery'])->name('api.search');
     // Add other routes accessible to both users and guests here...
 });
 
@@ -34,7 +35,6 @@ Route::middleware([
     'block_admin',
     'role:web'
 ])->group(function () {
-    Route::get('/user/profile', [UserProfileController::class, 'show'])->name('user.profile.show');
     Route::post('/concert/{concert}', [HomeController::class, 'followConcert'])->name('concert.follow');
 
     // Add other user-only routes here...
@@ -62,7 +62,7 @@ Route::middleware([
 
 Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
-    
+
     // --- Admin Concert Management Routes ---
     Route::get('/concert', [AdminConcertController::class, 'index'])->name('concert.index');
     Route::get('/concert/create', [AdminConcertController::class, 'create'])->name('concert.create');
@@ -71,7 +71,7 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/concert/edit/{concert}', [AdminConcertController::class, 'edit'])->name('concert.edit');
     Route::post('/concert/{concert}', [AdminConcertController::class, 'update'])->name('concert.update');
     Route::delete('/concert/{concert}', [AdminConcertController::class, 'destroy'])->name('concert.delete');
-    
+
     // --- Admin User Management Routes ---
     Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
 
@@ -91,6 +91,6 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
 
     // --- Admin Artist Management Routes ---
     Route::get('/artist', [AdminArtistController::class, 'index'])->name('artist.index');
-    
+
     // Add other admin-only routes here...
 });

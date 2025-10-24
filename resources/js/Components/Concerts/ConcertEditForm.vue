@@ -123,17 +123,6 @@ const photoPreview = ref(initialImageUrl.value);
                     <InputError :message="form.errors.price" class="mt-2" />
                 </div>
 
-                <!-- Status -->
-                <div class="md:col-span-2">
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select id="status" v-model="form.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="upcoming">Upcoming</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <InputError :message="form.errors.status" class="mt-2" />
-                </div>
-
                 <!-- Ticket Link -->
                 <div class="md:col-span-2">
                     <label for="ticket_link" class="block text-sm font-medium text-gray-700 mb-1">Ticket Link</label>

@@ -19,7 +19,7 @@ const isDarkMode = inject("isDarkMode");
 
 <template>
     <div
-        :style="{ width: !modelValue ? '125px' : '90px' }"
+        :style="{ width: !modelValue ? '130px' : '90px' }"
         class="transition-all duration-300"
     >
         <VueDatePicker
@@ -31,6 +31,7 @@ const isDarkMode = inject("isDarkMode");
             auto-apply
             input-class-name="!hidden"
             model-type="HH:mm"
+            :start-time="{ hours: 0, minutes: 0 }"
         >
             <template #dp-input="{ value }">
                 <div

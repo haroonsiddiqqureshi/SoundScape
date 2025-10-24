@@ -2,17 +2,19 @@
 import { computed } from "vue";
 import { router } from "@inertiajs/vue3";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/vue/24/outline";
-import { HeartIcon as SolidHeartIcon } from "@heroicons/vue/24/solid";
+import {
+    HeartIcon as SolidHeartIcon,
+    MapPinIcon,
+    TicketIcon,
+} from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     concert: Object,
     provinces: Object,
-    isUser: {
-        type: Boolean,
-        default: false,
-    },
+    role: String,
 });
 
+// No changes needed, logic is sound.
 const pictureUrl = computed(() => {
     if (props.concert?.picture_url) {
         if (props.concert.picture_url.startsWith("http")) {
@@ -23,10 +25,10 @@ const pictureUrl = computed(() => {
     return "https://placehold.co/600x400?text=SoundScape";
 });
 
+// No changes needed, logic is sound.
 const provinceName = computed(() => {
     if (props.provinces && props.concert && props.concert.province_id) {
         const province = props.provinces[props.concert.province_id];
-
         return province ? province.name_th : "Unknown Province";
     }
     return "Loading...";
@@ -35,32 +37,34 @@ const provinceName = computed(() => {
 const formattedDate = computed(() => {
     if (props.concert && props.concert.start_show_date) {
         const date = new Date(props.concert.start_show_date);
-        return date.toLocaleDateString("en-GB", {
+        return date.toLocaleDateString("th-TH", {
             day: "2-digit",
             month: "long",
-            year: "2-digit",
+            year: "numeric",
         });
     }
-    return "N/A";
+    return "ยังไม่ระบุวันที่";
 });
 
 const formattedPrice = computed(() => {
     if (props.concert && props.concert.price_min != null) {
+        // IMPROVEMENT: Handle free concerts explicitly
+        if (props.concert.price_min === 0) {
+            return "Free";
+        }
         return new Intl.NumberFormat("th-TH", {
-            style: "currency",
-            currency: "THB",
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(props.concert.price_min);
     }
-    return "ฟรี";
+    return null;
 });
 
 const followConcert = (follow) => {
     router.post(
         route("concert.follow", props.concert.id),
         {
-            is_following: follow ? false : true,
+            is_following: !follow,
         },
         { preserveState: true }
     );
@@ -68,21 +72,22 @@ const followConcert = (follow) => {
 </script>
 
 <template>
-    <div class="bg-card rounded-md p-2 space-y-2 shadow-md">
+    <div class="bg-card rounded-md p-2 space-y-2 shadow-md overflow-hidden">
         <img
             :src="pictureUrl"
-            alt="Concert Picture"
-            class="aspect-[2/3] rounded-md"
+            :alt="props.concert.name || 'Concert Picture'"
+            class="w-full aspect-[2/3] object-fill rounded-md"
         />
-        <div class="flex flex-col">
-            <div class="flex justify-between relative">
-                <span class="font-semibold text-text-medium">{{
+        <div class="flex flex-col space-y-1">
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-text-medium truncate">{{
                     formattedDate
                 }}</span>
                 <button
-                    @click="followConcert(props.concert.is_followed)"
-                    :class="{ hidden: !isUser }"
-                    class="absolute right-0 z-10"
+                    @click.prevent.stop="
+                        followConcert(props.concert.is_followed)
+                    "
+                    :class="{ hidden: role !== 'user' }"
                 >
                     <component
                         :is="
@@ -90,7 +95,7 @@ const followConcert = (follow) => {
                                 ? SolidHeartIcon
                                 : OutlineHeartIcon
                         "
-                        class="w-6 h-6"
+                        class="w-5 h-5"
                         :class="
                             props.concert.is_followed
                                 ? 'text-primary'
@@ -99,10 +104,16 @@ const followConcert = (follow) => {
                     />
                 </button>
             </div>
-            <span class="font-bold">{{ props.concert.name }}</span>
+            <span class="font-semibold line-clamp-2 min-h-12">{{ props.concert.name }}</span>
             <div class="flex justify-between text-sm text-text-medium">
-                <span> {{ provinceName }} </span>
-                <span> {{ formattedPrice }} </span>
+                <div class="flex items-center gap-1 min-w-0 text-accent">
+                    <TicketIcon class="w-4 h-4 flex-shrink-0" />
+                    <span class="truncate"> {{ formattedPrice }} </span>
+                </div>
+                <div class="flex items-center gap-1 min-w-0 text-secondary">
+                    <MapPinIcon class="w-4 h-4 flex-shrink-0" />
+                    <span class="truncate"> {{ provinceName }} </span>
+                </div>
             </div>
         </div>
     </div>

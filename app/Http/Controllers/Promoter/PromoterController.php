@@ -13,14 +13,14 @@ class PromoterController extends Controller
     {
         $promoter = Promoter::where('user_id', auth('web')->user()->id)->first();
 
-        return Inertia::render('User/Promoter/Index', [
+        return Inertia::render('Promoter/Index', [
             'promoter' => $promoter,
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('User/Promoter/Create');
+        return Inertia::render('Promoter/Create');
     }
 
     public function store(Request $request)

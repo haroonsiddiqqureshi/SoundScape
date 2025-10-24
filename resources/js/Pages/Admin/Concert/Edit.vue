@@ -11,7 +11,6 @@ const props = defineProps({
 const form = useForm({
     name: props.concert.name,
     description: props.concert.description,
-    status: props.concert.status,
     venue_name: props.concert.venue_name,
     province: props.concert.province,
     latitude: props.concert.latitude,

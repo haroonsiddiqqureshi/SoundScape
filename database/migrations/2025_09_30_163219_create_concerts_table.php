@@ -17,7 +17,6 @@ return new class extends Migration
             // Core Information
             $table->string('name'); // Name of the concert
             $table->text('description'); // Description of the concert
-            $table->string('status')->default('up_coming'); // Status of the concert
             $table->string('event_type')->nullable(); // Type of the event
             $table->string('genre')->nullable(); // Genre of the concert
             $table->text('picture_url'); // Picture URL
@@ -45,7 +44,7 @@ return new class extends Migration
             $table->integer('like_count')->nullable()->default(0); // Like count
             
             //Foreign keys
-            $table->foreignId('province_id')->constrained('provinces');
+            $table->foreignId('province_id')->nullable()->constrained('provinces');
             $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('cascade'); // Admin who created the concert
             $table->foreignId('promoter_id')->nullable()->constrained('promoters')->onDelete('cascade'); // Promoter who created the concert
             

@@ -1,5 +1,5 @@
 <script setup>
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 
 const props = defineProps({
@@ -7,8 +7,6 @@ const props = defineProps({
     placeholder: {
         type: String,
     },
-    // REMOVE the 'startDate' prop
-    // ADD minDate and maxDate props
     minDate: {
         type: [Date, String, null],
         default: null,
@@ -23,11 +21,17 @@ const emit = defineEmits(["update:modelValue"]);
 
 const isDarkMode = inject("isDarkMode");
 
+const thaiDayNames = ref(["จ", "อ", "พ", "พฤ", "ศ", "ส", "อา"]);
+
+// Calculate year range
+const currentYear = new Date().getFullYear() - 1;
+const yearRange = [currentYear, currentYear + 11];
+
 const format = (date) => {
     if (!date) {
         return props.placeholder;
     }
-    return new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
+    return new Intl.DateTimeFormat("th-TH", { dateStyle: "medium" }).format(
         new Date(date)
     );
 };
@@ -35,20 +39,24 @@ const format = (date) => {
 
 <template>
     <div
-        :style="{ width: !modelValue ? '175px' : '160px' }"
+        :style="{ width: !modelValue ? '160px' : '130px' }"
         class="transition-all duration-300"
     >
         <VueDatePicker
             :model-value="modelValue"
             @update:model-value="emit('update:modelValue', $event)"
+            locale="th"
+            month-name-format="long"
+            :day-names="thaiDayNames"
             :enable-time-picker="false"
             :dark="isDarkMode"
-            
             :min-date="minDate"
             :max-date="maxDate"
-            
+            :start-date="minDate"
+            :year-range="yearRange"
             auto-apply
             input-class-name="!hidden"
+            no-today
         >
             <template #dp-input="{ value }">
                 <div

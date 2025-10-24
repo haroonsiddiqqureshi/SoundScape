@@ -19,8 +19,8 @@ const getPictureUrl = (highlight) => {
         return `/storage/${highlight.picture_url}`;
     }
     return isDarkMode.value
-        ? "https://placehold.co/600x400/1a1a2e/ffffff?text=SoundScape"
-        : "https://placehold.co/600x400/ffffff/000000?text=SoundScape";
+        ? "https://placehold.co/600x400/1a1a2e/ffffff?text=SOUNDSCAPE"
+        : "https://placehold.co/600x400/ffffff/000000?text=SOUNDSCAPE";
 };
 
 const currentIndex = ref(0);

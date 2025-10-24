@@ -17,7 +17,7 @@ const closeAddress = () => emit('update:showingFullAddress', false)
     <!-- Bio Modal -->
     <div
         v-if="props.showingFullBio"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center"
+        class="fixed inset-0 bg-text-reverse bg-opacity-50 z-50 flex justify-center items-center"
         @click="closeBio"
     >
         <div class="bg-white p-8 rounded-lg shadow-xl max-w-2xl" @click.stop>
@@ -37,7 +37,7 @@ const closeAddress = () => emit('update:showingFullAddress', false)
     <!-- Address Modal -->
     <div
         v-if="props.showingFullAddress"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center"
+        class="fixed inset-0 bg-text-reverse bg-opacity-50 z-50 flex justify-center items-center"
         @click="closeAddress"
     >
         <div class="bg-white p-8 rounded-lg shadow-xl max-w-2xl" @click.stop>

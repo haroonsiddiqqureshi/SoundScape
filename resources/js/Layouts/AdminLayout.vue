@@ -90,7 +90,7 @@ watchEffect(() => {
             <!-- Sidebar -->
             <aside
                 :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                class="fixed inset-y-0 left-0 z-30 w-48 bg-card transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col"
+                class="fixed inset-y-0 left-0 z-30 bg-card transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col"
             >
                 <div>
                     <div class="p-4">
@@ -98,14 +98,19 @@ watchEffect(() => {
                             :href="route('admin.dashboard')"
                             class="flex items-center"
                         >
-                            <ApplicationLogo class="block h-9 w-auto" />
-                            <span class="ml-2 text-xl font-bold"
-                                >SoundScape</span
-                            >
+                            <div class="flex items-center space-x-2">
+                                <ApplicationLogo
+                                    class="block h-12 p-2 rounded-md w-auto bg-primary text-white"
+                                />
+                                <span
+                                    class="flex justify-center text-pri font-bold tracking-wide text-2xl uppercase"
+                                    >SoundScape</span
+                                >
+                            </div>
                         </Link>
                     </div>
                     <nav
-                        class="py-4 flex-1 flex flex-col space-y-2 px-2 overflow-hidden"
+                        class="py-2 flex-1 flex flex-col space-y-2 px-2 overflow-hidden uppercase"
                     >
                         <NavLink
                             :href="route('admin.dashboard')"
@@ -168,7 +173,7 @@ watchEffect(() => {
                 <div class="p-2 mt-auto">
                     <form @submit.prevent="logout">
                         <button
-                            class="w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-black hover:bg-card transition-all duration-200"
+                            class="uppercase w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-bold hover:bg-card transition-all duration-200"
                         >
                             <span>Logout</span>
                         </button>
@@ -179,7 +184,7 @@ watchEffect(() => {
             <!-- Main content -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 <!-- Top navigation -->
-                <header class="bg-card shadow-md shadow-primary">
+                <header class="bg-card z-10 shadow-md">
                     <div
                         class="py-4 px-6 lg:px-8 flex justify-between items-center"
                     >
@@ -203,7 +208,7 @@ watchEffect(() => {
                             />
                             <button
                                 @click="toggleDarkMode"
-                                class="group p-2 text-accent outline-dashed outline-2 outline-card bg-secondary"
+                                class="group p-2 text-white outline-dashed outline-2 outline-card bg-secondary-high"
                             >
                                 <div
                                     v-if="darkMode"
@@ -226,7 +231,7 @@ watchEffect(() => {
                                     />
                                 </div>
                             </button>
-                            <div class="px-4 font-semibold text-white">
+                            <div class="px-4 font-bold text-white uppercase">
                                 {{ $page.props.auth.user.name }}
                             </div>
                         </div>
@@ -235,11 +240,11 @@ watchEffect(() => {
 
                 <!-- Page Content -->
                 <main
-                    class="flex-1 overflow-x-hidden overflow-y-auto bg-card md:bg-background"
+                    class="custom-scrollbar flex-1 overflow-x-hidden overflow-y-auto bg-background"
                     @click="sidebarOpen = false"
                 >
                     <div
-                        class="md:px-8 md:py-8 transition-all duration-300"
+                        class="px-8 py-8 transition-all duration-300"
                     >
                         <slot />
                     </div>
@@ -249,7 +254,7 @@ watchEffect(() => {
             <div
                 v-if="sidebarOpen"
                 @click="sidebarOpen = false"
-                class="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
+                class="fixed inset-0 bg-text-reverse opacity-50 z-20 md:hidden"
             ></div>
         </div>
     </div>

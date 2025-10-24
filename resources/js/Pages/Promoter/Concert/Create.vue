@@ -8,7 +8,6 @@ const form = useForm({
     // Core Infomation
     name: "",
     description: "",
-    status: "",
     event_type: "",
     genre: "",
     picture_url: "",

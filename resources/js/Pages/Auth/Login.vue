@@ -1,7 +1,8 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
-import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
+import AuthenticationCardBackground from "@/Components/AuthenticationCardBackground.vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -34,11 +35,23 @@ const submit = () => {
     <Head title="Log in" />
 
     <AuthenticationCard>
-        <template #logo>
-            <AuthenticationCardLogo />
+        <template #background>
+            <AuthenticationCardBackground />
         </template>
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
+        <template #logo>
+            <div class="flex items-center space-x-2 mb-4">
+                <ApplicationLogo
+                    class="block h-12 p-2 rounded-md w-auto bg-primary text-white"
+                />
+                <span
+                    class="flex justify-center text-pri font-bold tracking-wide text-2xl uppercase"
+                    >SoundScape</span
+                >
+            </div>
+        </template>
+
+        <div v-if="status" class="mb-4 font-medium text-sm text-secondary">
             {{ status }}
         </div>
 
@@ -58,7 +71,17 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <div class="flex justify-between">
+                    <InputLabel for="password" value="Password" />
+                    <Link
+                        v-if="canResetPassword"
+                        :href="route('password.request')"
+                        class="hover:underline text-sm text-text-medium hover:text-text rounded-md"
+                        tabindex="1"
+                    >
+                        Forgot your password?
+                    </Link>
+                </div>
                 <TextInput
                     id="password"
                     v-model="form.password"
@@ -73,28 +96,22 @@ const submit = () => {
             <div class="flex justify-between mt-4">
                 <label class="flex items-center">
                     <Checkbox v-model:checked="form.remember" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600">Remember me</span>
+                    <span class="ms-2 text-sm text-text-medium"
+                        >Remember me</span
+                    >
                 </label>
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md"
-                >
-                    Forgot your password?
-                </Link>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
+            <div class="flex items-center justify-end mt-2">
                 <Link
                     v-if="canRegister"
                     :href="route('register')"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md"
+                    class="hover:underline text-sm text-text-medium hover:text-text rounded-md"
                 >
-                    Register
+                    Don't have an account?
                 </Link>
-
                 <PrimaryButton
-                    class="ms-3"
+                    class="ms-4"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
