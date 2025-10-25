@@ -190,16 +190,15 @@ const logout = () => {
                                         class="absolute inset-y-0 left-0 pl-3 pr-3 flex items-center pointer-events-none group-focus-within:bg-primary rounded transition duration-150 ease-in-out"
                                     >
                                         <MagnifyingGlassIcon
-                                            class="h-5 w-5 text-text-medium group-focus-within:text-card group-focus-within:stroke-card"
+                                            class="h-5 w-5 text-text-medium group-focus-within:text-white group-focus-within:stroke-white"
                                             aria-hidden="true"
                                         />
                                     </div>
                                     <input
                                         id="search"
                                         name="search"
-                                        class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-background text-text placeholder-text-medium focus:pl-12 focus:border-primary focus:ring-primary sm:text-xs"
+                                        class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-background text-text placeholder-text-medium focus:pl-12 focus:bg-card focus:border-primary focus:ring-primary sm:text-xs"
                                         placeholder="Search"
-                                        type="search"
                                         autocomplete="off"
                                         v-model="search"
                                         @focus="onSearchFocus"

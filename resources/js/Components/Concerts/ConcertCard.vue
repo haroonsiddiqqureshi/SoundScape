@@ -14,7 +14,6 @@ const props = defineProps({
     role: String,
 });
 
-// No changes needed, logic is sound.
 const pictureUrl = computed(() => {
     if (props.concert?.picture_url) {
         if (props.concert.picture_url.startsWith("http")) {
@@ -25,13 +24,12 @@ const pictureUrl = computed(() => {
     return "https://placehold.co/600x400?text=SoundScape";
 });
 
-// No changes needed, logic is sound.
 const provinceName = computed(() => {
     if (props.provinces && props.concert && props.concert.province_id) {
         const province = props.provinces[props.concert.province_id];
         return province ? province.name_th : "Unknown Province";
     }
-    return "Loading...";
+    return "ไม่ระบุจังหวัด";
 });
 
 const formattedDate = computed(() => {
@@ -43,12 +41,11 @@ const formattedDate = computed(() => {
             year: "numeric",
         });
     }
-    return "ยังไม่ระบุวันที่";
+    return "ไม่ระบุวันที่";
 });
 
 const formattedPrice = computed(() => {
     if (props.concert && props.concert.price_min != null) {
-        // IMPROVEMENT: Handle free concerts explicitly
         if (props.concert.price_min === 0) {
             return "Free";
         }
@@ -57,7 +54,7 @@ const formattedPrice = computed(() => {
             maximumFractionDigits: 0,
         }).format(props.concert.price_min);
     }
-    return null;
+    return "ไม่ระบุราคา";
 });
 
 const followConcert = (follow) => {

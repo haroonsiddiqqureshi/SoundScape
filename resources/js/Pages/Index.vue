@@ -81,10 +81,15 @@ watch(
         :can-login="$page.props.canLogin"
         :can-register="$page.props.canRegister"
     >
-        <HighlightBanner :highlights="page.props.highlights" />
+        <HighlightBanner
+            v-if="!filters?.search"
+            :highlights="page.props.highlights"
+        />
 
         <div class="space-y-4">
-            <h2 class="text-2xl font-bold uppercase">All Concerts</h2>
+            <h2 class="text-2xl font-bold uppercase">
+                {{ filters?.search ? `Results for "${filters.search}"` : 'All Concerts' }}
+            </h2>
             <div class="mx-8 flex flex-wrap gap-2">
                 <DropdownFilter
                     id="event_type"
