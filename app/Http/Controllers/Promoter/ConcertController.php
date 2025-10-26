@@ -6,45 +6,73 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Concert;
+use App\Models\Artist;
+use App\Models\Province;
 use App\Models\Concert_Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class ConcertController extends Controller
 {
     public function index()
     {
+        // Retain promoter-specific query
         $concerts = Concert::where('promoter_id', auth('web')->user()->promoter->id)->get();
+        
+        // Add provinces, just like Admin
+        $provinces = Province::all()->keyBy('id'); 
+        
         return inertia::render('Promoter/Concert/Index', [
             'concerts' => $concerts,
+            'provinces' => $provinces, // Pass provinces
         ]);
     }
 
     public function create()
     {
-        return inertia::render('Promoter/Concert/Create');
+        // Add artists, just like Admin
+        $artists = Artist::all(); 
+        
+        return inertia::render('Promoter/Concert/Create', [
+            'artists' => $artists, // Pass artists
+        ]);
     }
 
     public function store(Request $request)
     {
+        // Use identical validation
         $validated = $request->validate($this->validationRules());
-
-        Concert::create([
+        
+        // Use identical create logic from Admin
+        $concert = Concert::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'artists' => $validated['artists'] ?? null,
-            'genre' => $validated['genre'] ?? null,
+            'genre' => $validated['genre'],
+            'event_type' => $validated['event_type'],
             'venue_name' => $validated['venue_name'],
             'province_id' => $validated['province_id'],
-            'price' => $validated['price'] ?? null,
-            'start_datetime' => $validated['start_datetime'],
-            'end_datetime' => $validated['end_datetime'] ?? null,
-            'latitude' => $validated['latitude'] ?? null,
-            'longitude' => $validated['longitude'] ?? null,
+            'price_min' => $validated['price_min'],
+            'price_max' => $validated['price_max'],
+            'start_show_date' => $validated['start_show_date'],
+            'start_show_time' => $validated['start_show_time'],
+            'end_show_date' => $validated['end_show_date'],
+            'end_show_time' => $validated['end_show_time'],
+            'start_sale_date' => $validated['start_sale_date'],
+            'end_sale_date' => $validated['end_sale_date'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
             'picture_url' => $validated['picture_url']->store('concerts', 'public'),
-            'ticket_link' => $validated['ticket_link'] ?? null,
-            'promoter_id' => auth('web')->user()->promoter->id,
+            'ticket_link' => $validated['ticket_link'],
+            
+            // Use promoter_id instead of admin_id
+            'promoter_id' => auth('web')->user()->promoter->id, 
         ]);
+
+        // Add artist relationship logic
+        if (isset($validated['artist_ids'])) {
+            $concert->artists()->attach($validated['artist_ids']);
+        }
 
         return redirect()->route('promoter.concert.index')->with('success', 'Concert created successfully.');
     }
@@ -56,8 +84,13 @@ class ConcertController extends Controller
             abort(403);
         }
 
+        // Add data loading, just like Admin
+        $concert->load('artists');
+        $provinces = Province::all()->keyBy('id');
+
         return Inertia::render('Promoter/Concert/Detail', [
             'concert' => $concert,
+            'provinces' => $provinces, // Pass provinces
         ]);
     }
 
@@ -68,8 +101,13 @@ class ConcertController extends Controller
             abort(403);
         }
 
+        // Add data loading, just like Admin
+        $concert->load('artists');
+        $artists = Artist::all();
+
         return Inertia::render('Promoter/Concert/Edit', [
             'concert' => $concert,
+            'artists' => $artists, // Pass artists
         ]);
     }
 
@@ -80,89 +118,128 @@ class ConcertController extends Controller
             abort(403);
         }
 
+        // Use identical validation
         $validated = $request->validate($this->validationRules(true));
 
         $originalData = $concert->getOriginal();
+        
+        // Get promoter ID for logging
+        $promoterId = Auth::user()->promoter->id; 
 
-        // Log changes
+        // Use identical logging logic from Admin
         foreach ($validated as $key => $value) {
-            if ($key === 'start_datetime') {
-                // Parse both dates to Carbon objects for accurate comparison
-                $oldDate = Carbon::parse($concert->start_datetime);
-                $newDate = Carbon::parse($value);
 
-                if ($oldDate->ne($newDate)) { // `ne` is "not equal"
+            if ($key === 'artist_ids') {
+
+                $oldArtistIds = $concert->artists()->pluck('artists.id')->toArray();
+                sort($oldArtistIds);
+
+                $newArtistIds = $value ?? [];
+                sort($newArtistIds);
+
+                if ($oldArtistIds !== $newArtistIds) {
                     Concert_Log::create([
                         'concert_id' => $concert->id,
-                        'promoter_id' => Auth::user()->promoter->id,
-                        'field_name' => $key,
-                        'old_value' => $concert->start_datetime,
-                        'new_value' => $newDate->toDateTimeString(),
+                        'promoter_id' => $promoterId, // Use promoter_id
+                        'field_name' => 'artist_ids',
+                        'old_value' => json_encode($oldArtistIds),
+                        'new_value' => json_encode($newArtistIds),
                     ]);
                 }
-            } elseif ($key !== 'picture_url' && $concert->{$key} != $value) {
+                continue;
+            }
+
+            if ($key !== 'picture_url' && $concert->{$key} != $value) {
                 Concert_Log::create([
                     'concert_id' => $concert->id,
-                    'promoter_id' => Auth::user()->promoter->id,
+                    'promoter_id' => $promoterId, // Use promoter_id
                     'field_name' => $key,
-                    'old_value' => $originalData[$key] ?? 'null',
+                    'old_value' => $originalData[$key],
                     'new_value' => $value,
                 ]);
             }
         }
 
         if ($request->hasFile('picture_url')) {
-            // Handle file upload and log change
             $newPath = $request->file('picture_url')->store('concerts', 'public');
             Concert_Log::create([
                 'concert_id' => $concert->id,
-                'promoter_id' => Auth::user()->promoter->id,
+                'promoter_id' => $promoterId, // Use promoter_id
                 'field_name' => 'picture_url',
                 'old_value' => $concert->picture_url,
                 'new_value' => $newPath,
             ]);
             $validated['picture_url'] = $newPath;
         } else {
-            // Exclude picture_url from the update if no new file is uploaded
             unset($validated['picture_url']);
         }
 
+        unset($validated['artist_ids']);
+
         $concert->update($validated);
+
+        // Add artist sync logic
+        if (isset($request->artist_ids)) {
+            $concert->artists()->sync($request->artist_ids ?? []);
+        }
 
         return redirect()->route('promoter.concert.detail', $concert)->with('success', 'Concert updated successfully.');
     }
 
+    // Add destroy method from Admin
+    public function destroy(Concert $concert)
+    {
+        // Ensure the authenticated promoter owns this concert
+        if ($concert->promoter_id !== Auth::user()->promoter->id) {
+            abort(403);
+        }
+
+        if ($concert->picture_url) {
+            Storage::disk('public')->delete($concert->picture_url);
+        }
+        $concert->delete();
+        return redirect()->route('promoter.concert.index')->with('success', 'Concert deleted successfully.');
+    }
+
+    // Use identical validation rules from Admin
     private function validationRules($isUpdate = false)
     {
         $rules = [
             // Core Information
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'event_type' => 'nullable|string|max:255',
-            'genre' => 'nullable|string|max:255',
+            'event_type' => 'nullable|in:music_festival,concert,club,fan_meeting,folk,other',
+            'genre' => 'nullable|in:pop,rock,hiphop,jazz,classical,country,edm,other',
 
             // Location
-            'venue_name' => 'required|string|max:255',
-            'province_id' => 'required|string|max:255',
+            'venue_name' => 'nullable|string|max:255',
+            'province_id' => 'nullable|exists:provinces,id',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            
+
             // Prices
             'price_min' => 'nullable|numeric|min:0',
-            'price_max' => 'nullable|numeric|min:0',
-            
+            'price_max' => 'nullable|numeric|min:0|gte:price_min',
+
             // Dates and Times
-            'start_show' => 'required|date',
-            'end_show' => 'nullable|date',
+            'start_sale_date' => 'nullable|date_format:Y-m-d',
+            'end_sale_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_sale_date',
+            'start_show_date' => 'nullable|date_format:Y-m-d',
+            'start_show_time' => 'nullable|date_format:H:i:s',
+            'end_show_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_show_date',
+            'end_show_time' => 'nullable|date_format:H:i:s',
 
             // Additional Information
             'ticket_link' => 'nullable|url',
+
+            'artist_ids' => 'nullable|array',
+            'artist_ids.*' => 'exists:artists,id',
         ];
 
         if ($isUpdate) {
-            $rules['picture_url'] = 'nullable|image|max:1024';
+            $rules['picture_url'] = 'nullable|image|max:2048';
         } else {
-            $rules['picture_url'] = 'required|image|max:1024';
+            $rules['picture_url'] = 'required|image|max:2048';
         }
 
         return $rules;

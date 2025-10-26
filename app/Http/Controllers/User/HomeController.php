@@ -9,7 +9,6 @@ use App\Models\Highlight;
 use App\Models\Concert;
 use App\Models\Follow;
 use App\Models\Province;
-use App\Models\Artist;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -17,7 +16,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $highlights = Highlight::where('is_active', true)->get();
-        $provinces = Province::all()->keyBy('id');
+        $provinces = Province::get();
 
         $query = Concert::query();
 
@@ -93,13 +92,18 @@ class HomeController extends Controller
     {
         $concert->load('artists');
         $provinces = Province::all()->keyBy('id');
-        $follow = Follow::where('user_id', Auth::id())
-            ->where('concert_id', $concert->id)
-            ->first();
+        $followedConcerts = [];
+        if (Auth::check()) {
+            $followedConcerts = Follow::where('user_id', Auth::id())
+                ->pluck('concert_id')
+                ->flip();
+        }
+
+        $concert->is_followed = isset($followedConcerts[$concert->id]);
+
         return Inertia::render('User/Concert/Detail', [
             'concert' => $concert,
             'provinces' => $provinces,
-            'follow' => $follow,
         ]);
     }
 

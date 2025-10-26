@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Concert_Log;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class ConcertController extends Controller
@@ -78,8 +79,13 @@ class ConcertController extends Controller
 
     public function edit(Concert $concert)
     {
+        $concert->load('artists');
+
+        $artists = Artist::all();
+
         return Inertia::render('Admin/Concert/Edit', [
             'concert' => $concert,
+            'artists' => $artists,
         ]);
     }
 
@@ -88,54 +94,64 @@ class ConcertController extends Controller
         $validated = $request->validate($this->validationRules(true));
 
         $originalData = $concert->getOriginal();
+        $adminId = Auth::guard('admin')->id();
 
         // Log changes
         foreach ($validated as $key => $value) {
-            if ($key === 'start_datetime') {
-                // Parse both dates to Carbon objects for accurate comparison
-                $oldDate = Carbon::parse($concert->start_datetime);
-                $newDate = Carbon::parse($value);
 
-                if ($oldDate->ne($newDate)) { // `ne` is "not equal"
+            if ($key === 'artist_ids') {
+
+                $oldArtistIds = $concert->artists()->pluck('artists.id')->toArray();
+
+                sort($oldArtistIds);
+
+                $newArtistIds = $value ?? [];
+                sort($newArtistIds);
+
+                if ($oldArtistIds !== $newArtistIds) {
                     Concert_Log::create([
                         'concert_id' => $concert->id,
-                        'admin_id' => Auth::guard('admin')->id(),
-                        'field_name' => $key,
-                        'old_value' => $concert->start_datetime,
-                        'new_value' => $newDate->toDateTimeString(),
+                        'admin_id' => $adminId,
+                        'field_name' => 'artist_ids',
+                        'old_value' => json_encode($oldArtistIds),
+                        'new_value' => json_encode($newArtistIds),
                     ]);
                 }
-            } elseif ($key !== 'picture_url' && $concert->{$key} != $value) {
+
+                continue;
+            }
+
+            if ($key !== 'picture_url' && $concert->{$key} != $value) {
                 Concert_Log::create([
                     'concert_id' => $concert->id,
-                    'admin_id' => Auth::guard('admin')->id(),
+                    'admin_id' => $adminId,
                     'field_name' => $key,
-                    'old_value' => $originalData[$key] ?? 'null',
+                    'old_value' => $originalData[$key],
                     'new_value' => $value,
                 ]);
             }
         }
 
         if ($request->hasFile('picture_url')) {
-            // Handle file upload and log change
             $newPath = $request->file('picture_url')->store('concerts', 'public');
             Concert_Log::create([
                 'concert_id' => $concert->id,
-                'admin_id' => Auth::guard('admin')->id(),
+                'admin_id' => $adminId,
                 'field_name' => 'picture_url',
                 'old_value' => $concert->picture_url,
                 'new_value' => $newPath,
             ]);
             $validated['picture_url'] = $newPath;
         } else {
-            // Exclude picture_url from the update if no new file is uploaded
             unset($validated['picture_url']);
         }
 
+        unset($validated['artist_ids']);
+
         $concert->update($validated);
 
-        if ($request->has('artist_ids')) {
-            $concert->artists()->sync($validated['artist_ids'] ?? []);
+        if (isset($request->artist_ids)) {
+            $concert->artists()->sync($request->artist_ids ?? []);
         }
 
         return redirect()->route('admin.concert.detail', $concert)->with('success', 'Concert updated successfully.');
@@ -143,6 +159,9 @@ class ConcertController extends Controller
 
     public function destroy(Concert $concert)
     {
+        if ($concert->picture_url) {
+            Storage::disk('public')->delete($concert->picture_url);
+        }
         $concert->delete();
         return redirect()->route('admin.concert.index')->with('success', 'Concert deleted successfully.');
     }
@@ -167,12 +186,12 @@ class ConcertController extends Controller
             'price_max' => 'nullable|numeric|min:0|gte:price_min',
 
             // Dates and Times
-            'start_sale_date' => 'nullable|date',
-            'end_sale_date' => 'nullable|date|after_or_equal:start_sale_date',
-            'start_show_date' => 'nullable|date|after_or_equal:today',
-            'start_show_time' => 'nullable|date_format:H:i',
-            'end_show_date' => 'nullable|date|after_or_equal:start_show_date',
-            'end_show_time' => 'nullable|date_format:H:i',
+            'start_sale_date' => 'nullable|date_format:Y-m-d',
+            'end_sale_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_sale_date',
+            'start_show_date' => 'nullable|date_format:Y-m-d',
+            'start_show_time' => 'nullable|date_format:H:i:s',
+            'end_show_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_show_date',
+            'end_show_time' => 'nullable|date_format:H:i:s',
 
             // Additional Information
             'ticket_link' => 'nullable|url',

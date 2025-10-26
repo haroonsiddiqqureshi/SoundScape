@@ -15,19 +15,24 @@ const form = useForm({
     link: props.highlight.link,
     concert_id: props.highlight.concert_id,
     is_active: props.highlight.is_active,
-    picture_url: null, // Will be a file if changed
-    _method: 'POST', // Inertia uses POST for updates with file uploads
+    picture_url: null,
+    _method: "POST",
 });
 
 function submit() {
-    form.post(route("admin.highlight.update", { highlight: props.highlight.id }));
+    form.post(
+        route("admin.highlight.update", { highlight: props.highlight.id })
+    );
 }
 </script>
 
 <template>
     <AdminLayout title="Edit Highlight">
-        <div class="container mx-auto p-4 md:p-8">
-            <HighlightEditForm :form="form" :highlight="highlight" :concerts="concerts" @submit="submit" />
-        </div>
+        <HighlightEditForm
+            :form="form"
+            :highlight="highlight"
+            :concerts="concerts"
+            @submit="submit"
+        />
     </AdminLayout>
 </template>

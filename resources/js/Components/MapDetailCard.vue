@@ -76,7 +76,7 @@ const genreName = computed(() => {
 });
 
 const detailUrl = computed(() => {
-    return route('concert.detail', { concert: props.concert.id });
+    return route('concert.detail', { concert: props.concert.name });
 });
 
 const followConcert = (follow) => {

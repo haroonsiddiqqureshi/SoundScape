@@ -114,7 +114,7 @@ const selectedOption = computed(() => {
         >
             <div
                 v-if="isOpen"
-                class="custom-scrollbar absolute z-10 mt-1 max-h-96 w-full min-w-[320px] overflow-auto rounded-lg bg-card text-sm shadow-2xl ring-1 ring-background focus:outline-none"
+                class="custom-scrollbar absolute z-10 mt-1 max-h-96 w-full min-w-[320px] overflow-auto rounded-md bg-card text-sm shadow-2xl ring-1 ring-background focus:outline-none"
             >
                 <!-- Search Input -->
                 <div class="sticky top-0 z-10 bg-card/80 backdrop-blur-sm p-2">
@@ -146,7 +146,7 @@ const selectedOption = computed(() => {
                         v-for="option in filteredOptions"
                         :key="option.value"
                         @click="selectOption(option)"
-                        class="flex items-center w-full p-2 rounded-lg hover:bg-background cursor-pointer transition-colors"
+                        class="flex items-center w-full p-2 rounded-md hover:bg-background cursor-pointer transition-colors"
                     >
                         <img
                             :src="option.picture_url || picturePlaceholder(option)"

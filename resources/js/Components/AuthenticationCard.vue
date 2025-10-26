@@ -50,7 +50,7 @@ watchEffect(() => {
         </button>
         
         <div
-            class="w-full max-w-md mt-6 px-8 py-6 bg-card shadow-2xl overflow-hidden rounded-lg ring-background"
+            class="w-full max-w-md mt-6 px-8 py-6 bg-card shadow-2xl overflow-hidden rounded-md ring-background"
         >
             <div class="flex justify-center">
                 <Link :href="'/'" class="flex flex-col items-center">

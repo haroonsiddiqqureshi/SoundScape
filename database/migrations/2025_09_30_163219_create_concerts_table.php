@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             // Core Information
-            $table->string('name'); // Name of the concert
+            $table->string('name')->unique(); // Name of the concert
             $table->text('description'); // Description of the concert
             $table->string('event_type')->nullable(); // Type of the event
             $table->string('genre')->nullable(); // Genre of the concert

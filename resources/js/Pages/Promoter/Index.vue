@@ -18,7 +18,7 @@ const isVerified = computed(() => {
 <template>
     <PromoterLayout title="Promoter Dashboard">
         <div v-if="isVerified">
-            <Dashboard />
+            <Dashboard :promoter="props.promoter" />
         </div>
         <div v-else-if="!isVerified">
             <Pending />

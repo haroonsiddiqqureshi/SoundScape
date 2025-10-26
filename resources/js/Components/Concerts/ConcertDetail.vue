@@ -1,23 +1,20 @@
 <script setup>
 import { defineProps, computed, inject, ref } from "vue";
-import { Link } from "@inertiajs/vue3";
-import { PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
+import { Link, router } from "@inertiajs/vue3";
 import {
-    HeartIcon,
+    HeartIcon as OutlineHeartIcon,
     LinkIcon,
-    // TicketIcon,
-    // ClockIcon,
-    // CalendarIcon,
-    // BanknotesIcon,
-    // MapPinIcon,
     ArrowTopRightOnSquareIcon,
 } from "@heroicons/vue/24/outline";
 import {
+    HeartIcon as SolidHeartIcon,
     TicketIcon,
     CalendarIcon,
     ClockIcon,
     BanknotesIcon,
     MapPinIcon,
+    PencilIcon,
+    TrashIcon,
 } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
@@ -42,7 +39,6 @@ const copyUrlToClipboard = () => {
         .writeText(url)
         .then(() => {
             copied.value = true;
-            // Reset the 'copied' state after 2 seconds
             setTimeout(() => {
                 copied.value = false;
             }, 2000);
@@ -52,7 +48,6 @@ const copyUrlToClipboard = () => {
         });
 };
 
-// Computed property for the delete route name
 const deleteRouteName = computed(() => {
     if (props.role === "admin") {
         return "admin.concert.delete";
@@ -60,7 +55,6 @@ const deleteRouteName = computed(() => {
     return "promoter.concert.delete";
 });
 
-// Data for mapping values to display names (from ConcertCreateForm)
 const eventTypes = [
     { value: "music_festival", name: "เทศกาลดนตรี" },
     { value: "concert", name: "คอนเสิร์ต" },
@@ -81,22 +75,18 @@ const genres = [
     { value: "other", name: "อื่นๆ" },
 ];
 
-// Computed property for the event poster image
 const photoPreview = computed(() => {
     if (props.concert.picture_url) {
         if (props.concert.picture_url.startsWith("http")) {
             return props.concert.picture_url;
         }
-        // Assuming picture_url is a path from storage
         return `/storage/${props.concert.picture_url}`;
     }
-    // Fallback placeholder
     return isDarkMode.value
         ? "https://placehold.co/800x1200/1c1423/ffffff80?text=No%5CnPicture"
         : "https://placehold.co/800x1200/e5e7eb/00000080?text=No%5CnPicture";
 });
 
-// Computed properties for display-friendly event type and genre
 const displayEventType = computed(() => {
     const eventType = eventTypes.find(
         (e) => e.value === props.concert.event_type
@@ -122,7 +112,7 @@ const formattedDate = (dateString) => {
             day: "numeric",
         });
     } catch (e) {
-        return dateString; // Fallback
+        return dateString;
     }
 };
 
@@ -140,7 +130,6 @@ const formattedPrice = (price) => {
     }).format(price);
 };
 
-// Computed properties for all dates and times
 const startSaleDate = computed(() =>
     formattedDate(props.concert.start_sale_date)
 );
@@ -156,7 +145,6 @@ const endShowTime = computed(() => formattedTime(props.concert.end_show_time));
 const priceMin = computed(() => formattedPrice(props.concert.price_min));
 const priceMax = computed(() => formattedPrice(props.concert.price_max));
 
-// Computed property for artist avatar placeholders
 const artistPicturePlaceholder = computed(() => {
     return (artist) => {
         return isDarkMode.value
@@ -178,7 +166,6 @@ const provinceName = computed(() => {
     return "Loading...";
 });
 
-// Google Maps link
 const googleMapsLink = computed(() => {
     if (props.concert.latitude && props.concert.longitude) {
         return `https://www.google.com/maps/search/?api=1&query=${props.concert.latitude},${props.concert.longitude}`;
@@ -190,6 +177,16 @@ const googleMapsLink = computed(() => {
         query
     )}`;
 });
+
+const followConcert = (follow) => {
+    router.post(
+        route("concert.follow", props.concert.id),
+        {
+            is_following: !follow,
+        },
+        { preserveState: true }
+    );
+};
 </script>
 
 <template>
@@ -231,9 +228,28 @@ const googleMapsLink = computed(() => {
                     <div
                         class="flex items-center space-x-12 mx-auto lg:ml-12 mt-4"
                     >
-                        <HeartIcon
+                        <OutlineHeartIcon
+                            v-if="
+                                props.role === 'admin' ||
+                                props.role === 'promoter'
+                            "
                             class="flex-none h-8 w-8 text-primary stroke-[3px]"
                         />
+                        <button
+                            v-else
+                            @click.prevent.stop="
+                                followConcert(props.concert.is_followed)
+                            "
+                        >
+                            <component
+                                :is="
+                                    props.concert.is_followed
+                                        ? SolidHeartIcon
+                                        : OutlineHeartIcon
+                                "
+                                class="flex-none h-8 w-8 text-primary stroke-[3px]"
+                            />
+                        </button>
                         <div class="relative">
                             <button
                                 @click="copyUrlToClipboard"
@@ -279,7 +295,7 @@ const googleMapsLink = computed(() => {
                             <span
                                 :class="{
                                     'font-medium text-text-medium':
-                                        !props.concert.price_min,
+                                        !props.concert.start_sale_date,
                                 }"
                                 class="font-semibold text-accent text-center"
                             >
@@ -307,7 +323,7 @@ const googleMapsLink = computed(() => {
                             <span
                                 :class="{
                                     'font-medium text-text-medium':
-                                        !props.concert.price_min,
+                                        !props.concert.start_show_date,
                                 }"
                                 class="font-semibold text-secondary text-center"
                             >
@@ -333,7 +349,7 @@ const googleMapsLink = computed(() => {
                             <span
                                 :class="{
                                     'font-medium text-text-medium':
-                                        !props.concert.price_min,
+                                        !props.concert.start_show_time,
                                 }"
                                 class="font-semibold text-primary text-center"
                             >
@@ -470,7 +486,7 @@ const googleMapsLink = computed(() => {
 
                         <div
                             :class="{
-                                'custom-scrollbar max-h-[32rem]':
+                                'custom-scrollbar max-h-[16rem]':
                                     props.role === 'admin' ||
                                     props.role === 'promoter',
                             }"
@@ -491,7 +507,7 @@ const googleMapsLink = computed(() => {
                     >
                         <Link
                             :href="editHref"
-                            class="flex px-2 items-center space-x-1 bg-[#008be6] hover:bg-[#007acc] text-md text-white font-semibold py-2 rounded-md transition-colors duration-200"
+                            class="flex px-2 items-center space-x-1 bg-secondary hover:bg-secondary-hover text-md text-white font-semibold py-2 rounded-md transition-colors duration-200"
                         >
                             <PencilIcon class="w-5 h-5" />
                             <span>แก้ไข</span>

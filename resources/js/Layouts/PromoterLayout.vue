@@ -1,22 +1,81 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted, watchEffect, provide } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Banner from "@/Components/Banner.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/DashboardNavLink.vue";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import DashboardCurrent from "@/Components/DashboardCurrent.vue";
+import {
+    SunIcon as SolidSunIcon,
+    MoonIcon as SolidMoonIcon,
+    Bars3Icon,
+} from "@heroicons/vue/24/solid";
+import {
+    SunIcon as OutlineSunIcon,
+    MoonIcon as OutlineMoonIcon,
+} from "@heroicons/vue/24/outline";
 
 defineProps({
     title: String,
 });
 
-const showingNavigationDropdown = ref(false);
+const darkMode = ref(false);
+
+const sidebarOpen = ref(false);
+
+const toggleSidebar = () => {
+    sidebarOpen.value = !sidebarOpen.value;
+};
+
+const handleResize = () => {
+    if (window.innerWidth >= 768) {
+        sidebarOpen.value = true;
+    } else {
+        sidebarOpen.value = false;
+    }
+};
 
 const logout = () => {
     router.post(route("logout"));
 };
+
+provide("isDarkMode", darkMode);
+
+const toggleDarkMode = () => {
+    darkMode.value = !darkMode.value;
+    if (darkMode.value) {
+        localStorage.theme = "dark";
+    } else {
+        localStorage.theme = "light";
+    }
+};
+
+onMounted(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+        darkMode.value = true;
+    } else {
+        darkMode.value = false;
+    }
+});
+
+onUnmounted(() => {
+    window.removeEventListener("resize", handleResize);
+});
+
+watchEffect(() => {
+    if (darkMode.value) {
+        document.documentElement.classList.add("dark");
+    } else {
+        document.documentElement.classList.remove("dark");
+    }
+});
 </script>
 
 <template>
@@ -25,245 +84,139 @@ const logout = () => {
 
         <Banner />
 
-        <div class="bg-background text-text">
-            <nav class="bg-card text-text border-b border-gray-100">
-                <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <!-- Logo -->
-                        <div class="shrink-0 flex items-center">
-                            <Link :href="route('promoter.index')">
-                                <ApplicationLogo class="block h-9 w-auto text-primary" />
-                            </Link>
-                        </div>
-
-                        <!-- Navigation Links -->
-                        <div
-                            class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+        <div class="flex h-screen bg-card">
+            <aside
+                :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                class="fixed inset-y-0 left-0 z-30 bg-card transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col"
+            >
+                <div>
+                    <div class="p-4">
+                        <Link
+                            :href="route('promoter.index')"
+                            class="flex items-center"
                         >
-                            <NavLink
-                                :href="route('promoter.index')"
-                                :active="route().current('promoter.index')"
-                            >
-                                Dashboard
-                            </NavLink>
-                        </div>
-                        <div
-                            class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                        >
-                            <NavLink
-                                :href="route('promoter.concert.index')"
-                                :active="route().current('promoter.concert.index')"
-                            >
-                                Concerts
-                            </NavLink>
-                        </div>
-
-                        <div class="hidden sm:flex sm:items-center sm:ms-6">
-                            <!-- Settings Dropdown -->
-                            <div class="ms-3 relative">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <button
-                                            v-if="
-                                                $page.props.jetstream
-                                                    .managesProfilePhotos
-                                            "
-                                            class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
-                                        >
-                                            <img
-                                                class="size-8 rounded-full object-cover"
-                                                :src="
-                                                    $page.props.auth.user
-                                                        .promoter.promoter_logo
-                                                "
-                                                :alt="
-                                                    $page.props.auth.user
-                                                        .promoter.fullname
-                                                "
-                                            />
-                                        </button>
-
-                                        <span
-                                            v-else
-                                            class="inline-flex rounded-md"
-                                        >
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150"
-                                            >
-                                                {{
-                                                    $page.props.auth.user
-                                                        .promoter.fullname
-                                                }}
-
-                                                <svg
-                                                    class="ms-2 -me-0.5 size-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke-width="1.5"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
-                                        <!-- Account Management -->
-                                        <div
-                                            class="block px-4 py-2 text-xs text-gray-400"
-                                        >
-                                            Manage Account
-                                        </div>
-
-                                        <!-- <DropdownLink :href="route('promoter.profile.show')">
-                                            Profile
-                                        </DropdownLink> -->
-
-                                        <DropdownLink
-                                            :href="route('promoter.index')"
-                                        >
-                                            Switch to User Account
-                                        </DropdownLink>
-
-                                        <div class="border-t border-gray-200" />
-
-                                        <!-- Authentication -->
-                                        <form @submit.prevent="logout">
-                                            <DropdownLink as="button">
-                                                Log Out
-                                            </DropdownLink>
-                                        </form>
-                                    </template>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                            >
-                                <svg
-                                    class="size-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
+                            <div class="flex items-center space-x-2">
+                                <ApplicationLogo
+                                    class="block h-12 p-2 rounded-md w-auto bg-primary text-white"
+                                />
+                                <span
+                                    class="flex justify-center text-pri font-bold tracking-wide text-2xl uppercase"
+                                    >SoundScape</span
                                 >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
+                            </div>
+                        </Link>
                     </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
-                >
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink
+                    <nav
+                        class="py-2 flex-1 flex flex-col space-y-2 px-2 overflow-hidden uppercase"
+                    >
+                        <NavLink
                             :href="route('promoter.index')"
                             :active="route().current('promoter.index')"
                         >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
-                        <div class="flex items-center px-4">
-                            <div
-                                v-if="
-                                    $page.props.jetstream.managesProfilePhotos
-                                "
-                                class="shrink-0 me-3"
-                            >
-                                <img
-                                    class="size-10 rounded-full object-cover"
-                                    :src="
-                                        $page.props.auth.user.promoter
-                                            .promoter_logo
-                                    "
-                                    :alt="
-                                        $page.props.auth.user.promoter.fullname
-                                    "
-                                />
-                            </div>
-
-                            <div>
-                                <div
-                                    class="font-medium text-base text-gray-800"
-                                >
-                                    {{
-                                        $page.props.auth.user.promoter.fullname
-                                    }}
-                                </div>
-                                <div class="font-medium text-sm text-gray-500">
-                                    {{ $page.props.auth.user.email }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink
-                                :href="route('user.profile.show')"
-                                :active="route().current('user.profile.show')"
-                            >
-                                Profile
-                            </ResponsiveNavLink>
-
-                            <!-- Authentication -->
-                            <form method="POST" @submit.prevent="logout">
-                                <ResponsiveNavLink as="button">
-                                    Log Out
-                                </ResponsiveNavLink>
-                            </form>
-                        </div>
-                    </div>
+                            <span class="w-full">Dashboard</span>
+                            <DashboardCurrent
+                                :active="route().current('promoter.index')"
+                            />
+                        </NavLink>
+                        <NavLink
+                            :href="route('promoter.concert.index')"
+                            :active="route().current('promoter.concert.*')"
+                        >
+                            <span class="w-full">Concerts</span>
+                            <DashboardCurrent
+                                :active="route().current('promoter.concert.*')"
+                            />
+                        </NavLink>
+                    </nav>
                 </div>
-            </nav>
+                <div class="p-2 mt-auto">
+                    <Link
+                        :href="route('index')"
+                        class="uppercase w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-bold hover:bg-card transition-all duration-200"
+                    >
+                        <span>Switch to User</span>
+                    </Link>
+                    <form @submit.prevent="logout">
+                        <button
+                            class="uppercase w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-bold hover:bg-card transition-all duration-200"
+                        >
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </aside>
 
-            <!-- Page Content -->
-            <main>
-                <slot />
-            </main>
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <header class="bg-card z-10 shadow-md">
+                    <div
+                        class="py-4 px-6 lg:px-8 flex justify-between items-center"
+                    >
+                        <div class="flex items-center">
+                            <button
+                                @click.stop="toggleSidebar"
+                                class="text-primary md:hidden"
+                            >
+                                <Bars3Icon class="h-6 w-6 stroke-current" />
+                            </button>
+                        </div>
+
+                        <div
+                            class="flex items-center sm:ms-6 bg-primary relative"
+                        >
+                            <div
+                                class="absolute -left-3 bg-card p-2 rounded-full"
+                            />
+                            <div
+                                class="absolute -right-3 bg-card p-2 rounded-full"
+                            />
+                            <button
+                                @click="toggleDarkMode"
+                                class="group p-2 text-white outline-dashed outline-2 outline-card bg-secondary-high"
+                            >
+                                <div
+                                    v-if="darkMode"
+                                    class="relative h-[20px] w-[20px]"
+                                >
+                                    <OutlineSunIcon
+                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2.5px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                    />
+                                    <SolidSunIcon
+                                        class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                    />
+                                </div>
+
+                                <div v-else class="relative h-[20px] w-[20px]">
+                                    <OutlineMoonIcon
+                                        class="absolute inset-0 h-full w-full stroke-current stroke-[3px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                    />
+                                    <SolidMoonIcon
+                                        class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                    />
+                                </div>
+                            </button>
+                            <div class="px-4 font-bold text-white uppercase">
+                                {{ $page.props.auth.user.promoter.fullname }}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main
+                    class="custom-scrollbar flex-1 overflow-x-hidden overflow-y-auto bg-background"
+                    @click="sidebarOpen = false"
+                >
+                    <div
+                        class="px-8 py-8 transition-all duration-300"
+                    >
+                        <slot />
+                    </div>
+                </main>
+            </div>
+            <div
+                v-if="sidebarOpen"
+                @click="sidebarOpen = false"
+                class="fixed inset-0 bg-text-reverse opacity-50 z-20 md:hidden"
+            ></div>
         </div>
     </div>
 </template>

@@ -1,11 +1,24 @@
 <script setup>
-import { computed } from "vue";
+import { computed, inject } from "vue";
 
 const props = defineProps({
     promoter: Object,
 });
 
-const emit = defineEmits(["show-full-bio", "show-full-address", "update-verification-status"]);
+const emit = defineEmits([
+    "show-full-bio",
+    "show-full-address",
+    "update-verification-status",
+]);
+const isDarkMode = inject("isDarkMode");
+
+const promoterPicturePlaceholder = computed(() => {
+    const name = encodeURIComponent(props.promoter?.fullname || "NA");
+
+    return isDarkMode.value
+        ? `https://ui-avatars.com/api/?name=${name}&background=1c1423&color=ffffff`
+        : `https://ui-avatars.com/api/?name=${name}&background=e5e7eb&color=000000`;
+});
 
 const availableSocialLinks = computed(() => {
     if (!props.promoter.social_links) {
@@ -18,104 +31,75 @@ const availableSocialLinks = computed(() => {
 </script>
 
 <template>
-    <div class="bg-white shadow-xl sm:rounded-lg">
-        <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+    <div class="overflow-hidden space-y-2">
+        <div class="bg-card rounded-md p-6 lg:px-20">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-6">
                     <img
-                        class="h-18 w-18 rounded-full flex items-center justify-center object-cover"
-                        :src="promoter.user.profile_photo_url"
-                        :alt="promoter.user.name"
+                        class="h-16 w-16 rounded-full flex items-center justify-center object-cover"
+                        :src="promoterPicturePlaceholder"
+                        :alt="promoter.fullname"
                     />
                     <div>
-                        <h2 class="text-2xl font-semibold text-gray-800">
+                        <h2 class="lg:text-2xl font-semibold text-text">
                             {{ promoter.fullname }}
                         </h2>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm text-text-medium">
                             {{ promoter.user.email }}
                         </p>
                     </div>
                 </div>
                 <div class="flex flex-col items-end space-y-2">
-                    <div class="flex items-center space-x-4">
-                        <span
-                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                            :class="
-                                promoter.is_verified
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-red-100 text-red-800'
-                            "
-                        >
-                            {{
-                                promoter.is_verified
-                                    ? "Verified"
-                                    : "Not Verified"
-                            }}
-                        </span>
-                        <button
-                            @click="
-                                emit('update-verification-status', promoter)
-                            "
-                            class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200"
-                            :class="
-                                promoter.is_verified
-                                    ? 'bg-green-600'
-                                    : 'bg-gray-200'
-                            "
-                        >
-                            <span class="sr-only">Use setting</span>
-                            <span
-                                aria-hidden="true"
-                                class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
-                                :class="{
-                                    'translate-x-5': promoter.is_verified,
-                                    'translate-x-0': !promoter.is_verified,
-                                }"
-                            ></span>
-                        </button>
-                    </div>
+                    <span
+                        @click="emit('update-verification-status', promoter)"
+                        class="px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer"
+                        :class="
+                            promoter.is_verified
+                                ? 'bg-primary text-white'
+                                : 'bg-background'
+                        "
+                    >
+                        {{ promoter.is_verified ? "Verified" : "Not Verified" }}
+                    </span>
                 </div>
             </div>
         </div>
 
         <div
-            class="p-6 sm:px-20 bg-white grid grid-cols-1 md:grid-cols-2 gap-6"
+            class="bg-card rounded-md p-6 lg:px-20 grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-            <!-- Business Details -->
-            <div class="p-6 bg-gray-50 rounded-lg">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <div class="p-6 bg-background rounded-md">
+                <h3 class="text-lg font-semibold text-text mb-4">
                     Business Details
                 </h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">
+                        <dt class="text-sm font-medium text-text/80">
                             Business Name
                         </dt>
-                        <dd class="mt-1 text-sm text-gray-900">
+                        <dd class="mt-1 text-sm text-text">
                             {{ promoter.business_name }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">
+                        <dt class="text-sm font-medium text-text/80">
                             Business Type
                         </dt>
-                        <dd class="mt-1 text-sm text-gray-900">
+                        <dd class="mt-1 text-sm text-text">
                             {{ promoter.business_category }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">
+                        <dt class="text-sm font-medium text-text/80">
                             Business Address
                         </dt>
-                        <dd
-                            class="mt-1 text-sm text-gray-900 flex justify-between"
-                        >
+                        <dd class="mt-1 text-sm text-text flex justify-between">
                             <span class="max-w-xs truncate">
                                 {{ promoter.business_address }}
                             </span>
                             <button
                                 @click="emit('show-full-address')"
-                                class="text-indigo-600 hover:text-indigo-900 text-sm ml-2"
+                                class="text-primary hover:text-primary-hover text-sm ml-2"
                             >
                                 View
                             </button>
@@ -124,38 +108,35 @@ const availableSocialLinks = computed(() => {
                 </dl>
             </div>
 
-            <!-- Contact and Bio -->
-            <div class="p-6 bg-gray-50 rounded-lg">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <div class="p-6 bg-background rounded-md">
+                <h3 class="text-lg font-semibold text-text mb-4">
                     Contact & Bio
                 </h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">
+                        <dt class="text-sm font-medium text-text/80">
                             Phone Number
                         </dt>
-                        <dd class="mt-1 text-sm text-gray-900">
+                        <dd class="mt-1 text-sm text-text">
                             {{ promoter.user.phone }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Line</dt>
-                        <dd class="mt-1 text-sm text-gray-900">
+                        <dt class="text-sm font-medium text-text/80">Line</dt>
+                        <dd class="mt-1 text-sm text-text">
                             {{ promoter.user?.line ?? "Not provided" }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Bio</dt>
-                        <dd
-                            class="mt-1 text-sm text-gray-900 flex justify-between"
-                        >
+                        <dt class="text-sm font-medium text-text/80">Bio</dt>
+                        <dd class="mt-1 text-sm text-text flex justify-between">
                             <span class="max-w-xs truncate">
                                 {{ promoter.bio || "Not provided" }}
                             </span>
                             <button
                                 v-if="promoter.bio"
                                 @click="emit('show-full-bio')"
-                                class="text-indigo-600 hover:text-indigo-900 text-sm ml-2"
+                                class="text-primary hover:text-primary-hover text-sm ml-2"
                             >
                                 View
                             </button>
@@ -164,9 +145,8 @@ const availableSocialLinks = computed(() => {
                 </dl>
             </div>
 
-            <!-- Social Links -->
-            <div class="md:col-span-2 p-6 bg-gray-50 rounded-lg">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <div class="md:col-span-2 p-6 bg-background rounded-md">
+                <h3 class="text-lg font-semibold text-text mb-4">
                     Social Links
                 </h3>
                 <div class="flex flex-wrap gap-4">
@@ -175,9 +155,11 @@ const availableSocialLinks = computed(() => {
                         :key="platform"
                         :href="link"
                         target="_blank"
-                        class="text-indigo-600 hover:text-indigo-900 flex items-center space-x-2"
+                        class="text-secondary hover:text-secondary-hover flex items-center space-x-2 transition-colors"
                     >
-                        <span class="capitalize">{{ platform }}</span>
+                        <span class="capitalize font-medium">{{
+                            platform
+                        }}</span>
                     </a>
                 </div>
             </div>

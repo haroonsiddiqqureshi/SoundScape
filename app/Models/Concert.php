@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
 
 class Concert extends Model
 {
@@ -18,12 +20,12 @@ class Concert extends Model
         'province_id',
         'price_min',
         'price_max',
+        'start_sale_date',
+        'end_sale_date',
         'start_show_date',
         'start_show_time',
         'end_show_date',
         'end_show_time',
-        'start_sale_date',
-        'end_sale_date',
         'latitude',
         'longitude',
         'picture_url',
@@ -39,15 +41,52 @@ class Concert extends Model
         'promoter_id' => 'integer',
         'latitude' => 'float',
         'longitude' => 'float',
-        'start_show_date' => 'date',
-        'end_show_date' => 'date',
-        'start_sale_date' => 'date',
-        'end_sale_date' => 'date',
+        // 'start_sale_date' => 'date:Y-m-d',
+        // 'end_sale_date'   => 'date:Y-m-d',
+        // 'start_show_date' => 'date:Y-m-d',
+        // 'end_show_date'   => 'date:Y-m-d',
         'price_min' => 'integer',
         'price_max' => 'integer',
         'view_count' => 'integer',
         'like_count' => 'integer',
     ];
+
+    protected function startShowDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+    
+    /**
+     * Get and format the end_show_date.
+     */
+    protected function endShowDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    /**
+     * Get and format the start_sale_date.
+     */
+    protected function startSaleDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    /**
+     * Get and format the end_sale_date.
+     */
+    protected function endSaleDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
 
     public function admin()
     {

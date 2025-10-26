@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('promoter_id')->nullable()->constrained('promoters')->onDelete('cascade'); // Promoter who made the change
             $table->foreignId('concert_id')->constrained('concerts')->onDelete('cascade'); // Associated concert
             $table->string('field_name'); // Name of the field that was changed
-            $table->text('old_value'); // Previous value
-            $table->text('new_value'); // New value
+            $table->text('old_value')->nullable(); // Previous value
+            $table->text('new_value')->nullable(); // New value
             $table->timestamps();
         });
     }

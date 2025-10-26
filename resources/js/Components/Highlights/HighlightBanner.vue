@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted , inject} from "vue";
+import { ref, computed, onMounted, onUnmounted, inject } from "vue";
+import { router } from "@inertiajs/vue3";
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
@@ -19,8 +20,8 @@ const getPictureUrl = (highlight) => {
         return `/storage/${highlight.picture_url}`;
     }
     return isDarkMode.value
-        ? "https://placehold.co/600x400/1a1a2e/ffffff?text=SOUNDSCAPE"
-        : "https://placehold.co/600x400/ffffff/000000?text=SOUNDSCAPE";
+        ? "https://placehold.co/800x200/1a1a2e/ffffff?text=SOUNDSCAPE"
+        : "https://placehold.co/800x200/ffffff/000000?text=SOUNDSCAPE";
 };
 
 const currentIndex = ref(0);
@@ -31,7 +32,7 @@ const highlightsKeys = computed(() => {
 });
 
 let intervalId = null;
-const INTERVAL_MS = 3000;
+const INTERVAL_MS = 5000;
 
 const startInterval = () => {
     stopInterval();
@@ -74,12 +75,25 @@ const selectIndex = (index) => {
     resetTimer();
 };
 
+const handleHighlightClick = (highlight) => {
+    if (highlight?.concert_id) {
+        stopInterval();
+        router.visit(route("concert.detail", highlight.concert_id));
+    } else if (highlight?.link) {
+        window.open(highlight.link, "_blank");
+        resetTimer();
+    }
+};
+
 onMounted(() => startInterval());
 onUnmounted(() => stopInterval());
 </script>
 
 <template>
-    <div v-if="highlightsKeys.length > 0" class="relative flex text-primary-low">
+    <div
+        v-if="highlightsKeys.length > 0"
+        class="relative flex text-primary-low"
+    >
         <button
             @click="previousHighlight"
             class="absolute top-1/2 p-2 xl:p-0 left-0 xl:-left-12 transform -translate-y-1/2 h-full bg-card-low xl:bg-transparent text-primary z-10 transition-all duration-300"
@@ -88,7 +102,7 @@ onUnmounted(() => stopInterval());
                 class="w-6 h-6 sm:w-8 sm:h-8 stroke-current"
             />
         </button>
-        <div class="shadow-md rounded-lg overflow-hidden flex-1">
+        <div class="shadow-md rounded-md overflow-hidden flex-1">
             <div
                 class="flex max-h-96 transition-transform duration-500 ease-in-out"
                 :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
@@ -96,7 +110,8 @@ onUnmounted(() => stopInterval());
                 <div
                     v-for="key in highlightsKeys"
                     :key="key"
-                    class="w-full flex-shrink-0"
+                    class="w-full flex-shrink-0 cursor-pointer"
+                    @click="handleHighlightClick(highlights[key])"
                 >
                     <img
                         :src="getPictureUrl(highlights[key])"
@@ -132,13 +147,13 @@ onUnmounted(() => stopInterval());
             ></button>
         </div>
     </div>
-    <div v-else class="shadow-md rounded-lg overflow-hidden flex-1">
+    <div v-else class="shadow-md rounded-md overflow-hidden flex-1">
         <div class="flex max-h-96">
             <div class="w-full">
                 <img
                     :src="getPictureUrl()"
                     alt="SoundScape"
-                    class="w-full h-full object-cover block"
+                    class="w-full h-full object-fill block"
                 />
             </div>
         </div>

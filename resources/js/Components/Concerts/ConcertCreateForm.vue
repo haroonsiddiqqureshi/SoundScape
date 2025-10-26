@@ -174,7 +174,7 @@ const artistPicturePlaceholder = computed(() => {
         return isDarkMode.value
             ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
                   artist.name
-              )}&background=ff1493&color=ffffff`
+              )}&background=1c1423&color=ffffff`
             : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                   artist.name
               )}&background=008be6&color=ffffff`;
@@ -188,7 +188,11 @@ const availableArtists = computed(() => {
             name: artist.name,
             value: artist.id,
             picture_url:
-                artist.picture_url || artistPicturePlaceholder.value(artist),
+                artist.picture_url && (artist.picture_url.startsWith('http://') || artist.picture_url.startsWith('https://'))
+                    ? artist.picture_url
+                    : artist.picture_url
+                        ? `/storage/${artist.picture_url}`
+                        : artistPicturePlaceholder.value(artist),
         }));
 });
 
@@ -418,9 +422,8 @@ watch(
                 <span class="text-sm"
                     >กรุณาตรวจสอบข้อมูลในช่องที่มีกรอบเส้นประอีกครั้ง</span
                 >
-                <span></span>
                 <ul
-                    class="list-disc list-inside space-y-1 pl-5 bg-background p-4 rounded-md outline-dashed text-primary"
+                    class="list-disc list-inside space-y-1 pl-5 bg-background p-4 rounded-md outline-dashed -outline-offset-4 text-primary"
                 >
                     <li
                         v-for="(errorMessages, fieldName) in props.form.errors"
@@ -438,7 +441,7 @@ watch(
     </div>
 
     <div
-        class="max-w-xl lg:max-w-full mx-auto bg-card lg:shadow-xl rounded-lg space-y-2"
+        class="max-w-xl lg:max-w-full mx-auto bg-card lg:shadow-xl rounded-md space-y-2"
     >
         <div class="lg:flex px-6 pt-6 space-y-2 lg:space-y-0">
             <div class="flex-none w-fit lg:mr-4 relative">
@@ -446,7 +449,7 @@ watch(
                     v-if="photoPreview"
                     class="relative cursor-pointer lg:h-[444px]"
                     :class="{
-                        'outline-dashed outline-primary rounded-md':
+                        'outline-dashed outline-primary -outline-offset-4 rounded-md':
                             props.form.errors.picture_url,
                     }"
                 >
@@ -475,7 +478,7 @@ watch(
                         v-model="props.form.event_type"
                         :options="eventTypes"
                         :class="{
-                            'outline-dashed outline-primary rounded-md':
+                            'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                 props.form.errors.event_type,
                         }"
                     />
@@ -484,7 +487,7 @@ watch(
                         v-model="props.form.genre"
                         :options="genres"
                         :class="{
-                            'outline-dashed outline-primary rounded-md':
+                            'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                 props.form.errors.genre,
                         }"
                     />
@@ -495,7 +498,7 @@ watch(
                     v-model="props.form.name"
                     class="mt-2 bg-background rounded-md font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                     :class="{
-                        'outline-dashed outline-primary rounded-md':
+                        'outline-dashed outline-primary -outline-offset-4 rounded-md':
                             props.form.errors.name,
                     }"
                     placeholder="ชื่องานดนตรี"
@@ -512,7 +515,7 @@ watch(
                         v-model="props.form.ticket_link"
                         class="w-full bg-background rounded-md border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                         :class="{
-                            'outline-dashed outline-primary rounded-md':
+                            'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                 props.form.errors.ticket_link,
                         }"
                         placeholder="ลิงก์จำหน่ายบัตร"
@@ -531,20 +534,14 @@ watch(
                                 v-model="props.form.start_sale_date"
                                 :max-date="props.form.end_sale_date"
                                 placeholder="วันจำหน่ายบัตร"
-                                :class="{
-                                    'outline-dashed outline-primary rounded-md':
-                                        props.form.errors.start_sale_date,
-                                }"
+                                :error="props.form.errors.start_sale_date"
                         /></template>
                         <template #endInput
                             ><DatePicker
                                 v-model="props.form.end_sale_date"
                                 :min-date="props.form.start_sale_date"
                                 placeholder="วันสิ้นสุดการจำหน่าย"
-                                :class="{
-                                    'outline-dashed outline-primary rounded-md':
-                                        props.form.errors.end_sale_date,
-                                }"
+                                :error="props.form.errors.end_sale_date"
                         /></template>
                     </AnimatedRangeInput>
                     <AnimatedRangeInput
@@ -560,20 +557,14 @@ watch(
                                 placeholder="วันที่แสดง"
                                 :min-date="new Date()"
                                 :max-date="props.form.end_show_date"
-                                :class="{
-                                    'outline-dashed outline-primary rounded-md':
-                                        props.form.errors.start_show_date,
-                                }"
+                                :error="props.form.errors.start_show_date"
                         /></template>
                         <template #endInput
                             ><DatePicker
                                 v-model="props.form.end_show_date"
                                 placeholder="สิ้นสุดการแสดง"
                                 :min-date="props.form.start_show_date"
-                                :class="{
-                                    'outline-dashed outline-primary rounded-md':
-                                        props.form.errors.end_show_date,
-                                }"
+                                :error="props.form.errors.end_show_date"
                         /></template>
                     </AnimatedRangeInput>
                     <AnimatedRangeInput
@@ -587,19 +578,13 @@ watch(
                             ><TimePicker
                                 v-model="props.form.start_show_time"
                                 placeholder="เวลาแสดง"
-                                :class="{
-                                    'outline-dashed outline-primary rounded-md':
-                                        props.form.errors.start_show_time,
-                                }"
+                                :error="props.form.errors.start_show_time"
                         /></template>
                         <template #endInput
                             ><TimePicker
                                 v-model="props.form.end_show_time"
                                 placeholder="เวลาสิ้นสุด"
-                                :class="{
-                                    'outline-dashed outline-primary rounded-md':
-                                        props.form.errors.end_show_time,
-                                }"
+                                :error="props.form.errors.end_show_time"
                         /></template>
                     </AnimatedRangeInput>
                     <AnimatedRangeInput :trigger-value="props.form.price_min">
@@ -612,7 +597,7 @@ watch(
                                 v-model="props.form.price_min"
                                 class="bg-background rounded-md text-sm font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium w-[100px]"
                                 :class="{
-                                    'outline-dashed outline-primary rounded-md':
+                                    'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                         props.form.errors.price_min,
                                 }"
                                 placeholder="ราคาเริ่มต้น"
@@ -623,7 +608,7 @@ watch(
                                 v-model="props.form.price_max"
                                 class="bg-background rounded-md text-sm font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium w-[100px]"
                                 :class="{
-                                    'outline-dashed outline-primary rounded-md':
+                                    'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                         props.form.errors.price_max,
                                 }"
                                 placeholder="ราคาสูงสุด"
@@ -667,7 +652,7 @@ watch(
                                     @click="openMap"
                                     class="bg-background hover:bg-background-hover rounded-md text-sm font-medium border-none text-text-medium text-left w-full px-3 py-2"
                                     :class="{
-                                        'outline-dashed outline-primary rounded-md':
+                                        'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                             props.form.errors.latitude ||
                                             props.form.errors.longitude,
                                         'text-text': props.form.latitude,
@@ -690,7 +675,7 @@ watch(
                                     v-model="props.form.province_id"
                                     :provinces="allProvinces"
                                     :class="{
-                                        'outline-dashed outline-primary rounded-md':
+                                        'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                             props.form.errors.province_id,
                                     }"
                                 />
@@ -706,7 +691,7 @@ watch(
                                         v-model="props.form.venue_name"
                                         class="bg-background rounded-md text-sm font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium w-full pr-10"
                                         :class="{
-                                            'outline-dashed outline-primary rounded-md':
+                                            'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                                 props.form.errors.venue_name,
                                         }"
                                         placeholder="ชื่อสถานที่จัดงาน"
@@ -741,7 +726,7 @@ watch(
                                     :options="availableArtists"
                                     :is-dark-mode="isDarkMode"
                                     :class="{
-                                        'outline-dashed outline-primary rounded-full':
+                                        'outline-dashed outline-primary -outline-offset-4 rounded-full':
                                             props.form.errors.artist_ids,
                                     }"
                                 >
@@ -767,8 +752,11 @@ watch(
                             >
                                 <img
                                     :src="
-                                        artist.picture_url ||
-                                        artistPicturePlaceholder(artist)
+                                        artist.picture_url && (artist.picture_url.startsWith('http://') || artist.picture_url.startsWith('https://'))
+                                            ? artist.picture_url
+                                            : artist.picture_url
+                                                ? `/storage/${artist.picture_url}`
+                                                : artistPicturePlaceholder(artist)
                                     "
                                     :alt="artist.name"
                                     class="w-5 h-5 rounded-full object-cover"
@@ -792,7 +780,7 @@ watch(
                             class="w-full resize-none h-64 bg-transparent border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                             :class="{
                                 'text-center': props.form.description,
-                                'outline-dashed outline-primary rounded-md':
+                                'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                     props.form.errors.description,
                             }"
                             placeholder="รายละเอียดงานดนตรี"
@@ -818,7 +806,7 @@ watch(
                 @click.self="closeModal"
             >
                 <div
-                    class="bg-card rounded-lg shadow-xl w-full max-w-2xl p-6 space-y-4"
+                    class="bg-card rounded-md shadow-xl w-full max-w-2xl p-6 space-y-4"
                 >
                     <div class="flex justify-between items-center">
                         <h3

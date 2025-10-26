@@ -207,13 +207,13 @@ const logout = () => {
                                     />
                                 </div>
 
-                                <SearchResults
+                                <!-- <SearchResults
                                     v-if="
                                         isSearchFocused && search.length > 1
                                     "
                                     :is-loading="isLoadingSearch"
                                     :results="searchResults"
-                                />
+                                /> -->
                             </div>
                         </div>
 

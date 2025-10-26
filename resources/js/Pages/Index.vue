@@ -141,7 +141,7 @@ watch(
                     :key="concert.id"
                     :href="
                         route('concert.detail', {
-                            concert: concert.id,
+                            concert: concert.name,
                         })
                     "
                     class="block"

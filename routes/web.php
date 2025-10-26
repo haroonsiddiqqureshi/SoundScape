@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 
 // --- Admin Controllers ---
@@ -23,7 +22,7 @@ Route::middleware([
     'block_admin'
 ])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('index');
-    Route::get('/concert/{concert}', [HomeController::class, 'concertDetail'])->name('concert.detail');
+    Route::get('/concert/{concert:name}', [HomeController::class, 'concertDetail'])->name('concert.detail');
     Route::get('/map', [MapController::class, 'index'])->name('map.index');
     Route::get('/search-query', [HomeController::class, 'searchQuery'])->name('api.search');
     // Add other routes accessible to both users and guests here...
@@ -50,6 +49,7 @@ Route::middleware([
             Route::get('/concert/{concert}', [PromoterConcertController::class, 'detail'])->name('concert.detail');
             Route::get('/concert/edit/{concert}', [PromoterConcertController::class, 'edit'])->name('concert.edit');
             Route::post('/concert/{concert}', [PromoterConcertController::class, 'update'])->name('concert.update');
+            Route::delete('/concert/{concert}', [PromoterConcertController::class, 'destroy'])->name('concert.delete');
 
             // Add other promoter-only routes here...
         });
@@ -91,6 +91,11 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
 
     // --- Admin Artist Management Routes ---
     Route::get('/artist', [AdminArtistController::class, 'index'])->name('artist.index');
+    Route::get('/artist/create', [AdminArtistController::class, 'create'])->name('artist.create');
+    Route::post('/artist', [AdminArtistController::class, 'store'])->name('artist.store');
+    Route::get('/artist/edit/{artist}', [AdminArtistController::class, 'edit'])->name('artist.edit');
+    Route::post('/artist/{artist}', [AdminArtistController::class, 'update'])->name('artist.update');
+    Route::delete('/artist/{artist}', [AdminArtistController::class, 'destroy'])->name('artist.delete');
 
     // Add other admin-only routes here...
 });

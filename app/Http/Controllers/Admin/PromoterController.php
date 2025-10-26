@@ -9,11 +9,26 @@ use App\Models\Promoter;
 
 class PromoterController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $promoters = Promoter::with('user')->get();
+        $query = Promoter::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            
+            $query->where(function ($q) use ($search) {
+                $q->where('fullname', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('email', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        $promoters = $query->get();
+
         return Inertia::render('Admin/Promoter/Index', [
             'promoters' => $promoters,
+            'filters' => $request->only(['search']),
         ]);
     }
 

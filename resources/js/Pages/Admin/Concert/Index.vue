@@ -18,9 +18,9 @@ const props = defineProps({
         >
             <Link
                 :href="route('admin.concert.create')"
-                class="inline-flex py-16 items-center justify-center text-primary bg-primary-low rounded-md outline-dashed"
+                class="inline-flex py-16 items-center justify-center text-primary bg-primary-low rounded-md outline-dashed outline-4 -outline-offset-4"
             >
-                <PlusIcon class="w-12 h-12" />
+                <PlusIcon class="w-12 h-12 stroke-current" />
             </Link>
             <Link
                 v-for="concert in concerts"
@@ -38,9 +38,9 @@ const props = defineProps({
         <Link
             v-else
             :href="route('admin.concert.create')"
-            class="w-full flex items-center justify-center py-20 outline-dashed rounded-md text-primary bg-primary-low"
+            class="w-full flex items-center justify-center py-20 outline-dashed outline-4 rounded-md text-primary bg-primary-low"
         >
-            <PlusIcon class="w-12 h-12" />
+            <PlusIcon class="w-12 h-12 stroke-current" />
         </Link>
     </AdminLayout>
 </template>

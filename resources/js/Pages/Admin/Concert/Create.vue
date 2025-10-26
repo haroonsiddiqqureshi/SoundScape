@@ -26,12 +26,12 @@ const form = useForm({
     price_max: null,
 
     // Date & Time
+    start_sale_date: null,
+    end_sale_date: null,
     start_show_date: null,
     start_show_time: null,
     end_show_date: null,
     end_show_time: null,
-    start_sale_date: null,
-    end_sale_date: null,
 
     // Additional Information
     ticket_link: "",

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('artists', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // Name of the artist
+            $table->string('name'); // Name of the artist
             $table->text('bio')->nullable(); // Biography of the artist
             $table->text('picture_url')->nullable(); // Picture URL of the artist
             $table->timestamps();

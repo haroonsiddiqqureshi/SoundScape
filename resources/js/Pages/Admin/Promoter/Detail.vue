@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import PromoterDetail from "@/Components/Promoters/PromoterDetail.vue";
-import AdminPromoterModal from "@/Components/AdminPromoterModal.vue";
+import PromoterModal from "@/Components/Promoters/PromoterModal.vue";
 import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
 
@@ -28,19 +28,15 @@ const updateVerificationStatus = (promoter) => {
 
 <template>
     <AdminLayout title="Promoter Details">
-        <div class="py-12">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                <PromoterDetail
-                    :promoter="promoter"
-                    @show-full-bio="showingFullBio = true"
-                    @show-full-address="showingFullAddress = true"
-                    @update-verification-status="updateVerificationStatus"
-                />
-            </div>
-        </div>
+        <PromoterDetail
+            :promoter="promoter"
+            @show-full-bio="showingFullBio = true"
+            @show-full-address="showingFullAddress = true"
+            @update-verification-status="updateVerificationStatus"
+        />
 
         <!-- Bio & Address Modals -->
-        <AdminPromoterModal
+        <PromoterModal
             :promoter="promoter"
             v-model:showingFullBio="showingFullBio"
             v-model:showingFullAddress="showingFullAddress"
