@@ -24,8 +24,9 @@ class ArtistController extends Controller
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
+            ->where('picture_url', '!=', 'https://static.joox.com/pc/prod/static/di/default/default-artist@300.png')
             ->latest()
-            ->get();
+            ->paginate(30);
 
         return Inertia::render('Admin/Artist/Index', [
             'artists' => $artists,

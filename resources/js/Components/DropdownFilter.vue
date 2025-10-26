@@ -54,7 +54,7 @@ onBeforeUnmount(() => {
             <button
                 type="button"
                 @click="isOpen = !isOpen"
-                class="group relative w-full cursor-pointer rounded-full bg-card py-1 pl-3 pr-10 text-left text-sm font-semibold ring-1 ring-inset ring-card focus:outline-none hover:bg-primary hover:text-white transition-colors duration-200"
+                class="group relative w-full cursor-pointer rounded-full bg-card py-1 pl-3 pr-10 text-left text-sm font-semibold ring-0 focus:outline-none hover:bg-primary hover:text-white transition-colors duration-200"
             >
                 <span
                     class="block truncate"
@@ -91,7 +91,7 @@ onBeforeUnmount(() => {
                         v-for="option in options"
                         :key="option.value"
                         @click="selectOption(option.value)"
-                        class="relative cursor-pointer py-2 px-6 font-normal hover:text-secondary hover:text-lg transition-all duration-150"
+                        class="relative cursor-pointer py-2 px-6 font-normal hover:text-primary hover:font-bold hover:text-lg transition-all duration-150"
                     >
                         <span
                             class="block truncate"
@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
                         </span>
                         <span
                             v-if="modelValue === option.value"
-                            class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary"
+                            class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary"
                         >
                         </span>
                     </div>

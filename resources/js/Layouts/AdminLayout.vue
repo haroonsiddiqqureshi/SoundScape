@@ -150,12 +150,12 @@ watchEffect(() => {
                         </NavLink>
                         <NavLink
                             :href="route('admin.promoter.index')"
-                            :active="route().current('admin.promoter.index')"
+                            :active="route().current('admin.promoter.*')"
                         >
                             <span class="w-full">Promoters</span>
                             <DashboardCurrent
                                 :active="
-                                    route().current('admin.promoter.index')
+                                    route().current('admin.promoter.*')
                                 "
                             />
                         </NavLink>

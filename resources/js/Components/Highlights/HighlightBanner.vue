@@ -116,7 +116,7 @@ onUnmounted(() => stopInterval());
                     <img
                         :src="getPictureUrl(highlights[key])"
                         :alt="highlights[key].name"
-                        class="w-full h-full object-cover block"
+                        class="w-full h-full object-fill block"
                     />
                 </div>
             </div>

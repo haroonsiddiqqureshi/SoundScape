@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ConcertController;
+use App\Http\Controllers\Api\ArtistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProvinceController;
@@ -12,3 +13,5 @@ Route::get('/user', function (Request $request) {
 Route::get('/provinces', [ProvinceController::class, 'index']);
 
 Route::post('/concerts', [ConcertController::class, 'store']);
+
+Route::post('/artists', [ArtistController::class, 'store']);

@@ -35,6 +35,12 @@ class HomeController extends Controller
         $sort = $request->input('sort', 'newest');
 
         switch ($sort) {
+            case 'name_az':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_za':
+                $query->orderBy('name', 'desc');
+                break;
             case 'date_asc':
                 $query->orderBy('start_show_date', 'asc');
                 break;

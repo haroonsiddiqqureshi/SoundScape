@@ -3,15 +3,8 @@
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch, computed, inject } from "vue";
 import { debounce } from "lodash-es";
-import {
-    PlusIcon,
-    PencilIcon,
-    TrashIcon,
-} from "@heroicons/vue/24/solid";
-import {
-    FolderPlusIcon,
-    MagnifyingGlassIcon,
-} from "@heroicons/vue/24/outline";
+import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
+import { FolderPlusIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 
 // This component receives the props from Index.vue
 const props = defineProps({
@@ -58,7 +51,7 @@ const getPictureUrl = (artist) => {
         }
         return `/storage/${artist.picture_url}`;
     }
-    
+
     const name = encodeURIComponent(artist?.name || "NA");
     return isDarkMode.value
         ? `https://ui-avatars.com/api/?name=${name}&background=1c1423&color=ffffff`
@@ -68,7 +61,6 @@ const getPictureUrl = (artist) => {
 
 <template>
     <div class="w-full mx-auto rounded-md space-y-6">
-        
         <div class="flex justify-between items-center space-x-4">
             <div class="w-full flex items-center space-x-4">
                 <div class="relative w-full">
@@ -101,8 +93,13 @@ const getPictureUrl = (artist) => {
             v-if="hasArtists"
             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
         >
-            <div
-                v-for="artist in props.artists"
+            <Link
+                v-for="artist in props.artists.data"
+                :href="
+                    route('admin.artist.edit', {
+                        artist: artist.id,
+                    })
+                "
                 :key="artist.id"
                 class="bg-card rounded-md shadow-lg overflow-hidden ring-4 ring-card flex flex-col hover:scale-[1.05] transition-transform duration-300"
             >
@@ -111,25 +108,10 @@ const getPictureUrl = (artist) => {
                     :alt="artist.name"
                     class="w-full aspect-square object-cover bg-background-hover rounded-md"
                 />
-                <h3
-                    class="p-3 text-center font-semibold text-text truncate"
-                >
+                <h3 class="p-3 text-center font-semibold text-text truncate">
                     {{ artist.name }}
                 </h3>
-                <div
-                    class="flex justify-center space-x-2 px-3 pb-3 pt-0"
-                >
-                    <Link
-                        :href="
-                            route('admin.artist.edit', {
-                                artist: artist.id,
-                            })
-                        "
-                        class="flex items-center px-2 h-6 w-fit space-x-1 bg-secondary hover:bg-secondary-hover rounded-full transition-colors duration-200 text-white text-sm"
-                    >
-                        <PencilIcon class="w-4 h-4" />
-                        <span>แก้ไข</span>
-                    </Link>
+                <div class="flex justify-center px-3 pb-3 pt-0">
                     <Link
                         :href="
                             route('admin.artist.delete', {
@@ -143,7 +125,7 @@ const getPictureUrl = (artist) => {
                         <span>ลบ</span>
                     </Link>
                 </div>
-            </div>
+            </Link>
         </div>
 
         <div

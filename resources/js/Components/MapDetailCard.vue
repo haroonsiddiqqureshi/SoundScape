@@ -64,7 +64,7 @@ const eventTypeName = computed(() => {
         const event = eventTypes.find(e => e.value === props.concert.event_type);
         return event ? event.name : props.concert.event_type;
     }
-    return "N/A";
+    return "ไม่ระบุประเภท";
 });
 
 const genreName = computed(() => {
@@ -72,7 +72,7 @@ const genreName = computed(() => {
         const genre = genres.find(g => g.value === props.concert.genre);
         return genre ? genre.name : props.concert.genre;
     }
-    return "N/A";
+    return "ไม่ระบุแนวเพลง";
 });
 
 const detailUrl = computed(() => {

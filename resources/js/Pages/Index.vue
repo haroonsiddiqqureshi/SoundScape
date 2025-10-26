@@ -40,6 +40,8 @@ const genres = [
 
 const sortOptions = [
     { value: "newest", name: "Newest" },
+    { value: "name_az", name: "Name: A-Z" },
+    { value: "name_za", name: "Name: Z-A" },
     { value: "date_asc", name: "Date: Soonest" },
     { value: "price_asc", name: "Price: Low to High" },
     { value: "price_desc", name: "Price: High to Low" },
@@ -141,7 +143,7 @@ watch(
                     :key="concert.id"
                     :href="
                         route('concert.detail', {
-                            concert: concert.name,
+                            concert: concert.id,
                         })
                     "
                     class="block"

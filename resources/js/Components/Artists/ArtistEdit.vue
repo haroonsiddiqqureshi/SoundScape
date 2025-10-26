@@ -39,8 +39,15 @@ const photoPreview = computed(() => {
 
     // 2. If no new preview, but the artist has an existing picture, show that.
     if (props.artist.picture_url) {
-        // We assume the file is in public storage
-        return `/storage/${props.artist.picture_url}`;
+        const url = props.artist.picture_url;
+
+        // Check if it's already a full URL
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url; // Return the full URL directly
+        }
+        
+        // Otherwise, assume it's a relative path and prepend storage
+        return `/storage/${url}`;
     }
 
     // 3. Fallback to placeholders

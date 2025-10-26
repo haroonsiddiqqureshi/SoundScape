@@ -22,7 +22,7 @@ Route::middleware([
     'block_admin'
 ])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('index');
-    Route::get('/concert/{concert:name}', [HomeController::class, 'concertDetail'])->name('concert.detail');
+    Route::get('/concert/{concert}', [HomeController::class, 'concertDetail'])->name('concert.detail');
     Route::get('/map', [MapController::class, 'index'])->name('map.index');
     Route::get('/search-query', [HomeController::class, 'searchQuery'])->name('api.search');
     // Add other routes accessible to both users and guests here...
