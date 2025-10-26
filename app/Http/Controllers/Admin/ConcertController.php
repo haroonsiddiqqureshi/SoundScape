@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Concert_Log;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 class ConcertController extends Controller
 {
@@ -38,6 +39,36 @@ class ConcertController extends Controller
     {
         $validated = $request->validate($this->validationRules());
 
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+
+        if (is_null($latitude) && !empty($validated['venue_name']) && !empty($validated['province_id'])) {
+            
+            $province = Province::find($validated['province_id']);
+            
+            if ($province) {
+                $queryString = urlencode($validated['venue_name'] . ', ' . $province->name_th . ', Thailand');
+                $url = "https://nominatim.openstreetmap.org/search?q={$queryString}&format=json&limit=1&accept-language=th,en";
+
+                $response = Http::withHeaders([
+                    'User-Agent' => 'SoundScape/1.0 (haroonsiddiq.q@kkumail.com)'
+                ])->get($url);
+
+                if ($response->successful()) {
+                $data = $response->json();
+                
+                if (!empty($data)) {
+                    $latitude = $data[0]['lat'];
+                    $longitude = $data[0]['lon'];
+                } else {
+                    throw ValidationException::withMessages([
+                        'venue_name' => 'ไม่พบตำแหน่งนี้ ตรวจสอบชื่อสถานที่และจังหวัดอีกครั้ง หรือใช้แผนที่เพื่อปักหมุดเอง',
+                    ]);
+                }
+            }
+            }
+        }
+
         $concert = Concert::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
@@ -53,8 +84,8 @@ class ConcertController extends Controller
             'end_show_time' => $validated['end_show_time'],
             'start_sale_date' => $validated['start_sale_date'],
             'end_sale_date' => $validated['end_sale_date'],
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
+            'latitude' => $latitude,   
+            'longitude' => $longitude,
             'picture_url' => $validated['picture_url']->store('concerts', 'public'),
             'ticket_link' => $validated['ticket_link'],
             'admin_id' => Auth::guard('admin')->id(),
@@ -79,13 +110,8 @@ class ConcertController extends Controller
 
     public function edit(Concert $concert)
     {
-        $concert->load('artists');
-
-        $artists = Artist::all();
-
         return Inertia::render('Admin/Concert/Edit', [
             'concert' => $concert,
-            'artists' => $artists,
         ]);
     }
 
@@ -94,39 +120,60 @@ class ConcertController extends Controller
         $validated = $request->validate($this->validationRules(true));
 
         $originalData = $concert->getOriginal();
-        $adminId = Auth::guard('admin')->id();
 
-        // Log changes
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+
+        if (is_null($latitude) && !empty($validated['venue_name']) && !empty($validated['province_id'])) {
+            
+            $province = Province::find($validated['province_id']);
+            
+            if ($province) {
+                $queryString = urlencode($validated['venue_name'] . ', ' . $province->name_th . ', Thailand');
+                $url = "https://nominatim.openstreetmap.org/search?q={$queryString}&format=json&limit=1&accept-language=th,en";
+
+                $response = Http::withHeaders([
+                    'User-Agent' => 'SoundScape/1.0 (haroonsiddiq.q@kkumail.com)'
+                ])->get($url);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                
+                    if (!empty($data)) {
+                        $latitude = $data[0]['lat'];
+                        $longitude = $data[0]['lon'];
+                    } else {
+                        throw ValidationException::withMessages([
+                            'venue_name' => 'ไม่พบตำแหน่งนี้ ตรวจสอบชื่อสถานที่และจังหวัดอีกครั้ง หรือใช้แผนที่เพื่อปักหมุดเอง',
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        $validated['latitude'] = $latitude;
+        $validated['longitude'] = $longitude;
+
         foreach ($validated as $key => $value) {
+            if ($key === 'start_datetime') {
+                $oldDate = Carbon::parse($concert->start_datetime);
+                $newDate = Carbon::parse($value);
 
-            if ($key === 'artist_ids') {
-
-                $oldArtistIds = $concert->artists()->pluck('artists.id')->toArray();
-
-                sort($oldArtistIds);
-
-                $newArtistIds = $value ?? [];
-                sort($newArtistIds);
-
-                if ($oldArtistIds !== $newArtistIds) {
+                if ($oldDate->ne($newDate)) {
                     Concert_Log::create([
                         'concert_id' => $concert->id,
-                        'admin_id' => $adminId,
-                        'field_name' => 'artist_ids',
-                        'old_value' => json_encode($oldArtistIds),
-                        'new_value' => json_encode($newArtistIds),
+                        'admin_id' => Auth::guard('admin')->id(),
+                        'field_name' => $key,
+                        'old_value' => $concert->start_datetime,
+                        'new_value' => $newDate->toDateTimeString(),
                     ]);
                 }
-
-                continue;
-            }
-
-            if ($key !== 'picture_url' && $concert->{$key} != $value) {
+            } elseif ($key !== 'picture_url' && $concert->{$key} != $value) {
                 Concert_Log::create([
                     'concert_id' => $concert->id,
-                    'admin_id' => $adminId,
+                    'admin_id' => Auth::guard('admin')->id(),
                     'field_name' => $key,
-                    'old_value' => $originalData[$key],
+                    'old_value' => $originalData[$key] ?? 'null',
                     'new_value' => $value,
                 ]);
             }
@@ -136,7 +183,7 @@ class ConcertController extends Controller
             $newPath = $request->file('picture_url')->store('concerts', 'public');
             Concert_Log::create([
                 'concert_id' => $concert->id,
-                'admin_id' => $adminId,
+                'admin_id' => Auth::guard('admin')->id(),
                 'field_name' => 'picture_url',
                 'old_value' => $concert->picture_url,
                 'new_value' => $newPath,
@@ -146,12 +193,10 @@ class ConcertController extends Controller
             unset($validated['picture_url']);
         }
 
-        unset($validated['artist_ids']);
-
         $concert->update($validated);
 
-        if (isset($request->artist_ids)) {
-            $concert->artists()->sync($request->artist_ids ?? []);
+        if ($request->has('artist_ids')) {
+            $concert->artists()->sync($validated['artist_ids'] ?? []);
         }
 
         return redirect()->route('admin.concert.detail', $concert)->with('success', 'Concert updated successfully.');
@@ -159,9 +204,6 @@ class ConcertController extends Controller
 
     public function destroy(Concert $concert)
     {
-        if ($concert->picture_url) {
-            Storage::disk('public')->delete($concert->picture_url);
-        }
         $concert->delete();
         return redirect()->route('admin.concert.index')->with('success', 'Concert deleted successfully.');
     }

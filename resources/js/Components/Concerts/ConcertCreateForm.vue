@@ -219,7 +219,7 @@ const mapInstance = ref(null);
 const selectedLocation = ref(null);
 const mapMarker = ref(null);
 const isGeocoding = ref(false);
-const locationMode = ref("map");
+const locationMode = ref("manual");
 
 const selectedCoordinates = computed(() => {
     if (props.form.latitude && props.form.longitude) {

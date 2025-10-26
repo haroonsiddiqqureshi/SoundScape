@@ -12,6 +12,8 @@ use App\Models\Concert_Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http; // <-- Added for Geocoding
+use Illuminate\Validation\ValidationException; // <-- Added for Geocoding error
 
 class ConcertController extends Controller
 {
@@ -44,6 +46,42 @@ class ConcertController extends Controller
         // Use identical validation
         $validated = $request->validate($this->validationRules());
         
+        // --- Start of Geocoding Block (Identical to Admin) ---
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+
+        if (is_null($latitude) && !empty($validated['venue_name']) && !empty($validated['province_id'])) {
+            
+            $province = Province::find($validated['province_id']);
+            
+            if ($province) {
+                $queryString = urlencode($validated['venue_name'] . ', ' . $province->name_th . ', Thailand');
+                $url = "https://nominatim.openstreetmap.org/search?q={$queryString}&format=json&limit=1&accept-language=th,en";
+
+                $response = Http::withHeaders([
+                    'User-Agent' => 'SoundScape/1.0 (haroonsiddiq.q@kkumail.com)'
+                ])->get($url);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                
+                    if (!empty($data)) {
+                        $latitude = $data[0]['lat'];
+                        $longitude = $data[0]['lon'];
+                    } else {
+                        throw ValidationException::withMessages([
+                            'venue_name' => 'ไม่พบตำแหน่งนี้ ตรวจสอบชื่อสถานที่และจังหวัดอีกครั้ง หรือใช้แผนที่เพื่อปักหมุดเอง',
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        $validated['latitude'] = $latitude;
+        $validated['longitude'] = $longitude;
+        // --- End of Geocoding Block ---
+
+
         // Use identical create logic from Admin
         $concert = Concert::create([
             'name' => $validated['name'],
@@ -60,8 +98,8 @@ class ConcertController extends Controller
             'end_show_time' => $validated['end_show_time'],
             'start_sale_date' => $validated['start_sale_date'],
             'end_sale_date' => $validated['end_sale_date'],
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
+            'latitude' => $validated['latitude'], // Will now use geocoded value if available
+            'longitude' => $validated['longitude'], // Will now use geocoded value if available
             'picture_url' => $validated['picture_url']->store('concerts', 'public'),
             'ticket_link' => $validated['ticket_link'],
             
@@ -123,6 +161,41 @@ class ConcertController extends Controller
 
         $originalData = $concert->getOriginal();
         
+        // --- Start of Geocoding Block (Identical to Admin) ---
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+
+        if (is_null($latitude) && !empty($validated['venue_name']) && !empty($validated['province_id'])) {
+            
+            $province = Province::find($validated['province_id']);
+            
+            if ($province) {
+                $queryString = urlencode($validated['venue_name'] . ', ' . $province->name_th . ', Thailand');
+                $url = "https://nominatim.openstreetmap.org/search?q={$queryString}&format=json&limit=1&accept-language=th,en";
+
+                $response = Http::withHeaders([
+                    'User-Agent' => 'SoundScape/1.0 (haroonsiddiq.q@kkumail.com)'
+                ])->get($url);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                
+                    if (!empty($data)) {
+                        $latitude = $data[0]['lat'];
+                        $longitude = $data[0]['lon'];
+                    } else {
+                        throw ValidationException::withMessages([
+                            'venue_name' => 'ไม่พบตำแหน่งนี้ ตรวจสอบชื่อสถานที่และจังหวัดอีกครั้ง หรือใช้แผนที่เพื่อปักหมุดเอง',
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        $validated['latitude'] = $latitude;
+        $validated['longitude'] = $longitude;
+        // --- End of Geocoding Block ---
+
         // Get promoter ID for logging
         $promoterId = Auth::user()->promoter->id; 
 
