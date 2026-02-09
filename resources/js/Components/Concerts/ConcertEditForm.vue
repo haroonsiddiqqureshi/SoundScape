@@ -17,16 +17,15 @@ import {
     HeartIcon,
     LinkIcon,
     PlusIcon,
-} from "@heroicons/vue/24/outline";
-import {
     TicketIcon,
     CalendarIcon,
     ClockIcon,
     BanknotesIcon,
     MapPinIcon,
     MapIcon,
-    ArrowTurnLeftUpIcon,
-} from "@heroicons/vue/24/solid";
+    FolderArrowDownIcon,
+} from "@heroicons/vue/24/outline";
+import { ArrowTurnLeftUpIcon } from "@heroicons/vue/24/solid";
 
 // Third-Party Libraries
 import L from "leaflet";
@@ -246,7 +245,7 @@ watch(tempArtistId, (newId) => {
             props.form.artist_ids = [];
         }
         if (!props.form.artist_ids.includes(newId)) {
-             props.form.artist_ids.push(newId);
+            props.form.artist_ids.push(newId);
         }
     }
     // Reset the dropdown
@@ -275,9 +274,9 @@ const locationMode = ref("map");
 
 const selectedCoordinates = computed(() => {
     if (props.form.latitude && props.form.longitude) {
-        return `${Number(props.form.latitude).toFixed(
-            6
-        )}, ${Number(props.form.longitude).toFixed(6)}`;
+        return `${Number(props.form.latitude).toFixed(6)}, ${Number(
+            props.form.longitude
+        ).toFixed(6)}`;
     }
     return null;
 });
@@ -556,12 +555,8 @@ watch(
                     placeholder="ชื่องานดนตรี"
                 />
                 <div class="flex items-center space-x-8 ml-12 mt-4">
-                    <HeartIcon
-                        class="flex-none h-8 w-8 text-primary stroke-[3px]"
-                    />
-                    <LinkIcon
-                        class="flex-none h-8 w-8 text-secondary stroke-[2.5px]"
-                    />
+                    <HeartIcon class="flex-none h-8 w-8 text-primary" />
+                    <LinkIcon class="flex-none h-8 w-8 text-secondary" />
                     <input
                         type="text"
                         v-model="props.form.ticket_link"
@@ -837,12 +832,13 @@ watch(
                     <button
                         type="button"
                         @click="submit"
-                        class="rounded-md bg-primary px-4 py-2 font-bold w-full text-white hover:bg-primary-hover disabled:bg-primary-hover disabled:cursor-not-allowed"
+                        class="rounded-md border-[2px] border-primary flex items-center space-x-2 justify-center px-4 w-full text-primary disabled:cursor-not-allowed"
                         :disabled="props.form.processing"
                     >
-                        <span v-if="props.form.processing"
-                            >กำลังอัปเดต...</span
-                        >
+                        <FolderArrowDownIcon
+                            class="w-4 h-4 stroke-current stroke-[2px]"
+                        />
+                        <span v-if="props.form.processing">กำลังอัปเดต...</span>
                         <span v-else>อัปเดตงานดนตรี</span>
                     </button>
                 </div>

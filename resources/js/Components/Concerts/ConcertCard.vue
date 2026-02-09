@@ -101,7 +101,7 @@ const followConcert = (follow) => {
                     />
                 </button>
             </div>
-            <span class="font-semibold line-clamp-2 min-h-12">{{ props.concert.name }}</span>
+            <span class="text-sm md:text-base lg:text-lg font-semibold line-clamp-2 min-h-14">{{ props.concert.name }}</span>
             <div class="flex justify-between text-sm text-text-medium">
                 <div class="flex items-center gap-1 min-w-0 text-accent">
                     <TicketIcon class="w-4 h-4 flex-shrink-0" />

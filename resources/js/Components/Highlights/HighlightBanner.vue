@@ -102,9 +102,9 @@ onUnmounted(() => stopInterval());
                 class="w-6 h-6 sm:w-8 sm:h-8 stroke-current"
             />
         </button>
-        <div class="shadow-md rounded-md overflow-hidden flex-1">
+        <div class="shadow-md max-h-[525px] rounded-md overflow-hidden flex-1">
             <div
-                class="flex max-h-96 transition-transform duration-500 ease-in-out"
+                class="flex transition-transform duration-500 ease-in-out"
                 :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
             >
                 <div
@@ -116,7 +116,7 @@ onUnmounted(() => stopInterval());
                     <img
                         :src="getPictureUrl(highlights[key])"
                         :alt="highlights[key].name"
-                        class="w-full h-full object-fill block"
+                        class="w-full h-full object-cover block"
                     />
                 </div>
             </div>
@@ -137,7 +137,7 @@ onUnmounted(() => stopInterval());
                 :key="key"
                 @click="selectIndex(index)"
                 :class="{
-                    'w-3 h-3 rounded-full bg-primary-medium shadow-inner shadow-primary':
+                    'w-3 h-3 rounded-full bg-primary':
                         index === currentIndex,
                     'w-3 h-3 rounded-full bg-primary-low':
                         index !== currentIndex,

@@ -54,13 +54,12 @@ onBeforeUnmount(() => {
             <button
                 type="button"
                 @click="isOpen = !isOpen"
-                class="group relative w-full cursor-pointer rounded-full bg-card py-1 pl-3 pr-10 text-left text-sm font-semibold ring-0 focus:outline-none hover:bg-primary hover:text-white transition-colors duration-200"
+                class="group relative w-full cursor-pointer rounded-full bg-card py-1 pl-3 pr-10 text-left text-sm font-semibold ring-0 focus:outline-none hover:bg-primary hover:text-white focus:bg-primary focus:text-white transition-colors duration-100"
             >
                 <span
                     class="block truncate"
                     :class="{
-                        'font-medium text-text group-hover:text-white':
-                            !selectedOption,
+                        'text-text group-hover:text-white group-focus:text-white': !selectedOption,
                     }"
                 >
                     {{ selectedOption ? selectedOption.name : placeholder }}
@@ -69,7 +68,7 @@ onBeforeUnmount(() => {
                     class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
                 >
                     <ChevronDownIcon
-                        class="h-4 w-4 stroke-current text-text group-hover:text-white transition-transform duration-200"
+                        class="h-4 w-4 stroke-current text-text group-hover:text-white group-focus:text-white transition-transform duration-200"
                         :class="{ 'transform rotate-180': isOpen }"
                     />
                 </span>

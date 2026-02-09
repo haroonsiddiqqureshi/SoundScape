@@ -177,10 +177,10 @@ const logout = () => {
                         </div>
 
                         <div
-                            class="flex-1 flex items-center justify-end px-2 ms-2 group"
+                            class="flex-1 flex items-center justify-end px-2 ml-4 sm:ml-6 group"
                         >
                             <div
-                                class="relative max-w-xs w-full lg:max-w-xs group-focus-within:max-w-full transition-all duration-300 ease-in-out"
+                                class="relative sm:max-w-xs w-full lg:max-w-xs group-focus-within:max-w-full transition-all duration-300 ease-in-out"
                             >
                                 <label for="search" class="sr-only"
                                     >Search</label

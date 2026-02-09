@@ -5,7 +5,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import HighlightBanner from "@/Components/Highlights/HighlightBanner.vue";
 import ConcertCard from "@/Components/Concerts/ConcertCard.vue";
 import DropdownFilter from "@/Components/DropdownFilter.vue";
-import { MinusCircleIcon } from "@heroicons/vue/24/outline";
+import { MinusCircleIcon, HeartIcon } from "@heroicons/vue/24/outline";
+import { HeartIcon as HeartIconSolid } from "@heroicons/vue/24/solid";
 
 const page = usePage();
 
@@ -15,8 +16,6 @@ const props = defineProps({
     provinces: Object,
     filters: Object,
 });
-
-// --- Filter & Sort Data ---
 
 const eventTypes = [
     { value: "music_festival", name: "เทศกาลดนตรี" },
@@ -39,24 +38,22 @@ const genres = [
 ];
 
 const sortOptions = [
-    { value: "newest", name: "Newest" },
-    { value: "name_az", name: "Name: A-Z" },
-    { value: "name_za", name: "Name: Z-A" },
-    { value: "date_asc", name: "Date: Soonest" },
-    { value: "price_asc", name: "Price: Low to High" },
-    { value: "price_desc", name: "Price: High to Low" },
+    { value: "newest", name: "ล่าสุด" },
+    { value: "name_az", name: "ชื่อ A-Z" },
+    { value: "name_za", name: "ชื่อ Z-A" },
+    { value: "date_asc", name: "วันที่ใกล้ที่สุด" },
+    { value: "price_asc", name: "ราคาต่ำสุด" },
+    { value: "price_desc", name: "ราคาสูงสุด" },
 ];
-
-// --- Reactive State ---
 
 const selectedEventType = ref(props.filters?.event_type || "");
 const selectedGenre = ref(props.filters?.genre || "");
 const selectedSort = ref(props.filters?.sort || "newest");
-// --- Watcher ---
+const showFollowedOnly = ref(props.filters?.followed === "true" || false);
 
 watch(
-    [selectedEventType, selectedGenre, selectedSort],
-    ([eventType, genre, sort]) => {
+    [selectedEventType, selectedGenre, selectedSort, showFollowedOnly],
+    ([eventType, genre, sort, followed]) => {
         const currentSearch = props.filters?.search || undefined;
 
         router.get(
@@ -66,6 +63,7 @@ watch(
                 event_type: eventType || undefined,
                 genre: genre || undefined,
                 sort: sort === "newest" ? undefined : sort,
+                followed: followed ? "true" : undefined,
             },
             {
                 preserveState: true,
@@ -90,28 +88,32 @@ watch(
 
         <div class="space-y-4">
             <h2 class="text-2xl font-bold uppercase">
-                {{ filters?.search ? `Results for "${filters.search}"` : 'All Concerts' }}
+                {{
+                    filters?.search
+                        ? `Results for "${filters.search}"`
+                        : "All Concerts"
+                }}
             </h2>
             <div class="mx-8 flex flex-wrap gap-2">
                 <DropdownFilter
                     id="event_type"
                     v-model="selectedEventType"
                     :options="eventTypes"
-                    placeholder="All Types"
+                    placeholder="ทุกประเภท"
                 />
 
                 <DropdownFilter
                     id="genre"
                     v-model="selectedGenre"
                     :options="genres"
-                    placeholder="All Genres"
+                    placeholder="ทุกแนวเพลง"
                 />
 
                 <DropdownFilter
                     id="sort"
                     v-model="selectedSort"
                     :options="sortOptions"
-                    placeholder="Sort By"
+                    placeholder="ล่าสุด"
                 />
 
                 <button
@@ -126,10 +128,36 @@ watch(
                             (selectedSort = 'newest')
                     "
                     type="button"
-                    class="group p-1 bg-card rounded-full text-text hover:bg-primary hover:text-text transition-colors duration-200"
+                    class="group p-1 bg-card rounded-full text-text hover:bg-primary hover:text-white transition-colors duration-100"
                     title="Clear filters"
                 >
                     <MinusCircleIcon
+                        class="h-5 w-5 stroke-[2px] group-hover:stroke-[2.5px]"
+                    />
+                </button>
+
+                <button
+                    v-if="$page.props.auth.user"
+                    @click="showFollowedOnly = !showFollowedOnly"
+                    type="button"
+                    :class="[
+                        'group p-1 bg-card rounded-full transition-colors duration-200',
+                        showFollowedOnly
+                            ? 'text-primary hover:bg-primary hover:text-text'
+                            : 'text-text hover:bg-primary hover:text-text',
+                    ]"
+                    :title="
+                        showFollowedOnly
+                            ? 'Show all concerts'
+                            : 'Show followed concerts only'
+                    "
+                >
+                    <HeartIconSolid
+                        v-if="showFollowedOnly"
+                        class="h-5 w-5 stroke-[2px] group-hover:stroke-[2.5px] fill-current"
+                    />
+                    <HeartIcon
+                        v-else
                         class="h-5 w-5 stroke-[2px] group-hover:stroke-[2.5px]"
                     />
                 </button>

@@ -42,6 +42,7 @@ return new class extends Migration
             $table->text('ticket_link')->nullable(); // Ticket link
             $table->integer('view_count')->nullable()->default(0); // View count
             $table->integer('like_count')->nullable()->default(0); // Like count
+            $table->string('origin')->nullable(); // Where it originated from (The Concert, Ticketier, etc.)
             
             //Foreign keys
             $table->foreignId('province_id')->nullable()->constrained('provinces');

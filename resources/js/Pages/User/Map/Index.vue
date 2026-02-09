@@ -8,6 +8,7 @@ import MapDetailCard from "@/Components/MapDetailCard.vue";
 
 const props = defineProps({
     concerts: Array,
+    provinces: Array,
 });
 
 const page = usePage();

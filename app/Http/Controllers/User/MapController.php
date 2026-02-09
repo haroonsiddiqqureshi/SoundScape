@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Concert;
 use App\Models\Follow;
+use App\Models\Province;
 use Illuminate\Support\Facades\Auth;
 
 class MapController extends Controller
@@ -14,6 +15,7 @@ class MapController extends Controller
     public function index()
     {
         $concerts = Concert::all();
+        $provinces = Province::get()->where('');
 
         $concerts->each(function ($concert) {
             $concert->is_followed = Follow::where('user_id', Auth::id())
@@ -22,7 +24,8 @@ class MapController extends Controller
         });
 
         return Inertia::render('User/Map/Index', [
-            'concerts' => $concerts
+            'concerts' => $concerts,
+            'provinces' => $provinces,
         ]);
     }
 }

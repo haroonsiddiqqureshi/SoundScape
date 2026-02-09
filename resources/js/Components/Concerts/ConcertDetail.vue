@@ -5,9 +5,7 @@ import {
     HeartIcon as OutlineHeartIcon,
     LinkIcon,
     ArrowTopRightOnSquareIcon,
-} from "@heroicons/vue/24/outline";
-import {
-    HeartIcon as SolidHeartIcon,
+    ArrowRightStartOnRectangleIcon,
     TicketIcon,
     CalendarIcon,
     ClockIcon,
@@ -15,7 +13,8 @@ import {
     MapPinIcon,
     PencilIcon,
     TrashIcon,
-} from "@heroicons/vue/24/solid";
+} from "@heroicons/vue/24/outline";
+import { HeartIcon as SolidHeartIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     concert: Object,
@@ -160,10 +159,9 @@ const artistPicturePlaceholder = computed(() => {
 const provinceName = computed(() => {
     if (props.provinces && props.concert && props.concert.province_id) {
         const province = props.provinces[props.concert.province_id];
-
         return province ? province.name_th : "Unknown Province";
     }
-    return "Loading...";
+    return "ไม่ระบุจังหวัด";
 });
 
 const googleMapsLink = computed(() => {
@@ -191,7 +189,7 @@ const followConcert = (follow) => {
 
 <template>
     <div
-        class="mx-auto max-w-5xl lg:max-w-fit bg-card shadow-xl rounded-md space-y-2 lg:space-y-6"
+        class="mx-auto max-w-xl lg:max-w-fit bg-card shadow-xl rounded-md space-y-2 lg:space-y-6"
     >
         <div class="lg:flex px-6 pt-6 space-y-2 lg:space-y-0">
             <div class="flex-none w-fit lg:mr-4">
@@ -204,23 +202,23 @@ const followConcert = (follow) => {
                 </div>
             </div>
 
-            <div class="flex flex-col min-w-[300px] justify-between py-2">
+            <div class="flex flex-col min-w-[300px] justify-between pb-2">
                 <div class="flex flex-col">
                     <div class="flex space-x-2">
                         <div
-                            class="inline-flex items-center bg-primary rounded-full px-3 h-6 text-sm font-bold text-white"
+                            class="inline-flex items-center border-[2px] border-primary rounded-full px-3 h-6 text-sm text-primary"
                         >
                             {{ displayEventType }}
                         </div>
                         <div
-                            class="inline-flex items-center bg-secondary rounded-full px-3 h-6 text-sm font-bold text-white"
+                            class="inline-flex items-center border-[2px] border-secondary rounded-full px-3 h-6 text-sm text-secondary"
                         >
                             {{ displayGenre }}
                         </div>
                     </div>
 
                     <h1
-                        class="custom-scrollbar mt-1 ml-2 font-semibold text-4xl text-text break-all line-clamp-2 py-1"
+                        class="custom-scrollbar mt-1 ml-2 font-semibold text-2xl lg:text-4xl text-text break-words line-clamp-2 py-1"
                     >
                         {{ props.concert.name }}
                     </h1>
@@ -233,7 +231,7 @@ const followConcert = (follow) => {
                                 props.role === 'admin' ||
                                 props.role === 'promoter'
                             "
-                            class="flex-none h-8 w-8 text-primary stroke-[3px]"
+                            class="flex-none h-8 w-8 text-primary"
                         />
                         <button
                             v-else
@@ -247,7 +245,7 @@ const followConcert = (follow) => {
                                         ? SolidHeartIcon
                                         : OutlineHeartIcon
                                 "
-                                class="flex-none h-8 w-8 text-primary stroke-[3px]"
+                                class="flex-none h-8 w-8 text-primary"
                             />
                         </button>
                         <div class="relative">
@@ -258,7 +256,7 @@ const followConcert = (follow) => {
                                 aria-label="Copy page URL"
                             >
                                 <LinkIcon
-                                    class="flex-none h-8 w-8 text-secondary stroke-[2.5px]"
+                                    class="flex-none h-8 w-8 text-secondary"
                                 />
                             </button>
                             <transition
@@ -280,9 +278,10 @@ const followConcert = (follow) => {
                             :href="props.concert.ticket_link"
                             target="_blank"
                             rel="noopener noreferrer"
+                            title="ไปยังเว็บไซต์คอนเสิร์ต"
                         >
-                            <ArrowTopRightOnSquareIcon
-                                class="flex-none h-8 w-8 text-accent stroke-[2px]"
+                            <ArrowRightStartOnRectangleIcon
+                                class="flex-none h-8 w-8 text-accent"
                             />
                         </a>
                     </div>
@@ -292,13 +291,7 @@ const followConcert = (follow) => {
                     <div class="flex items-center">
                         <div class="flex items-center space-x-2 mr-2">
                             <TicketIcon class="flex-none h-8 w-8 text-accent" />
-                            <span
-                                :class="{
-                                    'font-medium text-text-medium':
-                                        !props.concert.start_sale_date,
-                                }"
-                                class="font-semibold text-accent text-center"
-                            >
+                            <span class="text-accent text-center">
                                 {{
                                     props.concert.start_sale_date
                                         ? "วันจำหน่ายบัตร |"
@@ -306,7 +299,7 @@ const followConcert = (follow) => {
                                 }}
                             </span>
                         </div>
-                        <div class="flex items-center font-semibold space-x-2">
+                        <div class="flex items-center space-x-2">
                             <span>{{ startSaleDate }}</span>
                             <span v-if="props.concert.end_sale_date">-</span>
                             <span v-if="props.concert.end_sale_date">
@@ -320,13 +313,7 @@ const followConcert = (follow) => {
                             <CalendarIcon
                                 class="flex-none h-8 w-8 text-secondary"
                             />
-                            <span
-                                :class="{
-                                    'font-medium text-text-medium':
-                                        !props.concert.start_show_date,
-                                }"
-                                class="font-semibold text-secondary text-center"
-                            >
+                            <span class="text-secondary text-center">
                                 {{
                                     props.concert.start_show_date
                                         ? "วันที่แสดง |"
@@ -334,7 +321,7 @@ const followConcert = (follow) => {
                                 }}
                             </span>
                         </div>
-                        <div class="flex items-center font-semibold space-x-2">
+                        <div class="flex items-center space-x-2">
                             <span>{{ startShowDate }}</span>
                             <span v-if="props.concert.end_show_date">-</span>
                             <span v-if="props.concert.end_show_date">
@@ -346,13 +333,7 @@ const followConcert = (follow) => {
                     <div class="flex items-center lg:max-w-xl">
                         <div class="flex items-center space-x-2 mr-2">
                             <ClockIcon class="flex-none h-8 w-8 text-primary" />
-                            <span
-                                :class="{
-                                    'font-medium text-text-medium':
-                                        !props.concert.start_show_time,
-                                }"
-                                class="font-semibold text-primary text-center"
-                            >
+                            <span class="text-primary text-center">
                                 {{
                                     props.concert.start_show_time
                                         ? "เวลาแสดง |"
@@ -360,7 +341,7 @@ const followConcert = (follow) => {
                                 }}
                             </span>
                         </div>
-                        <div class="flex items-center font-semibold space-x-2">
+                        <div class="flex items-center space-x-2">
                             <span>{{ startShowTime }}</span>
                             <span v-if="props.concert.end_show_time">-</span>
                             <span v-if="props.concert.end_show_time">
@@ -374,13 +355,7 @@ const followConcert = (follow) => {
                             <BanknotesIcon
                                 class="flex-none h-8 w-8 text-accent"
                             />
-                            <span
-                                :class="{
-                                    'font-medium text-text-medium':
-                                        !props.concert.price_min,
-                                }"
-                                class="font-semibold text-accent text-center"
-                            >
+                            <span class="text-accent text-center">
                                 {{
                                     props.concert.price_min != null
                                         ? "ราคาบัตร |"
@@ -388,7 +363,7 @@ const followConcert = (follow) => {
                                 }}
                             </span>
                         </div>
-                        <div class="flex items-center font-semibold space-x-2">
+                        <div class="flex items-center space-x-2">
                             <span v-if="props.concert.price_min">{{
                                 priceMin
                             }}</span>
@@ -406,7 +381,7 @@ const followConcert = (follow) => {
                             />
                             <span
                                 v-if="props.concert.province_id"
-                                class="font-semibold text-secondary text-center"
+                                class="text-secondary text-center"
                             >
                                 {{
                                     props.concert.venue_name ||
@@ -428,7 +403,7 @@ const followConcert = (follow) => {
                         >
                             <span
                                 v-if="props.concert.venue_name"
-                                class="font-semibold text-text"
+                                class="text-text"
                             >
                                 {{ props.concert.venue_name }}
                                 <ArrowTopRightOnSquareIcon
@@ -440,7 +415,7 @@ const followConcert = (follow) => {
                                     props.concert.latitude &&
                                     props.concert.longitude
                                 "
-                                class="font-semibold text-text"
+                                class="text-text"
                             >
                                 View On Google Map
                                 <ArrowTopRightOnSquareIcon
@@ -503,13 +478,15 @@ const followConcert = (follow) => {
                         v-if="
                             props.role === 'admin' || props.role === 'promoter'
                         "
-                        class="flex space-x-2 justify-end"
+                        class="flex space-x-2"
                     >
                         <Link
                             :href="editHref"
-                            class="flex px-2 items-center space-x-1 bg-secondary hover:bg-secondary-hover text-md text-white font-semibold py-2 rounded-md transition-colors duration-200"
+                            class="flex w-full justify-center px-2 items-center space-x-1 border-[2px] border-secondary text-md text-secondary rounded-md transition-colors duration-200"
                         >
-                            <PencilIcon class="w-5 h-5" />
+                            <PencilIcon
+                                class="w-4 h-4 stroke-current stroke-[2px]"
+                            />
                             <span>แก้ไข</span>
                         </Link>
                         <Link
@@ -521,11 +498,28 @@ const followConcert = (follow) => {
                             method="delete"
                             as="button"
                             preserve-scroll
-                            class="flex px-2 items-center space-x-1 bg-red-600 hover:bg-red-700 text-md text-white font-semibold py-2 rounded-md transition-colors duration-200"
+                            class="flex w-full justify-center px-2 items-center space-x-1 border-[2px] border-red-600 text-md text-red-600 rounded-md transition-colors duration-200"
                         >
-                            <TrashIcon class="w-5 h-5" />
+                            <TrashIcon
+                                class="w-4 h-4 stroke-current stroke-[2px]"
+                            />
                             <span>ลบ</span>
                         </Link>
+                    </div>
+
+                    <div v-else class="flex justify-end">
+                        <a
+                            v-if="props.concert.ticket_link"
+                            :href="props.concert.ticket_link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="border-[2px] border-primary w-full flex items-center justify-center space-x-2 px-2 text-primary rounded-md"
+                        >
+                        <span>ไปยังเว็บไซต์คอนเสิร์ต</span>
+                        <ArrowRightStartOnRectangleIcon
+                            class="w-4 h-4 stroke-current stroke-[2px]"
+                        />
+                        </a>
                     </div>
                 </div>
             </div>

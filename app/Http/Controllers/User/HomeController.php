@@ -16,7 +16,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $highlights = Highlight::where('is_active', true)->get();
-        $provinces = Province::get();
+        $provinces = Province::all()->keyBy('id');
 
         $query = Concert::query();
 
@@ -42,7 +42,9 @@ class HomeController extends Controller
                 $query->orderBy('name', 'desc');
                 break;
             case 'date_asc':
-                $query->orderBy('start_show_date', 'asc');
+                $query->whereNotNull('start_show_date')
+                    ->whereDate('start_show_date', '>=', now())
+                    ->orderBy('start_show_date', 'asc');
                 break;
             case 'price_asc':
                 $query->orderBy('price_min', 'asc');
@@ -55,6 +57,12 @@ class HomeController extends Controller
                 $query->orderBy('created_at', 'desc');
                 break;
         }
+
+        $query->when($request->input('followed') && Auth::check(), function ($q) {
+            return $q->whereHas('followers', function ($followQuery) {
+                $followQuery->where('user_id', Auth::id());
+            });
+        });
 
         $concerts = $query->get();
 
@@ -73,7 +81,7 @@ class HomeController extends Controller
             'highlights' => $highlights,
             'concerts' => $concerts,
             'provinces' => $provinces,
-            'filters' => (object) $request->only(['search', 'event_type', 'genre', 'sort']),
+            'filters' => (object) $request->only(['search', 'event_type', 'genre', 'sort', 'followed']),
         ]);
     }
 

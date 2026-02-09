@@ -103,7 +103,7 @@ watchEffect(() => {
                                     class="block h-12 p-2 rounded-md w-auto bg-primary text-white"
                                 />
                                 <span
-                                    class="flex justify-center text-pri font-bold tracking-wide text-2xl uppercase"
+                                    class="flex justify-center text-primary font-bold tracking-wide text-2xl uppercase"
                                     >SoundScape</span
                                 >
                             </div>
@@ -215,7 +215,7 @@ watchEffect(() => {
                                     class="relative h-[20px] w-[20px]"
                                 >
                                     <OutlineSunIcon
-                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2.5px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
                                     />
                                     <SolidSunIcon
                                         class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"
@@ -224,7 +224,7 @@ watchEffect(() => {
 
                                 <div v-else class="relative h-[20px] w-[20px]">
                                     <OutlineMoonIcon
-                                        class="absolute inset-0 h-full w-full stroke-current stroke-[3px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+                                        class="absolute inset-0 h-full w-full stroke-current stroke-[2px] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
                                     />
                                     <SolidMoonIcon
                                         class="absolute inset-0 h-full w-full stroke-current opacity-0 transition-opacity duration-200 group-hover:opacity-100"

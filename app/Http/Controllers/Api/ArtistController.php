@@ -13,8 +13,8 @@ class ArtistController extends Controller
     public function store(Request $request)
     {
         try {
-            $validator =  Validator::make($request->all(), [
-                'name' => 'nullable|string|max:255',
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255', // เปลี่ยนเป็น required เพื่อใช้เป็น Key หลัก
                 'picture_url' => 'nullable|url'
             ]);
 
@@ -27,14 +27,28 @@ class ArtistController extends Controller
             }
 
             $data = $validator->validated();
-            $artist = Artist::create($data);
 
-            return response()->json(['message' => 'Artist created successfully', 'artist' => $artist], 201);
+            // ---------------------------------------------------------
+            // แก้ไข: ใช้ updateOrCreate แทน create
+            // ความหมาย: ค้นหาจาก 'name', ถ้าเจอให้อัปเดตข้อมูลที่เหลือ, ถ้าไม่เจอให้สร้างใหม่
+            // ---------------------------------------------------------
+            $artist = Artist::updateOrCreate(
+                ['name' => $data['name']], // เงื่อนไขในการค้นหา (Check duplicates by Name)
+                $data                       // ข้อมูลที่จะ Save/Update
+            );
+            // ---------------------------------------------------------
+
+            // เช็คว่าเป็นการสร้างใหม่หรืออัปเดตเพื่อส่ง Status Code ที่เหมาะสม (Optional)
+            $status = $artist->wasRecentlyCreated ? 201 : 200;
+            $msg = $artist->wasRecentlyCreated ? 'Artist created successfully' : 'Artist updated successfully';
+
+            return response()->json(['message' => $msg, 'artist' => $artist], $status);
+
         } catch (\Exception $e) {
-            Log::error('Error creating artist: ' . $e->getMessage());
+            Log::error('Error processing artist: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while creating the artist',
+                'message' => 'An error occurred',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -32,6 +32,7 @@ class Concert extends Model
         'view_count',
         'like_count',
         'ticket_link',
+        'origin',
         'admin_id',
         'promoter_id',
     ];

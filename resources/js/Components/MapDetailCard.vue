@@ -56,7 +56,7 @@ const formattedDate = computed(() => {
             year: "numeric",
         });
     }
-    return "Date not available";
+    return "ไม่ระบุวันที่";
 });
 
 const eventTypeName = computed(() => {
@@ -76,7 +76,7 @@ const genreName = computed(() => {
 });
 
 const detailUrl = computed(() => {
-    return route('concert.detail', { concert: props.concert.name });
+    return route('concert.detail', { concert: props.concert.id });
 });
 
 const followConcert = (follow) => {

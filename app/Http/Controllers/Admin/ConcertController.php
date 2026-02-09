@@ -17,9 +17,15 @@ use Illuminate\Validation\ValidationException;
 class ConcertController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $concerts = Concert::all();
+        $concerts = Concert::query()
+            ->when($request->input('search'), function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(12);
+
         $provinces = Province::all()->keyBy('id');
         return Inertia::render('Admin/Concert/Index', [
             'concerts' => $concerts,

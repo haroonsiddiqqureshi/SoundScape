@@ -26,10 +26,10 @@
     --color-accent-low: #ff149340; /* 25% */
     --color-accent-hover: #e01283;
 
-    --color-background: #e5e7eb; /* 100% */
-    --color-background-high: #e5e7ebbf; /* 75% */
-    --color-background-medium: #e5e7eb80; /* 50% */
-    --color-background-low: #e5e7eb40; /* 25% */
+    --color-background: #f3f4f7; /* 100% */
+    --color-background-high: #f3f4f7bf; /* 75% */
+    --color-background-medium: #f3f4f780; /* 50% */
+    --color-background-low: #f3f4f740; /* 25% */
     --color-background-hover: #d1d5db;
 
     --color-text: #000000;

@@ -30,7 +30,8 @@ const createIconHtml = (color) => {
     `;
 };
 const primaryColor = 'var(--color-primary, #3B82F6)';
-const secondaryColor = 'var(--color-secondary-high, #F97316)';
+const secondaryColor = 'var(--color-secondary, #28a745)';
+const accentColor = 'var(--color-accent, #ffd700)'
 const primaryIcon = L.divIcon({
     html: createIconHtml(primaryColor),
     className: '',
@@ -40,6 +41,13 @@ const primaryIcon = L.divIcon({
 });
 const secondaryIcon = L.divIcon({
     html: createIconHtml(secondaryColor),
+    className: '',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -34]
+});
+const accentIcon = L.divIcon({
+    html: createIconHtml(accentColor),
     className: '',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
@@ -59,9 +67,11 @@ const updateMarkers = (concerts) => {
             
             let icon;
             if (concert.admin_id !== null) {
-                icon = primaryIcon;
+                icon = accentIcon;
             } else if (concert.promoter_id !== null) {
                 icon = secondaryIcon;
+            } else if (concert.admin_id === null && concert.promoter_id === null) {
+                icon = primaryIcon;
             } else {
                 icon = new L.Icon.Default();
             }
