@@ -13,5 +13,6 @@ Route::get('/user', function (Request $request) {
 Route::get('/provinces', [ProvinceController::class, 'index']);
 
 Route::post('/concerts', [ConcertController::class, 'store']);
+Route::post('/concerts/cleanup', [ConcertController::class, 'cleanup']);
 
 Route::post('/artists', [ArtistController::class, 'store']);
