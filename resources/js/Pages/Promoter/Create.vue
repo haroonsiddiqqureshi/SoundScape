@@ -86,7 +86,7 @@ const submit = () => {
             </div>
         </div>
 
-        <div class="bg-card overflow-hidden shadow-xl sm:rounded-md p-6">
+        <div class="overflow-hidden">
             <PromoterCreateForm :form="form" @submit="submit" />
         </div>
     </AppLayout>

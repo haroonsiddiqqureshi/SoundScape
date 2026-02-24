@@ -155,7 +155,7 @@ const availableSocialLinks = computed(() => {
                         :key="platform"
                         :href="link"
                         target="_blank"
-                        class="text-secondary hover:text-secondary-hover flex items-center space-x-2 transition-colors"
+                        class="text-primary hover:text-primary-hover flex items-center space-x-2 transition-colors"
                     >
                         <span class="capitalize font-medium">{{
                             platform
