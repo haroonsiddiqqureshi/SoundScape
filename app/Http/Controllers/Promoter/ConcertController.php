@@ -12,22 +12,28 @@ use App\Models\Concert_Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http; // <-- Added for Geocoding
-use Illuminate\Validation\ValidationException; // <-- Added for Geocoding error
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 class ConcertController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Retain promoter-specific query
-        $concerts = Concert::where('promoter_id', auth('web')->user()->promoter->id)->get();
+        // Retain promoter-specific query but add search and pagination
+        $concerts = Concert::where('promoter_id', auth('web')->user()->promoter->id)
+            ->when($request->input('search'), function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString(); // Keeps the search query in the pagination links
         
-        // Add provinces, just like Admin
         $provinces = Province::all()->keyBy('id'); 
         
         return inertia::render('Promoter/Concert/Index', [
             'concerts' => $concerts,
-            'provinces' => $provinces, // Pass provinces
+            'provinces' => $provinces,
+            'filters' => $request->only(['search']),
         ]);
     }
 

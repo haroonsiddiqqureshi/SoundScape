@@ -131,11 +131,19 @@ watchEffect(() => {
                 </div>
                 <div class="p-2 mt-auto">
                     <Link
+                        :href="route('promoter.profile')"
+                        class="uppercase w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-bold hover:bg-card transition-all duration-200"
+                    >
+                        <span>Manage Account</span>
+                    </Link>
+
+                    <Link
                         :href="route('index')"
                         class="uppercase w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-bold hover:bg-card transition-all duration-200"
                     >
                         <span>Switch to User</span>
                     </Link>
+
                     <form @submit.prevent="logout">
                         <button
                             class="uppercase w-full flex items-center py-2 px-4 text-sm rounded-md text-text hover:text-primary hover:text-xl hover:font-bold hover:bg-card transition-all duration-200"

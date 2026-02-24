@@ -40,9 +40,11 @@ Route::middleware([
 
     Route::middleware('check_promoter')->group(function () {
         Route::get('/promoter', [PromoterController::class, 'index'])->name('promoter.index');
+        Route::put('/promoter', [PromoterController::class, 'update'])->name('promoter.update');
 
         Route::middleware(['verified_promoter'])->prefix('promoter')->name('promoter.')->group(function () {
             // --- Promoter Concert Management Routes ---
+            Route::get('/profile', [PromoterController::class, 'edit'])->name('profile');
             Route::get('/concert', [PromoterConcertController::class, 'index'])->name('concert.index');
             Route::get('/concert/create', [PromoterConcertController::class, 'create'])->name('concert.create');
             Route::post('/concert', [PromoterConcertController::class, 'store'])->name('concert.store');
