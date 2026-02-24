@@ -54,7 +54,7 @@ const submit = () => {
         <div
             ref="errorSummary"
             v-if="Object.keys(form.errors).length"
-            class="bg-card lg:shadow-xl rounded-md mb-4 p-6"
+            class="bg-card rounded-md mb-4 p-6"
         >
             <div>
                 <div class="flex flex-col w-full space-y-2">
