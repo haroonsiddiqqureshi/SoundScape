@@ -9,6 +9,8 @@ import {
     XMarkIcon,
     PencilIcon,
     TrashIcon,
+    ChevronUpIcon,
+    ChevronDownIcon,
 } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
@@ -45,6 +47,34 @@ const updateActiveStatus = (highlight) => {
         }
     );
 };
+
+const moveHighlight = (index, direction) => {
+    let reorderedHighlights = [...props.highlights];
+    
+    if (direction === 'up' && index > 0) {
+        const temp = reorderedHighlights[index];
+        reorderedHighlights[index] = reorderedHighlights[index - 1];
+        reorderedHighlights[index - 1] = temp;
+    } else if (direction === 'down' && index < reorderedHighlights.length - 1) {
+        const temp = reorderedHighlights[index];
+        reorderedHighlights[index] = reorderedHighlights[index + 1];
+        reorderedHighlights[index + 1] = temp;
+    } else {
+        return;
+    }
+
+    const payload = reorderedHighlights.map((item, i) => ({
+        id: item.id,
+        sort_order: i
+    }));
+
+    // Send to backend silently
+    router.put(route('admin.highlight.reorder'), { items: payload }, {
+        preserveScroll: true,
+        preserveState: false
+    });
+};
+// ------------------------------------------
 
 const showModal = ref(false);
 const modalImageUrl = ref("");
@@ -87,7 +117,10 @@ const getPictureUrl = (highlight) => {
 
             <template #header>
                 <tr>
-                    <th scope="col" class="px-4 py-3 pl-6 text-left">
+                    <th scope="col" class="px-4 py-3 pl-6 text-left w-16" v-if="!search">
+                        Order
+                    </th>
+                    <th scope="col" class="px-4 py-3 pl-6 text-left" :class="{ 'pl-6': search }">
                         Picture
                     </th>
                     <th scope="col" class="px-4 py-3 text-left">Title</th>
@@ -97,8 +130,28 @@ const getPictureUrl = (highlight) => {
             </template>
 
             <template #body>
-                <tr v-for="highlight in highlights" :key="highlight.id">
-                    <td class="px-4 py-3 pl-6">
+                <tr v-for="(highlight, index) in highlights" :key="highlight.id">
+                    
+                    <td class="px-4 py-3 pl-6 text-center w-16" v-if="!search">
+                        <div class="flex flex-col items-center gap-1">
+                            <button 
+                                @click="moveHighlight(index, 'up')" 
+                                :disabled="index === 0"
+                                :class="index === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-primary hover:text-primary-hover'"
+                            >
+                                <ChevronUpIcon class="w-5 h-5" />
+                            </button>
+                            <button 
+                                @click="moveHighlight(index, 'down')" 
+                                :disabled="index === highlights.length - 1"
+                                :class="index === highlights.length - 1 ? 'text-gray-400 cursor-not-allowed' : 'text-primary hover:text-primary-hover'"
+                            >
+                                <ChevronDownIcon class="w-5 h-5" />
+                            </button>
+                        </div>
+                    </td>
+
+                    <td class="px-4 py-3 pl-6" :class="{ 'pl-6': search }">
                         <img
                             :src="getPictureUrl(highlight)"
                             alt="Highlight image"

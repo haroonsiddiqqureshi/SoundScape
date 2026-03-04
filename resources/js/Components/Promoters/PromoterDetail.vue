@@ -49,10 +49,10 @@ const availableSocialLinks = computed(() => {
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-col items-end space-y-2">
+                <div class="flex flex-col items-end space-y-2 text-xs uppercase">
                     <span
                         @click="emit('update-verification-status', promoter)"
-                        class="px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer"
+                        class="px-2.5 py-1 rounded-full font-bold cursor-pointer"
                         :class="
                             promoter.is_verified
                                 ? 'bg-primary text-white'

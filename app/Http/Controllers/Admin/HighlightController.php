@@ -12,26 +12,37 @@ use Carbon\Carbon;
 
 class HighlightController extends Controller
 {
-    public function index(Request $request) // <-- Accept Request
+    public function index(Request $request)
     {
         $highlights = Highlight::query()
-            // Search filter (this remains)
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             })
-            // --- MODIFICATION ---
-            // 1. Sort by active status first (true/1 comes before false/0)
-            ->orderBy('is_active', 'desc')
-            // 2. Then, sort by the newest created
-            ->latest()
-            // --------------------
+            // Change the sorting to respect the sort_order column
+            ->orderBy('sort_order', 'asc')
             ->get();
 
         return Inertia::render('Admin/Highlight/Index', [
             'highlights' => $highlights,
-            'filters' => $request->only('search'), // <-- 3. Only pass 'search' back
+            'filters' => $request->only('search'),
         ]);
+    }
+
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id' => 'required|exists:highlights,id',
+            'items.*.sort_order' => 'required|integer',
+        ]);
+
+        // Loop through and update the sort_order for each highlight
+        foreach ($request->items as $item) {
+            Highlight::where('id', $item['id'])->update(['sort_order' => $item['sort_order']]);
+        }
+
+        return back();
     }
 
     public function create()

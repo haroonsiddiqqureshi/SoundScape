@@ -196,7 +196,7 @@ const followConcert = (follow) => {
                 <div class="lg:h-[444px]">
                     <img
                         :src="photoPreview"
-                        class="aspect-[2/3] h-full object-fill rounded-md"
+                        class="h-full object-cover rounded-md"
                         alt="Concert Poster"
                     />
                 </div>
@@ -461,11 +461,11 @@ const followConcert = (follow) => {
 
                         <div
                             :class="{
-                                'custom-scrollbar max-h-[16rem]':
+                                'custom-scrollbar max-h-fit':
                                     props.role === 'admin' ||
                                     props.role === 'promoter',
                             }"
-                            class="text-center w-full min-h-[16rem] overflow-auto p-2 whitespace-pre-wrap"
+                            class="text-center w-full min-h-fit overflow-auto p-2 whitespace-pre-wrap"
                         >
                             {{
                                 props.concert.description ||

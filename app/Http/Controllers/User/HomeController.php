@@ -15,7 +15,7 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $highlights = Highlight::where('is_active', true)->get();
+        $highlights = Highlight::where('is_active', true)->orderBy('sort_order', 'asc')->get();
         $provinces = Province::all()->keyBy('id');
 
         $query = Concert::query();

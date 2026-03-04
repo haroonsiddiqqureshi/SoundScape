@@ -13,6 +13,7 @@ class Highlight extends Model
         'concert_id',
         'link',
         'is_active',
+        'sort_order',
     ];
 
     protected $casts = [

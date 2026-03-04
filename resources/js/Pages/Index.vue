@@ -174,7 +174,7 @@ watch(
                             concert: concert.id,
                         })
                     "
-                    class="block"
+                    class="block h-full"
                 >
                     <ConcertCard
                         :concert="concert"

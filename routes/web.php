@@ -88,6 +88,7 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::post('/highlight', [AdminHighlightController::class, 'store'])->name('highlight.store');
     Route::get('/highlight/edit/{highlight}', [AdminHighlightController::class, 'edit'])->name('highlight.edit');
     Route::post('/highlight/{highlight}', [AdminHighlightController::class, 'update'])->name('highlight.update');
+    Route::put('highlight/reorder', [AdminHighlightController::class, 'reorder'])->name('highlight.reorder');
     Route::put('highlight/{highlight}', [AdminHighlightController::class, 'updateActiveStatus'])->name('highlight.updateActiveStatus');
     Route::delete('/highlight/{highlight}', [AdminHighlightController::class, 'destroy'])->name('highlight.delete');
 

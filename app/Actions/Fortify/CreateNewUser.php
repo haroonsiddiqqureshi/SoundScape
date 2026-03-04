@@ -19,10 +19,15 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        // ตรวจสอบและเปลี่ยน +66 เป็น 0
+        if (isset($input['phone']) && str_starts_with($input['phone'], '+66')) {
+            $input['phone'] = '0' . substr($input['phone'], 3);
+        }
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:255', 'unique:users'], // แนะนำให้เพิ่ม unique:users ถ้าต้องการให้เบอร์ไม่ซ้ำ
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();

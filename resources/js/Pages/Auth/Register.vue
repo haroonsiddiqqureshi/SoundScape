@@ -13,6 +13,7 @@ const form = useForm({
     name: "",
     email: "",
     phone: "",
+    line_id: "",
     password: "",
     password_confirmation: "",
     terms: false,
@@ -60,7 +61,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-2">
                 <InputLabel for="email" value="Email" />
                 <TextInput
                     id="email"
@@ -73,7 +74,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-2">
                 <InputLabel for="phone" value="Phone" />
                 <TextInput
                     id="phone"
@@ -86,7 +87,20 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.phone" />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-2">
+                <InputLabel for="line_id" value="line_id" />
+                <TextInput
+                    id="line_id"
+                    v-model="form.line_id"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                    autocomplete="line_id"
+                />
+                <InputError class="mt-2" :message="form.errors.line_id" />
+            </div>
+
+            <div class="mt-2">
                 <InputLabel for="password" value="Password" />
                 <TextInput
                     id="password"
@@ -99,7 +113,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-2">
                 <InputLabel
                     for="password_confirmation"
                     value="Confirm Password"
@@ -120,7 +134,7 @@ const submit = () => {
 
             <div
                 v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature"
-                class="mt-4"
+                class="mt-2"
             >
                 <InputLabel for="terms">
                     <div class="flex items-center">
