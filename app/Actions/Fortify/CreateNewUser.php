@@ -27,7 +27,8 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['required', 'string', 'max:255', 'unique:users'], // แนะนำให้เพิ่ม unique:users ถ้าต้องการให้เบอร์ไม่ซ้ำ
+            'phone' => ['required', 'string', 'max:255', 'unique:users'],
+            'line_id' => ['nullable', 'string', 'max:255'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
@@ -36,6 +37,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'phone' => $input['phone'],
+            'line_id' => $input['line_id'] ?? null,
             'password' => Hash::make($input['password']),
         ]);
     }
