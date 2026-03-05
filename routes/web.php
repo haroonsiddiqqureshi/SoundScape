@@ -18,6 +18,9 @@ use App\Http\Controllers\Promoter\ConcertController as PromoterConcertController
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\MapController;
 
+// --- Line Controller ---
+use App\Http\Controllers\LineIntegrationController;
+
 Route::middleware([
     'block_admin'
 ])->group(function () {
@@ -101,4 +104,13 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::delete('/artist/{artist}', [AdminArtistController::class, 'destroy'])->name('artist.delete');
 
     // Add other admin-only routes here...
+});
+
+// ----- Line -----
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+])->group(function () {
+    Route::get('/auth/line/redirect', [LineIntegrationController::class, 'redirect'])->name('line.redirect');
+    Route::get('/auth/line/callback', [LineIntegrationController::class, 'callback']);
 });

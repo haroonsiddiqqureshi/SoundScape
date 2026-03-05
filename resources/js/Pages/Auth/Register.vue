@@ -13,7 +13,6 @@ const form = useForm({
     name: "",
     email: "",
     phone: "",
-    line_id: "",
     password: "",
     password_confirmation: "",
     terms: false,
@@ -85,19 +84,6 @@ const submit = () => {
                     autocomplete="phone"
                 />
                 <InputError class="mt-2" :message="form.errors.phone" />
-            </div>
-
-            <div class="mt-2">
-                <InputLabel for="line_id" value="line_id" />
-                <TextInput
-                    id="line_id"
-                    v-model="form.line_id"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="line_id"
-                />
-                <InputError class="mt-2" :message="form.errors.line_id" />
             </div>
 
             <div class="mt-2">

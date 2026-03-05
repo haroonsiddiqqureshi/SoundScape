@@ -64,4 +64,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasManyThrough(Notification::class, Follow::class);
     }
+
+    public function routeNotificationForLine($notification)
+    {
+        return $this->line_id;
+    }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique(); // Email address
             $table->char('password', 97); // Hashed password
             $table->string('phone', 20); // Phone number
-            $table->string('line_id', 20)->nullable(); // Line ID (optional)
+            $table->string('line_id')->nullable()->unique(); // Line ID
 
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
