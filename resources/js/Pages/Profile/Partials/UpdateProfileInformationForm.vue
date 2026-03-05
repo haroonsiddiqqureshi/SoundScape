@@ -8,10 +8,6 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
-import {
-    EnvelopeIcon,
-    ChatBubbleOvalLeftEllipsisIcon,
-} from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     user: Object,
