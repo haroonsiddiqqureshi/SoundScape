@@ -3,33 +3,35 @@
 namespace App\Http\Controllers\Promoter;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\Concert;
+use App\Models\User;
 use App\Models\Artist;
+use App\Models\Concert;
 use App\Models\Province;
 use App\Models\Concert_Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Notifications\ConcertUpdatedNotification;
 use Carbon\Carbon;
+use Inertia\Inertia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class ConcertController extends Controller
 {
     public function index(Request $request)
     {
-        // Retain promoter-specific query but add search and pagination
         $concerts = Concert::where('promoter_id', auth('web')->user()->promoter->id)
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate(12)
-            ->withQueryString(); // Keeps the search query in the pagination links
-        
-        $provinces = Province::all()->keyBy('id'); 
-        
+            ->withQueryString();
+
+        $provinces = Province::all()->keyBy('id');
+
         return inertia::render('Promoter/Concert/Index', [
             'concerts' => $concerts,
             'provinces' => $provinces,
@@ -39,27 +41,23 @@ class ConcertController extends Controller
 
     public function create()
     {
-        // Add artists, just like Admin
-        $artists = Artist::all(); 
-        
+        $artists = Artist::all();
+
         return inertia::render('Promoter/Concert/Create', [
-            'artists' => $artists, // Pass artists
+            'artists' => $artists,
         ]);
     }
 
     public function store(Request $request)
     {
-        // Use identical validation
         $validated = $request->validate($this->validationRules());
-        
-        // --- Start of Geocoding Block (Identical to Admin) ---
         $latitude = $validated['latitude'];
         $longitude = $validated['longitude'];
 
         if (is_null($latitude) && !empty($validated['venue_name']) && !empty($validated['province_id'])) {
-            
+
             $province = Province::find($validated['province_id']);
-            
+
             if ($province) {
                 $queryString = urlencode($validated['venue_name'] . ', ' . $province->name_th . ', Thailand');
                 $url = "https://nominatim.openstreetmap.org/search?q={$queryString}&format=json&limit=1&accept-language=th,en";
@@ -70,7 +68,7 @@ class ConcertController extends Controller
 
                 if ($response->successful()) {
                     $data = $response->json();
-                
+
                     if (!empty($data)) {
                         $latitude = $data[0]['lat'];
                         $longitude = $data[0]['lon'];
@@ -82,13 +80,10 @@ class ConcertController extends Controller
                 }
             }
         }
-        
+
         $validated['latitude'] = $latitude;
         $validated['longitude'] = $longitude;
-        // --- End of Geocoding Block ---
 
-
-        // Use identical create logic from Admin
         $concert = Concert::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
@@ -104,16 +99,14 @@ class ConcertController extends Controller
             'end_show_time' => $validated['end_show_time'],
             'start_sale_date' => $validated['start_sale_date'],
             'end_sale_date' => $validated['end_sale_date'],
-            'latitude' => $validated['latitude'], // Will now use geocoded value if available
-            'longitude' => $validated['longitude'], // Will now use geocoded value if available
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
             'picture_url' => $validated['picture_url']->store('concerts', 'public'),
             'ticket_link' => $validated['ticket_link'],
-            
-            // Use promoter_id instead of admin_id
-            'promoter_id' => auth('web')->user()->promoter->id, 
+
+            'promoter_id' => auth('web')->user()->promoter->id,
         ]);
 
-        // Add artist relationship logic
         if (isset($validated['artist_ids'])) {
             $concert->artists()->attach($validated['artist_ids']);
         }
@@ -123,58 +116,49 @@ class ConcertController extends Controller
 
     public function detail(Concert $concert)
     {
-        // Ensure the authenticated promoter owns this concert
         if ($concert->promoter_id !== Auth::user()->promoter->id) {
             abort(403);
         }
 
-        // Add data loading, just like Admin
         $concert->load('artists');
         $provinces = Province::all()->keyBy('id');
 
         return Inertia::render('Promoter/Concert/Detail', [
             'concert' => $concert,
-            'provinces' => $provinces, // Pass provinces
+            'provinces' => $provinces,
         ]);
     }
 
     public function edit(Concert $concert)
     {
-        // Ensure the authenticated promoter owns this concert
         if ($concert->promoter_id !== Auth::user()->promoter->id) {
             abort(403);
         }
 
-        // Add data loading, just like Admin
         $concert->load('artists');
         $artists = Artist::all();
 
         return Inertia::render('Promoter/Concert/Edit', [
             'concert' => $concert,
-            'artists' => $artists, // Pass artists
+            'artists' => $artists,
         ]);
     }
 
     public function update(Request $request, Concert $concert)
     {
-        // Ensure the authenticated promoter owns this concert
         if ($concert->promoter_id !== Auth::user()->promoter->id) {
             abort(403);
         }
 
-        // Use identical validation
         $validated = $request->validate($this->validationRules(true));
-
         $originalData = $concert->getOriginal();
-        
-        // --- Start of Geocoding Block (Identical to Admin) ---
         $latitude = $validated['latitude'];
         $longitude = $validated['longitude'];
 
         if (is_null($latitude) && !empty($validated['venue_name']) && !empty($validated['province_id'])) {
-            
+
             $province = Province::find($validated['province_id']);
-            
+
             if ($province) {
                 $queryString = urlencode($validated['venue_name'] . ', ' . $province->name_th . ', Thailand');
                 $url = "https://nominatim.openstreetmap.org/search?q={$queryString}&format=json&limit=1&accept-language=th,en";
@@ -185,7 +169,7 @@ class ConcertController extends Controller
 
                 if ($response->successful()) {
                     $data = $response->json();
-                
+
                     if (!empty($data)) {
                         $latitude = $data[0]['lat'];
                         $longitude = $data[0]['lon'];
@@ -197,53 +181,19 @@ class ConcertController extends Controller
                 }
             }
         }
-        
+
         $validated['latitude'] = $latitude;
         $validated['longitude'] = $longitude;
-        // --- End of Geocoding Block ---
+        $promoterId = Auth::user()->promoter->id;
+        $actor = ['promoter_id' => Auth::user()->promoter->id];
 
-        // Get promoter ID for logging
-        $promoterId = Auth::user()->promoter->id; 
-
-        // Use identical logging logic from Admin
-        foreach ($validated as $key => $value) {
-
-            if ($key === 'artist_ids') {
-
-                $oldArtistIds = $concert->artists()->pluck('artists.id')->toArray();
-                sort($oldArtistIds);
-
-                $newArtistIds = $value ?? [];
-                sort($newArtistIds);
-
-                if ($oldArtistIds !== $newArtistIds) {
-                    Concert_Log::create([
-                        'concert_id' => $concert->id,
-                        'promoter_id' => $promoterId, // Use promoter_id
-                        'field_name' => 'artist_ids',
-                        'old_value' => json_encode($oldArtistIds),
-                        'new_value' => json_encode($newArtistIds),
-                    ]);
-                }
-                continue;
-            }
-
-            if ($key !== 'picture_url' && $concert->{$key} != $value) {
-                Concert_Log::create([
-                    'concert_id' => $concert->id,
-                    'promoter_id' => $promoterId, // Use promoter_id
-                    'field_name' => $key,
-                    'old_value' => $originalData[$key],
-                    'new_value' => $value,
-                ]);
-            }
-        }
+        $groupedChanges = $this->logConcertChanges($concert, $validated, $actor);
 
         if ($request->hasFile('picture_url')) {
             $newPath = $request->file('picture_url')->store('concerts', 'public');
             Concert_Log::create([
                 'concert_id' => $concert->id,
-                'promoter_id' => $promoterId, // Use promoter_id
+                'promoter_id' => $promoterId,
                 'field_name' => 'picture_url',
                 'old_value' => $concert->picture_url,
                 'new_value' => $newPath,
@@ -253,22 +203,29 @@ class ConcertController extends Controller
             unset($validated['picture_url']);
         }
 
-        unset($validated['artist_ids']);
+        if ($request->has('artist_ids')) {
+            $concert->artists()->sync($validated['artist_ids'] ?? []);
+
+            unset($validated['artist_ids']);
+        }
 
         $concert->update($validated);
 
-        // Add artist sync logic
-        if (isset($request->artist_ids)) {
-            $concert->artists()->sync($request->artist_ids ?? []);
+        if (!empty($groupedChanges)) {
+            $followers = User::whereHas('followedConcert', function($query) use ($concert) {
+                $query->where('concerts.id', $concert->id);
+            })->get();
+
+            if ($followers->count() > 0) {
+                Notification::send($followers, new ConcertUpdatedNotification($concert, $groupedChanges));
+            }
         }
 
         return redirect()->route('promoter.concert.detail', $concert)->with('success', 'Concert updated successfully.');
     }
 
-    // Add destroy method from Admin
     public function destroy(Concert $concert)
     {
-        // Ensure the authenticated promoter owns this concert
         if ($concert->promoter_id !== Auth::user()->promoter->id) {
             abort(403);
         }
@@ -280,7 +237,6 @@ class ConcertController extends Controller
         return redirect()->route('promoter.concert.index')->with('success', 'Concert deleted successfully.');
     }
 
-    // Use identical validation rules from Admin
     private function validationRules($isUpdate = false)
     {
         $rules = [

@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'notifications' => $request->user() ? $request->user()->unreadNotifications : [],
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

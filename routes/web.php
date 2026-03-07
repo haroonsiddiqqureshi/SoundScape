@@ -106,7 +106,7 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     // Add other admin-only routes here...
 });
 
-// ----- Line -----
+// --- Line ---
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -114,3 +114,10 @@ Route::middleware([
     Route::get('/auth/line/redirect', [LineIntegrationController::class, 'redirect'])->name('line.redirect');
     Route::get('/auth/line/callback', [LineIntegrationController::class, 'callback']);
 });
+
+// --- Notification ---
+Route::post('/notifications/{id}/read', function ($id, \Illuminate\Http\Request $request) {
+    $notification = $request->user()->notifications()->findOrFail($id);
+    $notification->markAsRead();
+    return back();
+})->name('notifications.read')->middleware('auth');

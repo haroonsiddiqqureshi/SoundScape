@@ -20,6 +20,7 @@ import {
 import {
     MoonIcon as OutlineMoonIcon,
     SunIcon as OutlineSunIcon,
+    BellIcon,
 } from "@heroicons/vue/24/outline";
 
 defineProps({
@@ -82,11 +83,31 @@ const fetchSearchResults = async () => {
     }
 };
 
+const markAsRead = (notification) => {
+    router.post(
+        route("notifications.read", notification.id),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                if (notification.data.concert_id) {
+                    router.get(
+                        route(
+                            "user.concert.detail",
+                            notification.data.concert_id,
+                        ),
+                    );
+                }
+            },
+        },
+    );
+};
+
 watch(
     () => page.props.filters?.search,
     (newSearch) => {
         search.value = newSearch || "";
-    }
+    },
 );
 
 watch(search, debounce(fetchSearchResults, 300));
@@ -207,14 +228,84 @@ const logout = () => {
                                     />
                                 </div>
 
-                                <!-- <SearchResults
-                                    v-if="
-                                        isSearchFocused && search.length > 1
-                                    "
+                                <SearchResults
+                                    v-if="isSearchFocused && search.length > 1"
                                     :is-loading="isLoadingSearch"
                                     :results="searchResults"
-                                /> -->
+                                />
                             </div>
+                        </div>
+
+                        <div
+                            v-if="page.props.auth.user"
+                            class="relative flex items-center mr-4"
+                        >
+                            <Dropdown align="right" width="64">
+                                <template #trigger>
+                                    <button
+                                        class="relative p-2 text-primary hover:text-text focus:outline-none transition duration-150 ease-in-out"
+                                    >
+                                        <BellIcon
+                                            class="h-6 w-6 stroke-current"
+                                        />
+                                        <span
+                                            v-if="
+                                                $page.props.auth.notifications
+                                                    .length > 0
+                                            "
+                                            class="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform bg-red-600 rounded-full"
+                                        >
+                                            {{
+                                                $page.props.auth.notifications
+                                                    .length
+                                            }}
+                                        </span>
+                                    </button>
+                                </template>
+
+                                <template #content>
+                                    <div
+                                        class="block px-4 py-2 text-xs text-text-medium font-bold border-b border-primary-low"
+                                    >
+                                        Notifications
+                                    </div>
+                                    <div
+                                        v-if="
+                                            $page.props.auth.notifications
+                                                .length === 0
+                                        "
+                                        class="px-4 py-3 text-sm text-text-medium text-center"
+                                    >
+                                        No new notifications
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="max-h-64 overflow-y-auto"
+                                    >
+                                        <button
+                                            v-for="notification in $page.props
+                                                .auth.notifications"
+                                            :key="notification.id"
+                                            @click="markAsRead(notification)"
+                                            class="w-full text-left px-4 py-3 hover:bg-primary-low border-b border-primary-low transition block"
+                                        >
+                                            <p
+                                                class="text-sm font-semibold text-text"
+                                            >
+                                                {{
+                                                    notification.data
+                                                        .concert_name
+                                                }}
+                                            </p>
+                                            <p
+                                                class="text-xs text-text-medium mt-1"
+                                            >
+                                                {{ notification.data.message }}
+                                            </p>
+                                        </button>
+                                    </div>
+                                </template>
+                            </Dropdown>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center space-x-4">
@@ -465,9 +556,7 @@ const logout = () => {
             </nav>
 
             <main class="py-12 mx-4 sm:mx-0 bg-background z-10">
-                <div
-                    class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-12"
-                >
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-12">
                     <slot />
                 </div>
             </main>
