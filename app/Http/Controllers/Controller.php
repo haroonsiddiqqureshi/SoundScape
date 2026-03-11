@@ -68,7 +68,7 @@ abstract class Controller
                     'new_value' => $value,
                 ], $actorDetails));
 
-                $excludedFields = ['genre', 'event_type'];
+                $excludedFields = ['genre', 'event_type', 'price_max', 'end_show_date', 'end_show_time']; // Field ที่ไม่ต้องการให้มีการแจ้งเตือน
 
                 if (!in_array($key, $excludedFields)) {
                     $groupedChanges[$key] = [
