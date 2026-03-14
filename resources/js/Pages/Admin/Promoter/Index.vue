@@ -71,7 +71,7 @@ const updateVerificationStatus = (promoter) => {
                     >
                         <span
                             @click="updateVerificationStatus(promoter)"
-                            class="px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer"
+                            class="px-2 py-1 rounded-md text-xs font-semibold cursor-pointer"
                             :class="
                                 promoter.is_verified
                                     ? 'bg-primary text-white'
@@ -94,7 +94,7 @@ const updateVerificationStatus = (promoter) => {
                                     promoter: promoter.id,
                                 })
                             "
-                            class="flex items-center px-2 h-6 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-full transition-colors duration-200"
+                            class="flex items-center px-2 h-6 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200"
                         >
                             <EyeIcon class="w-4 h-4" />
                             <span class="pb-1">ดูข้อมูล</span>

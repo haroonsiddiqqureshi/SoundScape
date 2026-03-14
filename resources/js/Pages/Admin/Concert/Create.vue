@@ -1,10 +1,10 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm } from "@inertiajs/vue3";
-import ConcertCreateForm from "@/Components/Concerts/ConcertCreateForm.vue";
+import ConcertForm from "@/Components/Concerts/ConcertForm.vue";
 
 defineProps({
-    artists: Object,
+    artists: Array,
 });
 
 const form = useForm({
@@ -45,6 +45,6 @@ const submit = () => {
 
 <template>
     <AdminLayout title="Create Concert">
-        <ConcertCreateForm :form="form" :artists="artists" @submit="submit" />
+        <ConcertForm :form="form" :artists="artists" @submit="submit" />
     </AdminLayout>
 </template>

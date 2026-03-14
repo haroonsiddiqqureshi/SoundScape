@@ -1,6 +1,5 @@
 <script setup>
 // --- Imports ---
-// Vue
 import { ref, inject, computed, watch, nextTick, onMounted } from "vue";
 
 // Components
@@ -25,9 +24,7 @@ import {
     MapIcon,
     FolderArrowDownIcon,
 } from "@heroicons/vue/24/outline";
-import {
-    ArrowTurnLeftUpIcon,
-} from "@heroicons/vue/24/solid";
+import { ArrowTurnLeftUpIcon } from "@heroicons/vue/24/solid";
 
 // Third-Party Libraries
 import L from "leaflet";
@@ -35,12 +32,16 @@ import "leaflet/dist/leaflet.css";
 
 // --- Core Vue Setup ---
 const props = defineProps({
-    form: Object,
-    artists: Object,
+    form: { type: Object, required: true },
+    artists: { type: Array, required: true, default: () => [] },
+    concert: { type: Object, default: null }, // If passed, we are in Edit mode
 });
 
 const emit = defineEmits(["submit"]);
 const isDarkMode = inject("isDarkMode");
+
+// Computed flag to check if we are editing
+const isEditMode = computed(() => !!props.concert);
 
 // --- Static Configuration ---
 const eventTypes = [
@@ -92,7 +93,6 @@ const submit = () => {
     emit("submit");
 };
 
-// Watch for errors and scroll to the summary
 watch(
     () => props.form.errors,
     (newErrors) => {
@@ -107,13 +107,12 @@ watch(
             });
         }
     },
-    { deep: true }
+    { deep: true },
 );
 
 // --- Lifecycle Hooks ---
 const allProvinces = ref([]);
 
-// Fetches provinces from your API on component load
 onMounted(() => {
     fetch("/api/provinces")
         .then((response) => {
@@ -124,6 +123,13 @@ onMounted(() => {
         })
         .then((data) => {
             allProvinces.value = data;
+            if (props.form.province_id) {
+                const initialProvince = allProvinces.value.find(
+                    (p) => p.id === props.form.province_id,
+                );
+                if (initialProvince)
+                    selectedProvinceName.value = initialProvince.name_th;
+            }
         })
         .catch((error) => console.error("Error fetching provinces:", error));
 });
@@ -132,23 +138,28 @@ onMounted(() => {
 const uploadedPhotoUrl = ref(null);
 const photoInput = ref(null);
 
-const photoPreview = computed(() => {
-    if (uploadedPhotoUrl.value) {
-        return uploadedPhotoUrl.value;
+const initialImageUrl = computed(() => {
+    if (props.concert && props.concert.picture_url) {
+        return props.concert.picture_url.startsWith("http")
+            ? props.concert.picture_url
+            : `/storage/${props.concert.picture_url}`;
     }
-    // Check if it's a new file upload (File object)
+    return null;
+});
+
+const photoPreview = computed(() => {
+    if (uploadedPhotoUrl.value) return uploadedPhotoUrl.value;
     if (props.form.picture_url && typeof props.form.picture_url !== "string") {
         return URL.createObjectURL(props.form.picture_url);
     }
-    // Placeholder logic
+    if (initialImageUrl.value) return initialImageUrl.value;
+
     return isDarkMode.value
         ? "https://placehold.co/800x1200/1c1423/ffffff80?text=Upload%5CnPicture"
         : "https://placehold.co/800x1200/e5e7eb/00000080?text=Upload%5CnPicture";
 });
 
-const selectNewPhoto = () => {
-    photoInput.value.click();
-};
+const selectNewPhoto = () => photoInput.value.click();
 
 const updatePhotoPreview = (event) => {
     const file = event.target.files[0];
@@ -164,52 +175,56 @@ const updatePhotoPreview = (event) => {
 // --- Feature: Artist Selection ---
 const tempArtistId = ref(null);
 
-const selectedArtists = computed(() => {
-    return props.form.artist_ids
-        .map((id) => props.artists.find((artist) => artist.id === id))
-        .filter(Boolean); // Filter out any undefined results
+const artistPicturePlaceholder = computed(() => {
+    return (artist) =>
+        isDarkMode.value
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=1c1423&color=ffffff`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=008be6&color=ffffff`;
 });
 
-const artistPicturePlaceholder = computed(() => {
-    return (artist) => {
-        return isDarkMode.value
-            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  artist.name
-              )}&background=1c1423&color=ffffff`
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  artist.name
-              )}&background=008be6&color=ffffff`;
-    };
+const selectedArtists = computed(() => {
+    if (!Array.isArray(props.form.artist_ids) || !Array.isArray(props.artists))
+        return [];
+    return props.form.artist_ids
+        .map((id) => props.artists.find((artist) => artist.id === id))
+        .filter(Boolean);
 });
 
 const availableArtists = computed(() => {
+    if (!Array.isArray(props.artists)) return [];
+    const selectedIds = Array.isArray(props.form.artist_ids)
+        ? props.form.artist_ids
+        : [];
+
     return props.artists
-        .filter((artist) => !props.form.artist_ids.includes(artist.id))
+        .filter((artist) => !selectedIds.includes(artist.id))
         .map((artist) => ({
             name: artist.name,
             value: artist.id,
             picture_url:
-                artist.picture_url && (artist.picture_url.startsWith('http://') || artist.picture_url.startsWith('https://'))
+                artist.picture_url && artist.picture_url.startsWith("http")
                     ? artist.picture_url
                     : artist.picture_url
-                        ? `/storage/${artist.picture_url}`
-                        : artistPicturePlaceholder.value(artist),
+                      ? `/storage/${artist.picture_url}`
+                      : artistPicturePlaceholder.value(artist),
         }));
 });
 
 watch(tempArtistId, (newId) => {
-    if (newId && !props.form.artist_ids.includes(newId)) {
-        props.form.artist_ids.push(newId);
+    if (newId) {
+        if (!Array.isArray(props.form.artist_ids)) props.form.artist_ids = [];
+        if (!props.form.artist_ids.includes(newId))
+            props.form.artist_ids.push(newId);
     }
-    // Reset the dropdown
     nextTick(() => {
         tempArtistId.value = null;
     });
 });
 
 function removeArtist(artistId) {
+    if (!Array.isArray(props.form.artist_ids)) return;
     props.form.artist_ids = props.form.artist_ids.filter(
-        (id) => id !== artistId
+        (id) => id !== artistId,
     );
 }
 
@@ -220,29 +235,28 @@ const mapInstance = ref(null);
 const selectedLocation = ref(null);
 const mapMarker = ref(null);
 const isGeocoding = ref(false);
-const locationMode = ref("manual");
+
+// Default to 'map' mode if coordinates exist (like in Edit form), else 'manual'
+const locationMode = ref(
+    props.form.latitude && props.form.longitude ? "map" : "manual",
+);
 
 const selectedCoordinates = computed(() => {
     if (props.form.latitude && props.form.longitude) {
-        return `${props.form.latitude.toFixed(
-            6
-        )}, ${props.form.longitude.toFixed(6)}`;
+        return `${Number(props.form.latitude).toFixed(6)}, ${Number(props.form.longitude).toFixed(6)}`;
     }
     return null;
 });
 
 const modalSelectedCoordinates = computed(() => {
     if (selectedLocation.value) {
-        return `${selectedLocation.value.lat.toFixed(
-            6
-        )}, ${selectedLocation.value.lng.toFixed(6)}`;
+        return `${selectedLocation.value.lat.toFixed(6)}, ${selectedLocation.value.lng.toFixed(6)}`;
     }
     return null;
 });
 
 function toggleLocationMode() {
     locationMode.value = locationMode.value === "manual" ? "map" : "manual";
-    // Clear the other method's data to avoid conflicts
     if (locationMode.value === "manual") {
         props.form.latitude = null;
         props.form.longitude = null;
@@ -257,53 +271,45 @@ const openMap = () => {
     selectedLocation.value = null;
     selectedProvinceName.value = null;
 
-    // If there's an initial province_id, set the province name
     if (props.form.province_id && allProvinces.value.length > 0) {
         const initialProvince = allProvinces.value.find(
-            (p) => p.id === props.form.province_id
+            (p) => p.id === props.form.province_id,
         );
-        if (initialProvince) {
+        if (initialProvince)
             selectedProvinceName.value = initialProvince.name_th;
-        }
     }
 };
 
 const initMap = () => {
     if (mapInstance.value) return;
-
-    let initialLat = props.form.latitude || 13.7563; // Default to Bangkok
+    let initialLat = props.form.latitude || 13.7563;
     let initialLng = props.form.longitude || 100.5018;
     let initialZoom = props.form.latitude ? 16 : 10;
 
     mapInstance.value = L.map("map-picker").setView(
         [initialLat, initialLng],
-        initialZoom
+        initialZoom,
     );
-
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(mapInstance.value);
 
-    // Set initial marker if coords exist
     if (props.form.latitude && props.form.longitude) {
         selectedLocation.value = {
             lat: props.form.latitude,
             lng: props.form.longitude,
         };
         mapMarker.value = L.marker(selectedLocation.value).addTo(
-            mapInstance.value
+            mapInstance.value,
         );
     }
 
-    // Handle map click
     mapInstance.value.on("click", (e) => {
         selectedLocation.value = e.latlng;
-        if (mapMarker.value) {
-            mapInstance.value.removeLayer(mapMarker.value);
-        }
+        if (mapMarker.value) mapInstance.value.removeLayer(mapMarker.value);
         mapMarker.value = L.marker(e.latlng).addTo(mapInstance.value);
-        selectedProvinceName.value = null; // Clear old name
+        selectedProvinceName.value = null;
         reverseGeocode(e.latlng);
     });
 };
@@ -321,14 +327,11 @@ const closeModal = () => {
 };
 
 async function reverseGeocode(latlng) {
-    if (allProvinces.value.length === 0) {
-        console.warn("Provinces list not loaded. Cannot find province ID.");
-        return;
-    }
+    if (allProvinces.value.length === 0) return;
     isGeocoding.value = true;
     try {
         const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&accept-language=th,en`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&accept-language=th,en`,
         );
         const data = await response.json();
         if (data && data.address) {
@@ -340,23 +343,18 @@ async function reverseGeocode(latlng) {
                 const matchingProvince = allProvinces.value.find(
                     (p) =>
                         p.name_th.includes(normalizedName) ||
-                        (p.name_en && p.name_en.includes(normalizedName))
+                        (p.name_en && p.name_en.includes(normalizedName)),
                 );
                 if (matchingProvince) {
                     props.form.province_id = matchingProvince.id;
                     selectedProvinceName.value = matchingProvince.name_th;
                 } else {
-                    console.warn(`Could not match province: ${provinceName}`);
                     props.form.province_id = null;
                     selectedProvinceName.value = "ไม่พบ";
                 }
-            } else {
-                props.form.province_id = null;
-                selectedProvinceName.value = "ไม่พบ";
             }
         }
     } catch (error) {
-        console.error("Reverse geocoding failed:", error);
         props.form.province_id = null;
         selectedProvinceName.value = "ผิดพลาด";
     } finally {
@@ -364,14 +362,10 @@ async function reverseGeocode(latlng) {
     }
 }
 
-// Watcher for map modal lifecycle
 watch(showMapModal, (isShowing) => {
     if (isShowing) {
-        nextTick(() => {
-            initMap();
-        });
+        nextTick(() => initMap());
     } else {
-        // Destroy map instance when modal is closed to prevent memory leaks
         if (mapInstance.value) {
             mapInstance.value.remove();
             mapInstance.value = null;
@@ -389,9 +383,9 @@ watch(
             props.form.end_sale_date &&
             new Date(props.form.end_sale_date) < new Date(newStartDate)
         ) {
-            props.form.end_sale_date = null; // Reset end date if invalid
+            props.form.end_sale_date = null;
         }
-    }
+    },
 );
 
 watch(
@@ -402,14 +396,13 @@ watch(
             props.form.end_show_date &&
             new Date(props.form.end_show_date) < new Date(newStartDate)
         ) {
-            props.form.end_show_date = null; // Reset end date if invalid
+            props.form.end_show_date = null;
         }
-    }
+    },
 );
 </script>
 
 <template>
-    <!-- Show validation errors -->
     <div
         ref="errorSummary"
         v-if="Object.keys(props.form.errors).length"
@@ -456,7 +449,7 @@ watch(
                 >
                     <img
                         :src="photoPreview"
-                        class="aspect-[2/3] h-full object-fill rounded-md"
+                        class="h-full object-cover rounded-md"
                     />
                     <input
                         ref="photoInput"
@@ -495,7 +488,6 @@ watch(
                 </div>
                 <input
                     type="text"
-                    id="name"
                     v-model="props.form.name"
                     class="mt-2 bg-background rounded-md font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                     :class="{
@@ -504,13 +496,10 @@ watch(
                     }"
                     placeholder="ชื่องานดนตรี"
                 />
+
                 <div class="flex items-center space-x-8 ml-12 mt-4">
-                    <HeartIcon
-                        class="flex-none h-8 w-8 text-primary"
-                    />
-                    <LinkIcon
-                        class="flex-none h-8 w-8 text-secondary"
-                    />
+                    <HeartIcon class="flex-none h-8 w-8 text-primary" />
+                    <LinkIcon class="flex-none h-8 w-8 text-secondary" />
                     <input
                         type="text"
                         v-model="props.form.ticket_link"
@@ -522,14 +511,19 @@ watch(
                         placeholder="ลิงก์จำหน่ายบัตร"
                     />
                 </div>
+
                 <div class="flex flex-col mt-12 space-y-2 pl-2">
                     <AnimatedRangeInput
                         :trigger-value="props.form.start_sale_date"
                         v-model:end-value="props.form.end_sale_date"
                     >
-                        <template #icon
-                            ><TicketIcon class="h-8 w-8 text-accent"
-                        /></template>
+                        <template #icon>
+                            <div
+                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
+                            >
+                                <TicketIcon class="flex-none h-6 w-6" />
+                            </div>
+                        </template>
                         <template #startInput
                             ><DatePicker
                                 v-model="props.form.start_sale_date"
@@ -545,18 +539,23 @@ watch(
                                 :error="props.form.errors.end_sale_date"
                         /></template>
                     </AnimatedRangeInput>
+
                     <AnimatedRangeInput
                         :trigger-value="props.form.start_show_date"
                         v-model:end-value="props.form.end_show_date"
                     >
-                        <template #icon
-                            ><CalendarIcon class="h-8 w-8 text-secondary"
-                        /></template>
+                        <template #icon>
+                            <div
+                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
+                            >
+                                <CalendarIcon class="flex-none h-6 w-6" />
+                            </div>
+                        </template>
                         <template #startInput
                             ><DatePicker
                                 v-model="props.form.start_show_date"
                                 placeholder="วันที่แสดง"
-                                :min-date="new Date()"
+                                :min-date="isEditMode ? null : new Date()"
                                 :max-date="props.form.end_show_date"
                                 :error="props.form.errors.start_show_date"
                         /></template>
@@ -568,13 +567,18 @@ watch(
                                 :error="props.form.errors.end_show_date"
                         /></template>
                     </AnimatedRangeInput>
+
                     <AnimatedRangeInput
                         :trigger-value="props.form.start_show_time"
                         v-model:end-value="props.form.end_show_time"
                     >
-                        <template #icon
-                            ><ClockIcon class="h-8 w-8 text-primary"
-                        /></template>
+                        <template #icon>
+                            <div
+                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
+                            >
+                                <ClockIcon class="flex-none h-6 w-6" />
+                            </div>
+                        </template>
                         <template #startInput
                             ><TimePicker
                                 v-model="props.form.start_show_time"
@@ -588,10 +592,15 @@ watch(
                                 :error="props.form.errors.end_show_time"
                         /></template>
                     </AnimatedRangeInput>
+
                     <AnimatedRangeInput :trigger-value="props.form.price_min">
-                        <template #icon
-                            ><BanknotesIcon class="h-8 w-8 text-accent"
-                        /></template>
+                        <template #icon>
+                            <div
+                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
+                            >
+                                <BanknotesIcon class="flex-none h-6 w-6" />
+                            </div>
+                        </template>
                         <template #startInput
                             ><input
                                 type="number"
@@ -631,18 +640,21 @@ watch(
                                 <button
                                     type="button"
                                     @click="toggleLocationMode"
-                                    class="flex items-center justify-center text-secondary hover:text-secondary-hover transition-colors duration-150 outline-none"
                                     :title="
                                         locationMode === 'manual'
                                             ? 'เลือกจากแผนที่'
                                             : 'กรอกด้วยตนเอง'
                                     "
                                 >
-                                    <MapIcon
-                                        v-if="locationMode === 'manual'"
-                                        class="h-8 w-8"
-                                    />
-                                    <MapPinIcon v-else class="h-8 w-8" />
+                                    <div
+                                        class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
+                                    >
+                                        <MapIcon
+                                            v-if="locationMode === 'manual'"
+                                            class="h-6 w-6"
+                                        />
+                                        <MapPinIcon v-else class="h-6 w-6" />
+                                    </div>
                                 </button>
                             </template>
 
@@ -662,7 +674,7 @@ watch(
                                     <span
                                         v-if="selectedCoordinates"
                                         class="text-text"
-                                        >{{ selectedProvinceName }} : 
+                                        >{{ selectedProvinceName }} :
                                         <span class="text-text-medium">{{
                                             selectedCoordinates
                                         }}</span></span
@@ -753,11 +765,8 @@ watch(
                             >
                                 <img
                                     :src="
-                                        artist.picture_url && (artist.picture_url.startsWith('http://') || artist.picture_url.startsWith('https://'))
-                                            ? artist.picture_url
-                                            : artist.picture_url
-                                                ? `/storage/${artist.picture_url}`
-                                                : artistPicturePlaceholder(artist)
+                                        artist.picture_url ||
+                                        artistPicturePlaceholder(artist)
                                     "
                                     :alt="artist.name"
                                     class="w-5 h-5 rounded-full object-cover"
@@ -787,6 +796,7 @@ watch(
                             placeholder="รายละเอียดงานดนตรี"
                         ></textarea>
                     </div>
+
                     <button
                         type="button"
                         @click="submit"
@@ -796,8 +806,12 @@ watch(
                         <FolderArrowDownIcon
                             class="w-4 h-4 stroke-current stroke-[2px]"
                         />
-                        <span v-if="props.form.processing">กำลังสร้าง...</span>
-                        <span v-else>สร้างงานดนตรี</span>
+                        <span v-if="props.form.processing">{{
+                            isEditMode ? "กำลังอัปเดต..." : "กำลังสร้าง..."
+                        }}</span>
+                        <span v-else>{{
+                            isEditMode ? "อัปเดตงานดนตรี" : "สร้างงานดนตรี"
+                        }}</span>
                     </button>
                 </div>
             </div>
@@ -817,20 +831,17 @@ watch(
                             class="text-lg flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 font-medium leading-6"
                         >
                             <span>เลือกตำแหน่งที่ตั้ง</span>
-
                             <span
                                 v-if="isGeocoding"
                                 class="text-sm font-normal text-text-medium"
+                                >(กำลังค้นหาจังหวัด...)</span
                             >
-                                (กำลังค้นหาจังหวัด...)
-                            </span>
                             <span
                                 v-else-if="selectedLocation"
                                 class="text-sm font-normal text-text-medium"
+                                >({{ selectedProvinceName }} - พิกัด:
+                                {{ modalSelectedCoordinates }})</span
                             >
-                                ({{ selectedProvinceName }} - พิกัด:
-                                {{ modalSelectedCoordinates }})
-                            </span>
                         </h3>
                         <button
                             @click="closeModal"
@@ -839,12 +850,10 @@ watch(
                             <XMarkIcon class="h-6 w-6" />
                         </button>
                     </div>
-
                     <div
                         id="map-picker"
                         class="rounded-md h-[400px] w-full"
                     ></div>
-
                     <button
                         type="button"
                         @click="confirmLocation"

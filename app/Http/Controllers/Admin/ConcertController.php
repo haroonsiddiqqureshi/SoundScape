@@ -109,8 +109,9 @@ class ConcertController extends Controller
 
     public function detail(Concert $concert)
     {
-        $concert->load('artists');
+        $concert->load(['artists', 'promoter.user']);
         $provinces = Province::all()->keyBy('id');
+
         return Inertia::render('Admin/Concert/Detail', [
             'concert' => $concert,
             'provinces' => $provinces,

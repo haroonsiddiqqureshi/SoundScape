@@ -188,7 +188,7 @@ const getPictureUrl = (highlight) => {
                                     highlight: highlight.id,
                                 })
                             "
-                            class="flex items-center px-2 h-6 w-fit space-x-1 bg-secondary hover:bg-secondary-hover rounded-full transition-colors duration-200"
+                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200"
                         >
                             <PencilIcon class="w-4 h-4" />
                             <span>แก้ไข</span>
@@ -200,7 +200,7 @@ const getPictureUrl = (highlight) => {
                                 })
                             "
                             method="delete"
-                            class="flex items-center px-2 h-6 w-fit space-x-1 bg-red-600 hover:bg-red-700 rounded-full transition-colors duration-200"
+                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200"
                         >
                             <TrashIcon class="w-4 h-4" />
                             <span>ลบ</span>
@@ -220,7 +220,7 @@ const getPictureUrl = (highlight) => {
                         @click="closeModal"
                         class="absolute -top-3 -right-3 z-10 bg-primary rounded-full p-1 text-white"
                     >
-                        <XMarkIcon class="h-4 w-4" />
+                        <XMarkIcon class="h-4 w-4 text-white stroke-current" />
                     </button>
                     <img
                         :src="modalImageUrl"

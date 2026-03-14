@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Promoter;
+use App\Models\Concert;
+use App\Models\Province;
 
 class PromoterController extends Controller
 {
@@ -35,8 +37,17 @@ class PromoterController extends Controller
     public function detail(Promoter $promoter)
     {
         $promoter->load(['user:id,name,email,phone']);
+        
+        $concerts = Concert::where('promoter_id', $promoter->id)
+            ->latest()
+            ->paginate(12);
+            
+        $provinces = Province::all()->keyBy('id');
+
         return Inertia::render('Admin/Promoter/Detail', [
             'promoter' => $promoter,
+            'concerts' => $concerts,
+            'provinces' => $provinces,
         ]);
     }
 

@@ -11,7 +11,7 @@ const props = defineProps({
 
 // --- Artist Form Definition ---
 const form = useForm({
-    _method: "PUT", // Spoof PUT method for file uploads
+    _method: "POST", // Spoof PUT method for file uploads
     name: props.artist.name, // Pre-fill the name
     picture_url: null, // Will hold the *new* file object if one is selected
 });

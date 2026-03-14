@@ -1,12 +1,12 @@
 <script setup>
 import PromoterLayout from "@/Layouts/PromoterLayout.vue";
-import ConcertEditForm from "@/Components/Concerts/ConcertEditForm.vue";
+import ConcertForm from "@/Components/Concerts/ConcertForm.vue";
 import { useForm } from "@inertiajs/vue3";
 import { defineProps } from "vue";
 
 const props = defineProps({
     concert: Object,
-    artists: Object,
+    artists: Array,
 });
 
 const form = useForm({
@@ -52,10 +52,10 @@ function submit() {
 
 <template>
     <PromoterLayout title="Edit Concert">
-        <ConcertEditForm
+        <ConcertForm
             :form="form"
-            :concert="concert"
             :artists="artists"
+            :concert="concert"
             @submit="submit"
         />
     </PromoterLayout>

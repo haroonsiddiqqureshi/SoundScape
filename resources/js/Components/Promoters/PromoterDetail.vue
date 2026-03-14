@@ -36,7 +36,7 @@ const availableSocialLinks = computed(() => {
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-6">
                     <img
-                        class="h-16 w-16 rounded-full flex items-center justify-center object-cover"
+                        class="h-16 w-16 border-2 border-primary rounded-full flex items-center justify-center object-cover"
                         :src="promoterPicturePlaceholder"
                         :alt="promoter.fullname"
                     />
@@ -52,10 +52,10 @@ const availableSocialLinks = computed(() => {
                 <div class="flex flex-col items-end space-y-2 text-xs uppercase">
                     <span
                         @click="emit('update-verification-status', promoter)"
-                        class="px-2.5 py-1 rounded-full font-bold cursor-pointer"
+                        class="px-2 py-1 rounded-md font-bold cursor-pointer"
                         :class="
                             promoter.is_verified
-                                ? 'bg-primary text-white'
+                                ? 'bg-primary text-white hover:bg-primary-hover'
                                 : 'bg-background'
                         "
                     >
@@ -66,7 +66,7 @@ const availableSocialLinks = computed(() => {
         </div>
 
         <div
-            class="bg-card rounded-md p-6 lg:px-20 grid grid-cols-1 md:grid-cols-2 gap-6"
+            class="bg-card rounded-md p-6 lg:px-20 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-6"
         >
             <div class="p-6 bg-background rounded-md">
                 <h3 class="text-lg font-semibold text-text mb-4">
@@ -74,7 +74,7 @@ const availableSocialLinks = computed(() => {
                 </h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-sm font-medium text-text/80">
+                        <dt class="text-xs text-text-medium">
                             Business Name
                         </dt>
                         <dd class="mt-1 text-sm text-text">
@@ -82,7 +82,7 @@ const availableSocialLinks = computed(() => {
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-text/80">
+                        <dt class="text-xs text-text-medium">
                             Business Type
                         </dt>
                         <dd class="mt-1 text-sm text-text">
@@ -90,7 +90,7 @@ const availableSocialLinks = computed(() => {
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-text/80">
+                        <dt class="text-xs text-text-medium">
                             Business Address
                         </dt>
                         <dd class="mt-1 text-sm text-text flex justify-between">
@@ -99,7 +99,7 @@ const availableSocialLinks = computed(() => {
                             </span>
                             <button
                                 @click="emit('show-full-address')"
-                                class="text-primary hover:text-primary-hover text-sm ml-2"
+                                class="text-primary hover:text-primary-hover text-sm font-semibold ml-2"
                             >
                                 View
                             </button>
@@ -114,7 +114,7 @@ const availableSocialLinks = computed(() => {
                 </h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-sm font-medium text-text/80">
+                        <dt class="text-xs text-text-medium">
                             Phone Number
                         </dt>
                         <dd class="mt-1 text-sm text-text">
@@ -122,13 +122,13 @@ const availableSocialLinks = computed(() => {
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-text/80">Line</dt>
+                        <dt class="text-xs text-text-medium">Line</dt>
                         <dd class="mt-1 text-sm text-text">
                             {{ promoter.user?.line ?? "Not provided" }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-text/80">Bio</dt>
+                        <dt class="text-xs text-text-medium">Bio</dt>
                         <dd class="mt-1 text-sm text-text flex justify-between">
                             <span class="max-w-xs truncate">
                                 {{ promoter.bio || "Not provided" }}
@@ -136,7 +136,7 @@ const availableSocialLinks = computed(() => {
                             <button
                                 v-if="promoter.bio"
                                 @click="emit('show-full-bio')"
-                                class="text-primary hover:text-primary-hover text-sm ml-2"
+                                class="text-primary hover:text-primary-hover text-sm font-semibold ml-2"
                             >
                                 View
                             </button>

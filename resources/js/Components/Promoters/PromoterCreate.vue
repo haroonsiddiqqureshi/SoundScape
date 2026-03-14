@@ -155,7 +155,7 @@ const submit = () => emit("submit");
                             <input
                                 v-model="form.fullname"
                                 type="text"
-                                class="w-full text-sm rounded-lg focus:ring-primary bg-background border-none focus:border-primary"
+                                class="w-full text-sm rounded-md focus:ring-primary bg-background border-none focus:border-primary"
                                 placeholder="e.g. John Doe"
                                 :class="{
                                     'outline-dashed outline-primary -outline-offset-2 rounded-md':
@@ -168,7 +168,7 @@ const submit = () => emit("submit");
                             <input
                                 v-model="form.business_name"
                                 type="text"
-                                class="w-full text-sm rounded-lg focus:ring-primary bg-background border-none focus:border-primary"
+                                class="w-full text-sm rounded-md focus:ring-primary bg-background border-none focus:border-primary"
                                 placeholder="e.g. SoundScape"
                                 :class="{
                                     'outline-dashed outline-primary -outline-offset-2 rounded-md':
@@ -203,7 +203,7 @@ const submit = () => emit("submit");
                                 <input
                                     v-model="form.business_address"
                                     type="text"
-                                    class="w-full text-sm pl-9 rounded-lg focus:ring-primary bg-background border-none focus:border-primary"
+                                    class="w-full text-sm pl-9 rounded-md focus:ring-primary bg-background border-none focus:border-primary"
                                     placeholder="City, Country"
                                     :class="{
                                         'outline-dashed outline-primary -outline-offset-2 rounded-md':
@@ -220,7 +220,7 @@ const submit = () => emit("submit");
                             <textarea
                                 v-model="form.bio"
                                 rows="3"
-                                class="w-full text-sm rounded-lg focus:ring-primary bg-background border-none focus:border-primary"
+                                class="w-full text-sm rounded-md focus:ring-primary bg-background border-none focus:border-primary"
                                 placeholder="Tell us a bit about what you do..."
                                 :class="{
                                     'outline-dashed outline-primary -outline-offset-2 rounded-md':
@@ -254,7 +254,7 @@ const submit = () => emit("submit");
                         class="flex items-center gap-1 bg-background px-3 border-none rounded-md transition-all"
                     >
                         <div
-                            class="w-6 h-6 flex items-center justify-center rounded-lg"
+                            class="w-6 h-6 flex items-center justify-center rounded-md"
                         >
                             <GlobeAltIcon
                                 v-if="link.platform === 'website'"
