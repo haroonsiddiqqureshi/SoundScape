@@ -13,14 +13,12 @@ class PromoterController extends Controller
     {
         $promoter = Promoter::where('user_id', auth('web')->user()->id)->first();
 
-        // If the promoter is not verified, send them to the Pending/Edit page
         if (!$promoter->is_verified) {
             return Inertia::render('Promoter/Components/Pending', [
                 'promoter' => $promoter,
             ]);
         }
 
-        // If verified, send them to the default Dashboard
         return Inertia::render('Promoter/Index', [
             'promoter' => $promoter,
         ]);
@@ -66,7 +64,6 @@ class PromoterController extends Controller
         ]);
     }
 
-    // Add this method to handle information updates while pending
     public function update(Request $request)
     {
         $promoter = Promoter::where('user_id', auth('web')->user()->id)->firstOrFail();

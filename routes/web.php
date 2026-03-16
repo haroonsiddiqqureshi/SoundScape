@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PromoterController as AdminPromoterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\HighlightController as AdminHighlightController;
 use App\Http\Controllers\Admin\ArtistController as AdminArtistController;
+use App\Http\Controllers\Admin\ScraperController;
 
 // --- Promoter Controllers ---
 use App\Http\Controllers\Promoter\PromoterController;
@@ -114,6 +115,13 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/artist/edit/{artist}', [AdminArtistController::class, 'edit'])->name('artist.edit');
     Route::post('/artist/{artist}', [AdminArtistController::class, 'update'])->name('artist.update');
     Route::delete('/artist/{artist}', [AdminArtistController::class, 'destroy'])->name('artist.delete');
+
+    // --- Admin Scraper Routes
+    Route::get('/concerts/scraper', [ScraperController::class, 'concertIndex'])->name('concert.scraper');
+    Route::get('/artists/scraper', [ScraperController::class, 'artistIndex'])->name('artist.scraper');
+    Route::get('/highlight/scraper', [ScraperController::class, 'highlightIndex'])->name('highlight.scraper');
+    Route::post('/scraper/run', [ScraperController::class, 'run'])->name('scraper.run');
+    Route::get('/scraper/status/{job}', [ScraperController::class, 'status'])->name('scraper.status');
 
     // Add other admin-only routes here...
 });

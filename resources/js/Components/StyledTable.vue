@@ -43,7 +43,7 @@ const hasItems = computed(() => {
             <slot name="adder" />
         </div>
 
-        <div v-if="hasItems" class="w-full overflow-x-auto rounded-md outline outline-4 outline-card">
+        <div v-if="hasItems" class="w-full overflow-x-auto rounded-md outline outline-card">
             <table class="min-w-full">
                 <thead class="bg-card text-xs font-semibold uppercase tracking-wider">
                     <slot name="header" />

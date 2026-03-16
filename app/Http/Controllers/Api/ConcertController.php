@@ -112,7 +112,6 @@ class ConcertController extends Controller
                     $artistIds[] = $artist->id;
                 }
 
-                // นำ ID ทั้งหมดไปผูกกับคอนเสิร์ตในตาราง artist_concerts (syncWithoutDetaching ไม่ลบของเดิมทิ้ง)
                 $concert->artists()->syncWithoutDetaching($artistIds);
             }
 

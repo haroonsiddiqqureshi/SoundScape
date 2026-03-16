@@ -18,7 +18,6 @@ class CheckPromoterAccount
     {
         if (Auth::check()) {
             $user = Auth::user();
-            // Avoid redirecting if the user is already on promoter routes (prevents loops)
             $currentRoute = $request->route() ? $request->route()->getName() : null;
 
             if ($user->promoter) {
@@ -26,14 +25,12 @@ class CheckPromoterAccount
                     return $next($request);
                 }
 
-                // User has a promoter account and is not on a promoter route -> redirect to promoter index
                 return redirect()->route('promoter.index');
             } else {
                 if ($currentRoute === 'promoter.create' || $currentRoute === 'promoter.store' || str_ends_with($currentRoute ?? '', '.create')) {
                     return $next($request);
                 }
 
-                // User does not have a promoter account, redirect to create page
                 return redirect()->route('promoter.create');
             }
         }

@@ -40,7 +40,6 @@ class ArtistController extends Controller
      */
     public function create()
     {
-        // Just render the create page
         return Inertia::render('Admin/Artist/Create');
     }
 
@@ -52,22 +51,18 @@ class ArtistController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'picture_url' => 'nullable|image|max:2048', // 2MB Max
         ]);
 
-        // Store the uploaded file and get its path
         if ($request->hasFile('picture_url')) {
             $path = $request->file('picture_url')->store('artists', 'public');
             $validated['picture_url'] = $path;
         }
 
-        // Create the new artist
         Artist::create($validated);
 
-        // Redirect back to the index page with a success message
         return redirect()->route('admin.artist.index')->with('success', 'Artist created successfully.');
     }
 
@@ -93,32 +88,24 @@ class ArtistController extends Controller
      */
     public function update(Request $request, Artist $artist)
     {
-        // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'picture_url' => 'nullable|image|max:2048', // 2MB Max
         ]);
 
-        // Check if a new picture has been uploaded
         if ($request->hasFile('picture_url')) {
-            // Delete the old picture if it exists
             if ($artist->picture_url) {
                 Storage::disk('public')->delete($artist->picture_url);
             }
 
-            // Store the new picture and get its path
             $path = $request->file('picture_url')->store('artists', 'public');
             $validated['picture_url'] = $path;
         } else {
-            // If no new file is uploaded, remove picture_url from the
-            // validated array so it doesn't overwrite the existing one with null
             unset($validated['picture_url']);
         }
 
-        // Update the artist
         $artist->update($validated);
 
-        // Redirect back to the index page with a success message
         return redirect()->route('admin.artist.index')->with('success', 'Artist updated successfully.');
     }
 
@@ -130,15 +117,12 @@ class ArtistController extends Controller
      */
     public function destroy(Artist $artist)
     {
-        // Delete the artist's picture from storage if it exists
         if ($artist->picture_url) {
             Storage::disk('public')->delete($artist->picture_url);
         }
 
-        // Delete the artist record from the database
         $artist->delete();
 
-        // Redirect back to the index page with a success message
         return Redirect::route('admin.artist.index')->with('success', 'Artist deleted.');
     }
 }

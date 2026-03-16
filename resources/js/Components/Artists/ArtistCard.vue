@@ -2,7 +2,7 @@
 import { Head, Link, router } from "@inertiajs/vue3";
 import { ref, watch, computed, inject } from "vue";
 import { debounce } from "lodash-es";
-import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
+import { PlusIcon, PencilIcon, TrashIcon, GlobeAsiaAustraliaIcon } from "@heroicons/vue/24/solid";
 import { FolderPlusIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -67,8 +67,12 @@ const getPictureUrl = (artist) => {
                 </div>
             </div>
             <Link :href="route('admin.artist.create')"
-                class="flex items-center justify-center py-1 ring-4 ring-primary rounded-md text-primary bg-primary w-32">
-                <PlusIcon class="w-5 h-5 text-white stroke-current stroke-[2px]" />
+                class="flex items-center justify-center py-1 ring-2 ring-primary rounded-md w-8 bg-card">
+                <PlusIcon class="w-5 h-5 stroke-current" />
+            </Link>
+            <Link :href="route('admin.artist.scraper')"
+                class="flex items-center justify-center py-1 ring-2 ring-primary rounded-md w-8 bg-card">
+                <GlobeAsiaAustraliaIcon class="w-5 h-5" />
             </Link>
         </div>
 

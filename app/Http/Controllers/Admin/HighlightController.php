@@ -19,7 +19,6 @@ class HighlightController extends Controller
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             })
-            // Change the sorting to respect the sort_order column
             ->orderBy('sort_order', 'asc')
             ->get();
 
@@ -37,7 +36,6 @@ class HighlightController extends Controller
             'items.*.sort_order' => 'required|integer',
         ]);
 
-        // Loop through and update the sort_order for each highlight
         foreach ($request->items as $item) {
             Highlight::where('id', $item['id'])->update(['sort_order' => $item['sort_order']]);
         }

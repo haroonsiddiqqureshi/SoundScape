@@ -487,13 +487,13 @@ const followConcert = (follow) => {
                 </div>
 
                 <div class="mt-auto pt-8">
-                    <div class="pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div class="pt-4 border-t border-text-low">
                         <div v-if="
                             props.role === 'admin' ||
                             props.role === 'promoter'
-                        " class="flex justify-end space-x-4 font-semibold">
+                        " class="flex justify-end space-x-2 font-semibold">
                             <Link :href="editHref"
-                                class="flex justify-center px-6 py-2 items-center space-x-2 bg-secondary text-white rounded-md hover:opacity-90 transition">
+                                class="flex justify-center px-4 py-1 items-center space-x-2 bg-secondary text-white rounded-md hover:opacity-90 transition">
                                 <PencilIcon class="w-4 h-4 stroke-current stroke-[2.5px]" />
                                 <span>แก้ไข</span>
                             </Link>
@@ -501,7 +501,7 @@ const followConcert = (follow) => {
                                 concert: props.concert.id,
                             })
                                 " method="delete" as="button" preserve-scroll
-                                class="flex justify-center px-6 py-2 items-center space-x-2 bg-red-600 text-white rounded-md hover:opacity-90 transition">
+                                class="flex justify-center px-4 py-1 items-center space-x-2 bg-red-600 text-white rounded-md hover:opacity-90 transition">
                                 <TrashIcon class="w-4 h-4 stroke-current stroke-[2.5px]" />
                                 <span>ลบ</span>
                             </Link>
@@ -558,7 +558,7 @@ const followConcert = (follow) => {
                                     </span>
                                 </h4>
 
-                                <span class="text-xs text-text-low">
+                                <span class="text-xs text-text-medium">
                                     {{
                                         formatCommentDate(
                                             comment.created_at,
@@ -570,15 +570,15 @@ const followConcert = (follow) => {
 
                             <div v-if="editingId === comment.id" class="mt-1">
                                 <textarea v-model="editForm.content"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm bg-background text-text"
+                                    class="custom-scrollbar overflow-y-auto resize-none w-full rounded-md border-text-low shadow-sm focus:border-primary focus:ring-primary text-sm bg-background"
                                     rows="2"></textarea>
-                                <div class="mt-2 flex space-x-2">
+                                <div class="flex space-x-2">
                                     <button @click="submitEdit(comment.id)" :disabled="editForm.processing"
                                         class="px-3 py-1 bg-primary text-white text-xs rounded font-semibold transition hover:bg-primary-hover">
                                         บันทึก
                                     </button>
                                     <button @click="cancelEdit" type="button"
-                                        class="px-3 py-1 bg-gray-500 text-white text-xs rounded font-semibold transition hover:bg-gray-600">
+                                        class="px-3 py-1 bg-text-medium text-white text-xs rounded font-semibold transition hover:bg-text-high">
                                         ยกเลิก
                                     </button>
                                 </div>
@@ -597,7 +597,7 @@ const followConcert = (follow) => {
                                     </template>
                                     <template #content>
                                         <div
-                                            class="py-1 bg-card rounded-md shadow-xs border border-gray-100 dark:border-gray-800">
+                                            class="py-1 bg-card rounded-md shadow-xs border border-text-low">
                                             <button @click="startEdit(comment)"
                                                 class="flex items-center space-x-2 w-full px-4 py-2 text-left text-sm hover:bg-background transition">
                                                 <PencilIcon class="w-4 h-4 stroke-current" />
@@ -618,7 +618,7 @@ const followConcert = (follow) => {
                             </div>
                         </div>
 
-                        <p v-if="!concert.comments?.length" class="text-gray-500 text-sm text-center py-8">
+                        <p v-if="!concert.comments?.length" class="text-text-medium text-sm text-center">
                             ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็นสิ!
                         </p>
                     </div>

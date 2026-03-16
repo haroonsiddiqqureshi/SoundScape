@@ -53,8 +53,8 @@ watch(
                     </div>
                 </div>
                 <Link :href="route('promoter.concert.create')"
-                    class="flex items-center justify-center py-1 ring-4 ring-primary rounded-md text-primary bg-primary w-32">
-                    <PlusIcon class="w-5 h-5 text-white stroke-current stroke-[2px]" />
+                    class="flex items-center justify-center py-1 ring-2 ring-primary rounded-md w-8 bg-card">
+                    <PlusIcon class="w-5 h-5 stroke-current" />
                 </Link>
             </div>
 

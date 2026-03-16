@@ -3,7 +3,8 @@
 use App\Http\Controllers\Api\ConcertController;
 use App\Http\Controllers\Api\ArtistController;
 use App\Http\Controllers\Api\ProvinceController;
-use App\Http\Controllers\Api\HighlightController; // Add this import
+use App\Http\Controllers\Api\HighlightController;
+use App\Http\Controllers\Admin\ScraperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,3 +23,6 @@ Route::post('/artists', [ArtistController::class, 'store']);
 
 // Highlight Sync Route
 Route::post('/highlights/sync', [HighlightController::class, 'sync']);
+
+// Scraper Route
+Route::post('/scraper/update/{job}', [ScraperController::class, 'updateStatus']);
