@@ -136,45 +136,32 @@ const submit = () => emit("submit");
                 </p>
             </div>
 
-            <div
-                class="lg:col-span-2 space-y-6 bg-card shadow-sm rounded-md p-8"
-            >
+            <div class="lg:col-span-2 space-y-6 bg-card shadow-sm rounded-md p-8">
                 <div class="space-y-6">
                     <div class="flex items-center gap-2 text-primary">
                         <UserIcon class="h-5 w-5 stroke-[2px]" />
-                        <span
-                            class="text-xs font-black uppercase tracking-widest"
-                            >Identity</span
-                        >
+                        <span class="text-xs font-black uppercase tracking-widest">Identity</span>
                         <div class="h-px grow bg-primary-medium ml-2"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-1.5">
                             <InputLabel value="Full Name" />
-                            <input
-                                v-model="form.fullname"
-                                type="text"
+                            <input v-model="form.fullname" type="text"
                                 class="w-full text-sm rounded-md focus:ring-primary bg-background border-none focus:border-primary"
-                                placeholder="e.g. John Doe"
-                                :class="{
+                                placeholder="e.g. John Doe" :class="{
                                     'outline-dashed outline-primary -outline-offset-2 rounded-md':
                                         props.form.errors.fullname,
-                                }"
-                            />
+                                }" />
                         </div>
                         <div class="space-y-1.5">
                             <InputLabel value="Business Name" />
-                            <input
-                                v-model="form.business_name"
-                                type="text"
+                            <input v-model="form.business_name" type="text"
                                 class="w-full text-sm rounded-md focus:ring-primary bg-background border-none focus:border-primary"
-                                placeholder="e.g. SoundScape"
-                                :class="{
+                                placeholder="e.g. SoundScape" :class="{
                                     'outline-dashed outline-primary -outline-offset-2 rounded-md':
                                         props.form.errors.business_name,
-                                }"
-                            />
+                                }" />
                         </div>
                     </div>
                 </div>
@@ -182,60 +169,42 @@ const submit = () => emit("submit");
                 <div class="space-y-6">
                     <div class="flex items-center gap-2 text-primary">
                         <BuildingStorefrontIcon class="h-5 w-5 stroke-[2px]" />
-                        <span
-                            class="text-xs font-black uppercase tracking-widest"
-                            >Business Details</span
-                        >
+                        <span class="text-xs font-black uppercase tracking-widest">Business Details</span>
                         <div class="h-px grow bg-primary-medium ml-2"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-1.5">
                             <InputLabel value="Category" />
-                            <DropdownSelector
-                                v-model="form.business_category"
-                                :options="BusinessCategories"
-                            />
+                            <DropdownSelector v-model="form.business_category" :options="BusinessCategories" />
                         </div>
                         <div class="space-y-1.5">
                             <InputLabel value="Business Address" />
                             <div class="relative">
-                                <input
-                                    v-model="form.business_address"
-                                    type="text"
+                                <input v-model="form.business_address" type="text"
                                     class="w-full text-sm pl-9 rounded-md focus:ring-primary bg-background border-none focus:border-primary"
-                                    placeholder="City, Country"
-                                    :class="{
+                                    placeholder="City, Country" :class="{
                                         'outline-dashed outline-primary -outline-offset-2 rounded-md':
                                             props.form.errors.business_address,
-                                    }"
-                                />
-                                <MapPinIcon
-                                    class="absolute left-3 top-2.5 h-4 w-4"
-                                />
+                                    }" />
+                                <MapPinIcon class="absolute left-3 top-2.5 h-4 w-4" />
                             </div>
                         </div>
                         <div class="md:col-span-2 space-y-1.5">
                             <InputLabel value="Short Bio" />
-                            <textarea
-                                v-model="form.bio"
-                                rows="3"
+                            <textarea v-model="form.bio" rows="3"
                                 class="w-full text-sm rounded-md focus:ring-primary bg-background border-none focus:border-primary"
-                                placeholder="Tell us a bit about what you do..."
-                                :class="{
+                                placeholder="Tell us a bit about what you do..." :class="{
                                     'outline-dashed outline-primary -outline-offset-2 rounded-md':
                                         props.form.errors.bio,
-                                }"
-                            ></textarea>
+                                }"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div
-            class="grid grid-cols-1 lg:grid-cols-3 gap-y-6 gap-x-12 mb-12 border-t border-text-low pt-12"
-        >
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-y-6 gap-x-12 mb-12 border-t border-text-low pt-12">
             <div>
                 <h3 class="text-xl font-bold">Social Media Platform</h3>
                 <p class="text-sm text-text-medium mt-2 leading-relaxed">
@@ -244,69 +213,41 @@ const submit = () => emit("submit");
                 </p>
             </div>
 
-            <div
-                class="lg:col-span-2 space-y-6 bg-card shadow-sm rounded-md p-8"
-            >
+            <div class="lg:col-span-2 space-y-6 bg-card shadow-sm rounded-md p-8">
                 <TransitionGroup name="list" tag="div" class="space-y-3">
-                    <div
-                        v-for="(link, index) in dynamicLinks"
-                        :key="index"
-                        class="flex items-center gap-1 bg-background px-3 border-none rounded-md transition-all"
-                    >
-                        <div
-                            class="w-6 h-6 flex items-center justify-center rounded-md"
-                        >
-                            <GlobeAltIcon
-                                v-if="link.platform === 'website'"
-                                class="h-5 w-5 text-text-medium"
-                            />
-                            <svg
-                                v-else
-                                class="h-5 w-5 fill-current"
-                                :class="getPlatformInfo(link.platform)?.color"
-                                viewBox="0 0 32 32"
-                            >
-                                <path
-                                    :d="getPlatformInfo(link.platform)?.icon"
-                                />
+                    <div v-for="(link, index) in dynamicLinks" :key="index"
+                        class="flex items-center gap-1 bg-background px-3 border-none rounded-md transition-all">
+                        <div class="w-6 h-6 flex items-center justify-center rounded-md">
+                            <GlobeAltIcon v-if="link.platform === 'website'" class="h-5 w-5 text-text-medium" />
+                            <svg v-else class="h-5 w-5 fill-current" :class="getPlatformInfo(link.platform)?.color"
+                                viewBox="0 0 32 32">
+                                <path :d="getPlatformInfo(link.platform)?.icon" />
                             </svg>
                         </div>
 
-                        <input
-                            v-model="link.url"
-                            type="url"
+                        <input v-model="link.url" type="url"
                             class="grow bg-transparent border-none focus:ring-0 text-sm placeholder:text-text-medium"
-                            placeholder="https://..."
-                            :class="{
+                            placeholder="https://..." :class="{
                                 'outline-dashed outline-primary -outline-offset-2 rounded-md':
                                     props.form.errors.url,
-                            }"
-                        />
+                            }" />
 
-                        <button
-                            type="button"
-                            @click="removeLink(index)"
-                            class="p-2 text-text-medium hover:text-red-500 rounded-full transition-all"
-                        >
+                        <button type="button" @click="removeLink(index)"
+                            class="p-2 text-text-medium hover:text-red-500 rounded-full transition-all">
                             <TrashIcon class="h-5 w-5" />
                         </button>
                     </div>
                 </TransitionGroup>
 
-                <button
-                    type="button"
-                    @click="addLink"
-                    class="group flex items-center gap-2 text-sm font-semibold hover:text-primary transition-all px-4"
-                >
+                <button type="button" @click="addLink"
+                    class="group flex items-center gap-2 text-sm font-semibold hover:text-primary transition-all px-4">
                     <PlusIcon class="h-4 w-4 stroke-[3px]" />
                     <span>Add another link</span>
                 </button>
             </div>
         </div>
 
-        <div
-            class="flex items-center justify-end gap-4 pt-8 border-t border-text-low"
-        >
+        <div class="flex items-center justify-end gap-4 pt-8 border-t border-text-low">
             <p v-if="form.recentlySuccessful" class="text-sm text-text-medium">
                 successfully updated.
             </p>
@@ -323,6 +264,7 @@ const submit = () => emit("submit");
 .list-leave-active {
     transition: all 0.3s ease;
 }
+
 .list-enter-from,
 .list-leave-to {
     opacity: 0;

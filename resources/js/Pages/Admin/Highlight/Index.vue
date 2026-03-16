@@ -50,7 +50,7 @@ const updateActiveStatus = (highlight) => {
 
 const moveHighlight = (index, direction) => {
     let reorderedHighlights = [...props.highlights];
-    
+
     if (direction === 'up' && index > 0) {
         const temp = reorderedHighlights[index];
         reorderedHighlights[index] = reorderedHighlights[index - 1];
@@ -68,13 +68,11 @@ const moveHighlight = (index, direction) => {
         sort_order: i
     }));
 
-    // Send to backend silently
     router.put(route('admin.highlight.reorder'), { items: payload }, {
         preserveScroll: true,
         preserveState: false
     });
 };
-// ------------------------------------------
 
 const showModal = ref(false);
 const modalImageUrl = ref("");
@@ -102,16 +100,13 @@ const getPictureUrl = (highlight) => {
 
 <template>
     <AdminLayout title="Highlights">
+
         <Head title="Highlights Management" />
         <StyledTable :items="highlights" v-model:search="search">
             <template #adder>
-                <Link
-                    :href="route('admin.highlight.create')"
-                    class="flex items-center justify-center py-1 ring-4 ring-primary rounded-md text-primary bg-primary w-32"
-                >
-                    <PlusIcon
-                        class="w-5 h-5 text-white stroke-current stroke-[2px]"
-                    />
+                <Link :href="route('admin.highlight.create')"
+                    class="flex items-center justify-center py-1 ring-4 ring-primary rounded-md text-primary bg-primary w-32">
+                    <PlusIcon class="w-5 h-5 text-white stroke-current stroke-[2px]" />
                 </Link>
             </template>
 
@@ -131,77 +126,52 @@ const getPictureUrl = (highlight) => {
 
             <template #body>
                 <tr v-for="(highlight, index) in highlights" :key="highlight.id">
-                    
+
                     <td class="px-4 py-3 pl-6 text-center w-16" v-if="!search">
                         <div class="flex flex-col items-center gap-1">
-                            <button 
-                                @click="moveHighlight(index, 'up')" 
-                                :disabled="index === 0"
-                                :class="index === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-primary hover:text-primary-hover'"
-                            >
+                            <button @click="moveHighlight(index, 'up')" :disabled="index === 0"
+                                :class="index === 0 ? 'text-gray-400 opacity-50' : 'text-primary hover:text-primary-hover'">
                                 <ChevronUpIcon class="w-5 h-5" />
                             </button>
-                            <button 
-                                @click="moveHighlight(index, 'down')" 
-                                :disabled="index === highlights.length - 1"
-                                :class="index === highlights.length - 1 ? 'text-gray-400 cursor-not-allowed' : 'text-primary hover:text-primary-hover'"
-                            >
+                            <button @click="moveHighlight(index, 'down')" :disabled="index === highlights.length - 1"
+                                :class="index === highlights.length - 1 ? 'text-gray-400 opacity-50' : 'text-primary hover:text-primary-hover'">
                                 <ChevronDownIcon class="w-5 h-5" />
                             </button>
                         </div>
                     </td>
 
                     <td class="px-4 py-3 pl-6" :class="{ 'pl-6': search }">
-                        <img
-                            :src="getPictureUrl(highlight)"
-                            alt="Highlight image"
+                        <img :src="getPictureUrl(highlight)" alt="Highlight image"
                             class="w-16 h-10 object-cover rounded-md bg-background cursor-pointer"
-                            @click="openImageModal(getPictureUrl(highlight))"
-                        />
+                            @click="openImageModal(getPictureUrl(highlight))" />
                     </td>
-                    <td
-                        class="px-4 py-3 whitespace-nowrap text-sm truncate text-text"
-                    >
+                    <td class="px-4 py-3 whitespace-nowrap text-sm truncate text-text">
                         {{ highlight.title }}
                     </td>
-                    <td
-                        class="px-4 py-3 text-center whitespace-nowrap text-sm uppercase"
-                    >
-                        <span
-                            @click="updateActiveStatus(highlight)"
-                            class="px-2.5 py-1 rounded-full text-xs text-white font-semibold cursor-pointer"
-                            :class="
-                                highlight.is_active
+                    <td class="px-4 py-3 text-center whitespace-nowrap text-sm uppercase">
+                        <span @click="updateActiveStatus(highlight)"
+                            class="px-2.5 py-1 rounded-full text-xs text-white font-semibold cursor-pointer" :class="highlight.is_active
                                     ? 'bg-primary'
                                     : 'bg-background-hover dark:bg-card-hover'
-                            "
-                        >
+                                ">
                             {{ highlight.is_active ? "Active" : "Inactive" }}
                         </span>
                     </td>
                     <td
-                        class="flex justify-end space-x-2 px-4 py-5 pr-6 whitespace-nowrap text-sm text-white font-semibold"
-                    >
-                        <Link
-                            :href="
-                                route('admin.highlight.edit', {
-                                    highlight: highlight.id,
-                                })
+                        class="flex justify-end space-x-2 px-4 py-5 pr-6 whitespace-nowrap text-sm text-white font-semibold">
+                        <Link :href="route('admin.highlight.edit', {
+                            highlight: highlight.id,
+                        })
                             "
-                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200"
-                        >
+                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200">
                             <PencilIcon class="w-4 h-4" />
                             <span>แก้ไข</span>
                         </Link>
-                        <Link
-                            :href="
-                                route('admin.highlight.delete', {
-                                    highlight: highlight.id,
-                                })
-                            "
-                            method="delete"
-                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200"
-                        >
+                        <Link :href="route('admin.highlight.delete', {
+                            highlight: highlight.id,
+                        })
+                            " method="delete"
+                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200">
                             <TrashIcon class="w-4 h-4" />
                             <span>ลบ</span>
                         </Link>
@@ -210,23 +180,15 @@ const getPictureUrl = (highlight) => {
             </template>
         </StyledTable>
         <teleport to="body">
-            <div
-                v-if="showModal"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-background-high p-4"
-                @click="closeModal"
-            >
+            <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background-high p-4"
+                @click="closeModal">
                 <div class="relative bg-card p-2 rounded-md" @click.stop>
-                    <button
-                        @click="closeModal"
-                        class="absolute -top-3 -right-3 z-10 bg-primary rounded-full p-1 text-white"
-                    >
+                    <button @click="closeModal"
+                        class="absolute -top-3 -right-3 z-10 bg-primary rounded-full p-1 text-white">
                         <XMarkIcon class="h-4 w-4 text-white stroke-current" />
                     </button>
-                    <img
-                        :src="modalImageUrl"
-                        alt="Full size highlight image"
-                        class="max-w-full h-auto max-h-[80vh] rounded-md"
-                    />
+                    <img :src="modalImageUrl" alt="Full size highlight image"
+                        class="max-w-full h-auto max-h-[80vh] rounded-md" />
                 </div>
             </div>
         </teleport>

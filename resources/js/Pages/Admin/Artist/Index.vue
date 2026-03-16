@@ -17,8 +17,7 @@ defineProps({
                 <li v-for="link in artists.links">
                     <Link
                         class="px-4 py-2 border border-card hover:border-primary rounded-md hover:bg-primary hover:text-white font-semibold ring-0 bg-card transition-colors duration-150"
-                        :href="link.url ?? route('admin.artist.index')"
-                    >
+                        :href="link.url ?? route('admin.artist.index')">
                         <span v-html="link.label"></span>
                     </Link>
                 </li>

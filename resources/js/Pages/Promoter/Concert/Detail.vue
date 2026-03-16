@@ -10,10 +10,6 @@ defineProps({
 
 <template>
     <PromoterLayout title="Concert Detail">
-        <ConcertDetail
-            :concert="concert"
-            :provinces="provinces"
-            role="promoter"
-        />
+        <ConcertDetail :concert="concert" :provinces="provinces" role="promoter" />
     </PromoterLayout>
 </template>

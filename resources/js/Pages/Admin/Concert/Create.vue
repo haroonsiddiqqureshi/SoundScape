@@ -8,32 +8,23 @@ defineProps({
 });
 
 const form = useForm({
-    // Core Infomation
     name: "",
     description: "",
     event_type: "",
     genre: "",
     picture_url: "",
-
-    // Location
     venue_name: "",
     province_id: null,
     latitude: null,
     longitude: null,
-
-    // Price
     price_min: null,
     price_max: null,
-
-    // Date & Time
     start_sale_date: null,
     end_sale_date: null,
     start_show_date: null,
     start_show_time: null,
     end_show_date: null,
     end_show_time: null,
-
-    // Additional Information
     ticket_link: "",
     artist_ids: [],
 });

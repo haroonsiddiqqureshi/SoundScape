@@ -9,11 +9,7 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout
-        title="Concert Detail"
-        :can-login="$page.props.canLogin"
-        :can-register="$page.props.canRegister"
-    >
+    <AppLayout title="Concert Detail" :can-login="$page.props.canLogin" :can-register="$page.props.canRegister">
         <ConcertDetail :concert="concert" :provinces="provinces" />
     </AppLayout>
 </template>

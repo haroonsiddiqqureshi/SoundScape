@@ -1,16 +1,11 @@
 <script setup>
-// --- Imports ---
 import { ref, inject, computed, watch, nextTick, onMounted } from "vue";
-
-// Components
 import DropdownSelector from "@/Components/DropdownSelector.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import TimePicker from "@/Components/TimePicker.vue";
 import AnimatedRangeInput from "@/Components/AnimatedRangeInput.vue";
 import ProvinceDropdown from "@/Components/ProvinceDropdown.vue";
 import ArtistDropdown from "@/Components/ArtistDropdown.vue";
-
-// Icons
 import {
     XMarkIcon,
     HeartIcon,
@@ -25,25 +20,20 @@ import {
     FolderArrowDownIcon,
 } from "@heroicons/vue/24/outline";
 import { ArrowTurnLeftUpIcon } from "@heroicons/vue/24/solid";
-
-// Third-Party Libraries
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// --- Core Vue Setup ---
 const props = defineProps({
     form: { type: Object, required: true },
     artists: { type: Array, required: true, default: () => [] },
-    concert: { type: Object, default: null }, // If passed, we are in Edit mode
+    concert: { type: Object, default: null },
 });
 
 const emit = defineEmits(["submit"]);
 const isDarkMode = inject("isDarkMode");
 
-// Computed flag to check if we are editing
 const isEditMode = computed(() => !!props.concert);
 
-// --- Static Configuration ---
 const eventTypes = [
     { value: "music_festival", name: "เทศกาลดนตรี" },
     { value: "concert", name: "คอนเสิร์ต" },
@@ -86,7 +76,6 @@ const fieldLabels = {
     picture_url: "รูปภาพ",
 };
 
-// --- Form Submission & Error Handling ---
 const errorSummary = ref(null);
 
 const submit = () => {
@@ -110,7 +99,6 @@ watch(
     { deep: true },
 );
 
-// --- Lifecycle Hooks ---
 const allProvinces = ref([]);
 
 onMounted(() => {
@@ -134,7 +122,6 @@ onMounted(() => {
         .catch((error) => console.error("Error fetching provinces:", error));
 });
 
-// --- Feature: Photo Upload ---
 const uploadedPhotoUrl = ref(null);
 const photoInput = ref(null);
 
@@ -172,14 +159,26 @@ const updatePhotoPreview = (event) => {
     reader.readAsDataURL(file);
 };
 
-// --- Feature: Artist Selection ---
 const tempArtistId = ref(null);
 
-const artistPicturePlaceholder = computed(() => {
-    return (artist) =>
-        isDarkMode.value
-            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=1c1423&color=ffffff`
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=008be6&color=ffffff`;
+const getArtistPicture = computed(() => {
+    return (artist) => {
+        if (artist && artist.picture_url) {
+            if (artist.picture_url.startsWith("http")) {
+                return artist.picture_url;
+            }
+            return `/storage/${artist.picture_url}`;
+        }
+
+        const name = artist?.name || "Artist";
+        return isDarkMode.value
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                name,
+            )}&background=ff1493&color=ffffff`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                name,
+            )}&background=008be6&color=ffffff`;
+    };
 });
 
 const selectedArtists = computed(() => {
@@ -205,8 +204,8 @@ const availableArtists = computed(() => {
                 artist.picture_url && artist.picture_url.startsWith("http")
                     ? artist.picture_url
                     : artist.picture_url
-                      ? `/storage/${artist.picture_url}`
-                      : artistPicturePlaceholder.value(artist),
+                        ? `/storage/${artist.picture_url}`
+                        : getArtistPicture.value(artist),
         }));
 });
 
@@ -228,7 +227,6 @@ function removeArtist(artistId) {
     );
 }
 
-// --- Feature: Location & Map ---
 const selectedProvinceName = ref(null);
 const showMapModal = ref(false);
 const mapInstance = ref(null);
@@ -236,7 +234,6 @@ const selectedLocation = ref(null);
 const mapMarker = ref(null);
 const isGeocoding = ref(false);
 
-// Default to 'map' mode if coordinates exist (like in Edit form), else 'manual'
 const locationMode = ref(
     props.form.latitude && props.form.longitude ? "map" : "manual",
 );
@@ -374,7 +371,6 @@ watch(showMapModal, (isShowing) => {
     }
 });
 
-// --- Feature: Date Validation Watchers ---
 watch(
     () => props.form.start_sale_date,
     (newStartDate) => {
@@ -403,30 +399,17 @@ watch(
 </script>
 
 <template>
-    <div
-        ref="errorSummary"
-        v-if="Object.keys(props.form.errors).length"
-        class="max-w-xl lg:max-w-full mx-auto bg-card lg:shadow-xl rounded-md mb-4 p-6"
-    >
+    <div ref="errorSummary" v-if="Object.keys(props.form.errors).length"
+        class="max-w-xl lg:max-w-full mx-auto bg-card lg:shadow-xl rounded-md mb-4 p-6">
         <div>
             <div class="flex flex-col w-full space-y-2">
-                <span class="text-lg font-semibold text-primary"
-                    >โอ๊ะ! เกิดข้อผิดพลาด</span
-                >
-                <span class="text-sm"
-                    >กรุณาตรวจสอบข้อมูลในช่องที่มีกรอบเส้นประอีกครั้ง</span
-                >
+                <span class="text-lg font-semibold text-primary">โอ๊ะ! เกิดข้อผิดพลาด</span>
+                <span class="text-sm">กรุณาตรวจสอบข้อมูลในช่องที่มีกรอบเส้นประอีกครั้ง</span>
                 <ul
-                    class="list-disc list-inside space-y-1 pl-5 bg-background p-4 rounded-md outline-dashed -outline-offset-4 text-primary"
-                >
-                    <li
-                        v-for="(errorMessages, fieldName) in props.form.errors"
-                        :key="fieldName"
-                        class="text-sm text-primary"
-                    >
-                        <strong class="font-bold"
-                            >{{ fieldLabels[fieldName] || fieldName }}:</strong
-                        >
+                    class="list-disc list-inside space-y-1 pl-5 bg-background p-4 rounded-md outline-dashed -outline-offset-4 text-primary">
+                    <li v-for="(errorMessages, fieldName) in props.form.errors" :key="fieldName"
+                        class="text-sm text-primary">
+                        <strong class="font-bold">{{ fieldLabels[fieldName] || fieldName }}:</strong>
                         <span class="ml-1 text-text">{{ errorMessages }}</span>
                     </li>
                 </ul>
@@ -434,432 +417,262 @@ watch(
         </div>
     </div>
 
-    <div
-        class="max-w-xl lg:max-w-full mx-auto bg-card lg:shadow-xl rounded-md space-y-2"
-    >
-        <div class="lg:flex px-6 pt-6 space-y-2 lg:space-y-0">
-            <div class="flex-none w-fit lg:mr-4 relative">
-                <div
-                    v-if="photoPreview"
-                    class="relative cursor-pointer lg:h-[444px]"
-                    :class="{
-                        'outline-dashed outline-primary -outline-offset-4 rounded-md':
-                            props.form.errors.picture_url,
-                    }"
-                >
-                    <img
-                        :src="photoPreview"
-                        class="h-full object-cover rounded-md"
-                    />
-                    <input
-                        ref="photoInput"
-                        type="file"
-                        class="hidden"
-                        @change="updatePhotoPreview"
-                        accept="image/*"
-                    />
-                    <button
-                        type="button"
-                        @click.prevent="selectNewPhoto"
-                        class="absolute inset-0"
-                    />
+    <div class="mx-auto max-w-5xl lg:max-w-7xl space-y-2 relative">
+        <div class="lg:flex p-6 space-y-2 lg:space-y-0 bg-card rounded-md">
+            <div class="flex-shrink w-fit lg:mr-4">
+                <div v-if="photoPreview" class="relative cursor-pointer lg:h-[444px]" :class="{
+                    'outline-dashed outline-primary -outline-offset-4 rounded-md':
+                        props.form.errors.picture_url,
+                }">
+                    <img :src="photoPreview" class="h-full object-cover rounded-md" />
+                    <input ref="photoInput" type="file" class="hidden" @change="updatePhotoPreview" accept="image/*" />
+                    <button type="button" @click.prevent="selectNewPhoto" class="absolute inset-0" />
                 </div>
             </div>
-            <div class="flex flex-col w-full">
+            <div class="flex flex-shrink-0 flex-col min-w-[300px] justify-between pb-2">
                 <div class="flex space-x-4">
-                    <DropdownSelector
-                        placeholder="ประเภทงาน"
-                        v-model="props.form.event_type"
-                        :options="eventTypes"
+                    <DropdownSelector placeholder="ประเภทงาน" v-model="props.form.event_type" :options="eventTypes"
                         :class="{
                             'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                 props.form.errors.event_type,
-                        }"
-                    />
-                    <DropdownSelector
-                        placeholder="ประเภทเพลง"
-                        v-model="props.form.genre"
-                        :options="genres"
-                        :class="{
-                            'outline-dashed outline-primary -outline-offset-4 rounded-md':
-                                props.form.errors.genre,
-                        }"
-                    />
+                        }" />
+                    <DropdownSelector placeholder="ประเภทเพลง" v-model="props.form.genre" :options="genres" :class="{
+                        'outline-dashed outline-primary -outline-offset-4 rounded-md':
+                            props.form.errors.genre,
+                    }" />
                 </div>
-                <input
-                    type="text"
-                    v-model="props.form.name"
+                <input type="text" v-model="props.form.name"
                     class="mt-2 bg-background rounded-md font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                     :class="{
                         'outline-dashed outline-primary -outline-offset-4 rounded-md':
                             props.form.errors.name,
-                    }"
-                    placeholder="ชื่องานดนตรี"
-                />
+                    }" placeholder="ชื่องานดนตรี" />
 
                 <div class="flex items-center space-x-8 ml-12 mt-4">
                     <HeartIcon class="flex-none h-8 w-8 text-primary" />
                     <LinkIcon class="flex-none h-8 w-8 text-secondary" />
-                    <input
-                        type="text"
-                        v-model="props.form.ticket_link"
+                    <input type="text" v-model="props.form.ticket_link"
                         class="w-full bg-background rounded-md border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                         :class="{
                             'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                 props.form.errors.ticket_link,
-                        }"
-                        placeholder="ลิงก์จำหน่ายบัตร"
-                    />
+                        }" placeholder="ลิงก์จำหน่ายบัตร" />
                 </div>
 
                 <div class="flex flex-col mt-12 space-y-2 pl-2">
-                    <AnimatedRangeInput
-                        :trigger-value="props.form.start_sale_date"
-                        v-model:end-value="props.form.end_sale_date"
-                    >
+                    <AnimatedRangeInput :trigger-value="props.form.start_sale_date"
+                        v-model:end-value="props.form.end_sale_date">
                         <template #icon>
-                            <div
-                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
-                            >
+                            <div class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1">
                                 <TicketIcon class="flex-none h-6 w-6" />
                             </div>
                         </template>
-                        <template #startInput
-                            ><DatePicker
-                                v-model="props.form.start_sale_date"
-                                :max-date="props.form.end_sale_date"
-                                placeholder="วันจำหน่ายบัตร"
-                                :error="props.form.errors.start_sale_date"
-                        /></template>
-                        <template #endInput
-                            ><DatePicker
-                                v-model="props.form.end_sale_date"
-                                :min-date="props.form.start_sale_date"
-                                placeholder="วันสิ้นสุดการจำหน่าย"
-                                :error="props.form.errors.end_sale_date"
-                        /></template>
+                        <template #startInput>
+                            <DatePicker v-model="props.form.start_sale_date" :max-date="props.form.end_sale_date"
+                                placeholder="วันจำหน่ายบัตร" :error="props.form.errors.start_sale_date" />
+                        </template>
+                        <template #endInput>
+                            <DatePicker v-model="props.form.end_sale_date" :min-date="props.form.start_sale_date"
+                                placeholder="วันสิ้นสุดการจำหน่าย" :error="props.form.errors.end_sale_date" />
+                        </template>
                     </AnimatedRangeInput>
 
-                    <AnimatedRangeInput
-                        :trigger-value="props.form.start_show_date"
-                        v-model:end-value="props.form.end_show_date"
-                    >
+                    <AnimatedRangeInput :trigger-value="props.form.start_show_date"
+                        v-model:end-value="props.form.end_show_date">
                         <template #icon>
-                            <div
-                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
-                            >
+                            <div class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1">
                                 <CalendarIcon class="flex-none h-6 w-6" />
                             </div>
                         </template>
-                        <template #startInput
-                            ><DatePicker
-                                v-model="props.form.start_show_date"
-                                placeholder="วันที่แสดง"
-                                :min-date="isEditMode ? null : new Date()"
-                                :max-date="props.form.end_show_date"
-                                :error="props.form.errors.start_show_date"
-                        /></template>
-                        <template #endInput
-                            ><DatePicker
-                                v-model="props.form.end_show_date"
-                                placeholder="สิ้นสุดการแสดง"
-                                :min-date="props.form.start_show_date"
-                                :error="props.form.errors.end_show_date"
-                        /></template>
+                        <template #startInput>
+                            <DatePicker v-model="props.form.start_show_date" placeholder="วันที่แสดง"
+                                :min-date="isEditMode ? null : new Date()" :max-date="props.form.end_show_date"
+                                :error="props.form.errors.start_show_date" />
+                        </template>
+                        <template #endInput>
+                            <DatePicker v-model="props.form.end_show_date" placeholder="สิ้นสุดการแสดง"
+                                :min-date="props.form.start_show_date" :error="props.form.errors.end_show_date" />
+                        </template>
                     </AnimatedRangeInput>
 
-                    <AnimatedRangeInput
-                        :trigger-value="props.form.start_show_time"
-                        v-model:end-value="props.form.end_show_time"
-                    >
+                    <AnimatedRangeInput :trigger-value="props.form.start_show_time"
+                        v-model:end-value="props.form.end_show_time">
                         <template #icon>
-                            <div
-                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
-                            >
+                            <div class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1">
                                 <ClockIcon class="flex-none h-6 w-6" />
                             </div>
                         </template>
-                        <template #startInput
-                            ><TimePicker
-                                v-model="props.form.start_show_time"
-                                placeholder="เวลาแสดง"
-                                :error="props.form.errors.start_show_time"
-                        /></template>
-                        <template #endInput
-                            ><TimePicker
-                                v-model="props.form.end_show_time"
-                                placeholder="เวลาสิ้นสุด"
-                                :error="props.form.errors.end_show_time"
-                        /></template>
+                        <template #startInput>
+                            <TimePicker v-model="props.form.start_show_time" placeholder="เวลาแสดง"
+                                :error="props.form.errors.start_show_time" />
+                        </template>
+                        <template #endInput>
+                            <TimePicker v-model="props.form.end_show_time" placeholder="เวลาสิ้นสุด"
+                                :error="props.form.errors.end_show_time" />
+                        </template>
                     </AnimatedRangeInput>
 
                     <AnimatedRangeInput :trigger-value="props.form.price_min">
                         <template #icon>
-                            <div
-                                class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
-                            >
+                            <div class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1">
                                 <BanknotesIcon class="flex-none h-6 w-6" />
                             </div>
                         </template>
-                        <template #startInput
-                            ><input
-                                type="number"
-                                v-model="props.form.price_min"
+                        <template #startInput><input type="number" v-model="props.form.price_min"
                                 class="bg-background rounded-md text-sm font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium w-[100px]"
                                 :class="{
                                     'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                         props.form.errors.price_min,
-                                }"
-                                placeholder="ราคาเริ่มต้น"
-                        /></template>
-                        <template #endInput
-                            ><input
-                                type="number"
-                                v-model="props.form.price_max"
+                                }" placeholder="ราคาเริ่มต้น" /></template>
+                        <template #endInput><input type="number" v-model="props.form.price_max"
                                 class="bg-background rounded-md text-sm font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium w-[100px]"
                                 :class="{
                                     'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                         props.form.errors.price_max,
-                                }"
-                                placeholder="ราคาสูงสุด"
-                        /></template>
+                                }" placeholder="ราคาสูงสุด" /></template>
                     </AnimatedRangeInput>
 
                     <div class="flex items-start space-x-2">
-                        <AnimatedRangeInput
-                            :trigger-value="
-                                locationMode === 'manual'
-                                    ? props.form.province_id
-                                    : props.form.latitude
-                            "
-                            separator=","
-                            :is-long="true"
-                            class="grow"
-                        >
+                        <AnimatedRangeInput :trigger-value="locationMode === 'manual'
+                            ? props.form.province_id
+                            : props.form.latitude
+                            " separator="," :is-long="true" class="grow">
                             <template #icon>
-                                <button
-                                    type="button"
-                                    @click="toggleLocationMode"
-                                    :title="
-                                        locationMode === 'manual'
-                                            ? 'เลือกจากแผนที่'
-                                            : 'กรอกด้วยตนเอง'
-                                    "
-                                >
+                                <button type="button" @click="toggleLocationMode" :title="locationMode === 'manual'
+                                    ? 'เลือกจากแผนที่'
+                                    : 'กรอกด้วยตนเอง'
+                                    ">
                                     <div
-                                        class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1"
-                                    >
-                                        <MapIcon
-                                            v-if="locationMode === 'manual'"
-                                            class="h-6 w-6"
-                                        />
+                                        class="flex items-center space-x-1 mr-2 border-2 border-primary rounded-md px-2 py-1">
+                                        <MapIcon v-if="locationMode === 'manual'" class="h-6 w-6" />
                                         <MapPinIcon v-else class="h-6 w-6" />
                                     </div>
                                 </button>
                             </template>
 
                             <template #startInput>
-                                <button
-                                    v-if="locationMode === 'map'"
-                                    type="button"
-                                    @click="openMap"
+                                <button v-if="locationMode === 'map'" type="button" @click="openMap"
                                     class="bg-background hover:bg-background-hover rounded-md text-sm font-medium border-none text-text-medium text-left w-full px-3 py-2"
                                     :class="{
                                         'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                             props.form.errors.latitude ||
                                             props.form.errors.longitude,
                                         'text-text': props.form.latitude,
-                                    }"
-                                >
-                                    <span
-                                        v-if="selectedCoordinates"
-                                        class="text-text"
-                                        >{{ selectedProvinceName }} :
+                                    }">
+                                    <span v-if="selectedCoordinates" class="text-text">{{ selectedProvinceName }} :
                                         <span class="text-text-medium">{{
                                             selectedCoordinates
-                                        }}</span></span
-                                    >
-                                    <span v-else
-                                        >เลือกตำแหน่งที่ตั้งจากแผนที่</span
-                                    >
+                                        }}</span></span>
+                                    <span v-else>เลือกตำแหน่งที่ตั้งจากแผนที่</span>
                                 </button>
-                                <ProvinceDropdown
-                                    v-if="locationMode === 'manual'"
-                                    v-model="props.form.province_id"
-                                    :provinces="allProvinces"
-                                    :class="{
+                                <ProvinceDropdown v-if="locationMode === 'manual'" v-model="props.form.province_id"
+                                    :provinces="allProvinces" :class="{
                                         'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                             props.form.errors.province_id,
-                                    }"
-                                />
+                                    }" />
                             </template>
 
                             <template #endInput>
-                                <div
-                                    v-if="locationMode === 'manual'"
-                                    class="relative w-full"
-                                >
-                                    <input
-                                        type="text"
-                                        v-model="props.form.venue_name"
+                                <div v-if="locationMode === 'manual'" class="relative w-full">
+                                    <input type="text" v-model="props.form.venue_name"
                                         class="bg-background rounded-md text-sm font-medium border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium w-full pr-10"
                                         :class="{
                                             'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                                 props.form.errors.venue_name,
-                                        }"
-                                        placeholder="ชื่อสถานที่จัดงาน"
-                                    />
+                                        }" placeholder="ชื่อสถานที่จัดงาน" />
                                 </div>
                             </template>
                         </AnimatedRangeInput>
                     </div>
                     <div class="flex text-sm space-x-4 ml-2.5">
                         <ArrowTurnLeftUpIcon class="h-4 w-4 inline-block" />
-                        <span class="mt-0.5"
-                            >คลิกเพื่อเปลี่ยนโหมดเลือกตำแหน่ง</span
-                        >
+                        <span class="mt-0.5">คลิกเพื่อเปลี่ยนโหมดเลือกตำแหน่ง</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="px-6 pb-6">
+        <div class="p-6 bg-card rounded-md">
             <div class="flex flex-col">
-                <div class="lg:hidden bg-background w-full h-[1px] mb-2" />
+                <h3 class="font-bold text-xl pb-2">คำอธิบาย</h3>
                 <div class="w-full space-y-2">
-                    <div
-                        class="w-full h-full px-2 py-4 bg-background rounded-md space-y-2"
-                    >
-                        <div
-                            class="flex flex-wrap items-center gap-y-2 gap-x-1 mx-2 bg-transparent"
-                        >
+                    <div class="w-full h-full px-2 py-4 bg-background rounded-md space-y-2">
+                        <div class="flex flex-wrap items-center gap-y-2 gap-x-1 mx-2 bg-transparent">
                             <div class="relative">
-                                <ArtistDropdown
-                                    v-model="tempArtistId"
-                                    :options="availableArtists"
-                                    :is-dark-mode="isDarkMode"
-                                    :class="{
+                                <ArtistDropdown v-model="tempArtistId" :options="availableArtists"
+                                    :is-dark-mode="isDarkMode" :class="{
                                         'outline-dashed outline-primary -outline-offset-4 rounded-full':
                                             props.form.errors.artist_ids,
-                                    }"
-                                >
+                                    }">
                                     <template #button-face="{ selectedOption }">
                                         <div
-                                            class="group flex items-center bg-card hover:bg-primary py-1 px-2 rounded-full text-sm font-medium cursor-pointer transition-all duration-150"
-                                        >
+                                            class="group flex items-center bg-card hover:bg-primary py-1 px-2 rounded-full text-sm font-medium cursor-pointer transition-all duration-150">
                                             <PlusIcon
-                                                class="h-4 w-4 stroke-current stroke-[3px] text-primary group-hover:text-white"
-                                            />
-                                            <span
-                                                class="mx-1 text-text group-hover:text-white uppercase"
-                                                >Singer</span
-                                            >
+                                                class="h-4 w-4 stroke-current stroke-[3px] text-primary group-hover:text-white" />
+                                            <span class="mx-1 group-hover:text-white uppercase">Singer</span>
                                         </div>
                                     </template>
                                 </ArtistDropdown>
                             </div>
-                            <div
-                                v-for="artist in selectedArtists"
-                                :key="artist.id"
-                                class="flex items-center space-x-2 bg-card py-1 px-2 rounded-full"
-                            >
-                                <img
-                                    :src="
-                                        artist.picture_url ||
-                                        artistPicturePlaceholder(artist)
-                                    "
-                                    :alt="artist.name"
-                                    class="w-5 h-5 rounded-full object-cover"
-                                />
+                            <div v-for="artist in selectedArtists" :key="artist.id"
+                                class="flex items-center space-x-2 bg-card py-1 px-2 rounded-full">
+                                <img :src="getArtistPicture(artist)" :alt="artist.name"
+                                    class="w-5 h-5 rounded-full object-cover" />
                                 <span class="text-sm font-medium uppercase">{{
                                     artist.name
                                 }}</span>
-                                <button
-                                    @click="removeArtist(artist.id)"
-                                    type="button"
-                                    class="text-text-medium hover:text-primary rounded-full p-0.5"
-                                >
-                                    <XMarkIcon
-                                        class="w-4 h-4 stroke-current stroke-[2px]"
-                                    />
+                                <button @click="removeArtist(artist.id)" type="button"
+                                    class="text-text-medium hover:text-primary rounded-full p-0.5">
+                                    <XMarkIcon class="w-4 h-4 stroke-current stroke-[2px]" />
                                 </button>
                             </div>
                         </div>
-                        <textarea
-                            v-model="props.form.description"
-                            class="w-full resize-none h-64 bg-transparent border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
+                        <textarea v-model="props.form.description"
+                            class="w-full resize-none h-96 bg-transparent border-none focus:ring-transparent placeholder:font-normal placeholder:text-text-medium"
                             :class="{
-                                'text-center': props.form.description,
                                 'outline-dashed outline-primary -outline-offset-4 rounded-md':
                                     props.form.errors.description,
-                            }"
-                            placeholder="รายละเอียดงานดนตรี"
-                        ></textarea>
+                            }" placeholder="รายละเอียดงานดนตรี"></textarea>
                     </div>
-
-                    <button
-                        type="button"
-                        @click="submit"
-                        class="rounded-md border-[2px] border-primary flex items-center space-x-2 justify-center px-4 w-full text-primary disabled:cursor-not-allowed"
-                        :disabled="props.form.processing"
-                    >
-                        <FolderArrowDownIcon
-                            class="w-4 h-4 stroke-current stroke-[2px]"
-                        />
-                        <span v-if="props.form.processing">{{
-                            isEditMode ? "กำลังอัปเดต..." : "กำลังสร้าง..."
-                        }}</span>
-                        <span v-else>{{
-                            isEditMode ? "อัปเดตงานดนตรี" : "สร้างงานดนตรี"
-                        }}</span>
-                    </button>
                 </div>
             </div>
         </div>
 
+        <button type="button" @click="submit"
+            class="rounded-md bg-primary flex items-center space-x-2 justify-center px-4 py-1 w-full text-white font-semibold disabled:opacity-50"
+            :disabled="props.form.processing">
+            <FolderArrowDownIcon class="w-4 h-4 stroke-current stroke-[2.5px]" />
+            <span v-if="props.form.processing">{{
+                isEditMode ? "กำลังอัปเดต..." : "กำลังสร้าง..."
+            }}</span>
+            <span v-else>{{
+                isEditMode ? "อัปเดตงานดนตรี" : "สร้างงานดนตรี"
+            }}</span>
+        </button>
+
         <teleport to="body">
-            <div
-                v-if="showMapModal"
+            <div v-if="showMapModal"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
-                @click.self="closeModal"
-            >
-                <div
-                    class="bg-card rounded-md shadow-xl w-full max-w-2xl p-6 space-y-4"
-                >
+                @click.self="closeModal">
+                <div class="bg-card rounded-md shadow-xl w-full max-w-2xl p-6 space-y-4">
                     <div class="flex justify-between items-center">
                         <h3
-                            class="text-lg flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 font-medium leading-6"
-                        >
+                            class="text-lg flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 font-medium leading-6">
                             <span>เลือกตำแหน่งที่ตั้ง</span>
-                            <span
-                                v-if="isGeocoding"
-                                class="text-sm font-normal text-text-medium"
-                                >(กำลังค้นหาจังหวัด...)</span
-                            >
-                            <span
-                                v-else-if="selectedLocation"
-                                class="text-sm font-normal text-text-medium"
-                                >({{ selectedProvinceName }} - พิกัด:
-                                {{ modalSelectedCoordinates }})</span
-                            >
+                            <span v-if="isGeocoding"
+                                class="text-sm font-normal text-text-medium">(กำลังค้นหาจังหวัด...)</span>
+                            <span v-else-if="selectedLocation" class="text-sm font-normal text-text-medium">({{
+                                selectedProvinceName }} - พิกัด:
+                                {{ modalSelectedCoordinates }})</span>
                         </h3>
-                        <button
-                            @click="closeModal"
-                            class="text-text hover:text-text-hover"
-                        >
+                        <button @click="closeModal" class="hover:text-text-hover">
                             <XMarkIcon class="h-6 w-6" />
                         </button>
                     </div>
-                    <div
-                        id="map-picker"
-                        class="rounded-md h-[400px] w-full"
-                    ></div>
-                    <button
-                        type="button"
-                        @click="confirmLocation"
-                        class="rounded-md w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="!selectedLocation || isGeocoding"
-                    >
+                    <div id="map-picker" class="rounded-md h-[400px] w-full"></div>
+                    <button type="button" @click="confirmLocation"
+                        class="rounded-md w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover disabled:opacity-50"
+                        :disabled="!selectedLocation || isGeocoding">
                         <span v-if="isGeocoding">กำลังค้นหา...</span>
                         <span v-else>ยืนยันตำแหน่ง</span>
                     </button>

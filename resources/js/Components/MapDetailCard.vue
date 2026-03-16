@@ -1,10 +1,13 @@
 <script setup>
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
-import { HeartIcon as OutlineHeartIcon, TagIcon } from "@heroicons/vue/24/outline";
+import {
+    HeartIcon as OutlineHeartIcon,
+    MapPinIcon,
+    TicketIcon,
+} from "@heroicons/vue/24/outline";
 import {
     HeartIcon as SolidHeartIcon,
-    MusicalNoteIcon,
 } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
@@ -75,6 +78,26 @@ const genreName = computed(() => {
     return "ไม่ระบุแนวเพลง";
 });
 
+const VenueName = computed(() => {
+    if (props.concert && props.concert.venue_name != null) {
+        return venue_name ? concert.vanue_name : "ไม่ระบุชื่อสถานที่";
+    }
+    return "ไม่ระบุชื่อสถานที่";
+});
+
+const formattedPrice = computed(() => {
+    if (props.concert && props.concert.price_min != null) {
+        if (props.concert.price_min === 0) {
+            return "ฟรี";
+        }
+        return new Intl.NumberFormat("th-TH", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(props.concert.price_min) + " บาท";
+    }
+    return "ไม่ระบุราคา";
+});
+
 const detailUrl = computed(() => {
     return route('concert.detail', { concert: props.concert.id });
 });
@@ -90,14 +113,14 @@ const followConcert = (follow) => {
         {
             is_following: !follow,
         },
-        { 
+        {
             preserveState: true,
             preserveScroll: true,
             onFinish: () => {
                 isLoading.value = false;
             },
             onError: () => {
-                props.concert.is_followed = follow; 
+                props.concert.is_followed = follow;
             }
         }
     );
@@ -105,61 +128,49 @@ const followConcert = (follow) => {
 </script>
 
 <template>
-    <div class="w-full bg-card overflow-hidden">
-        <img
-            :src="pictureUrl"
-            :alt="props.concert.name || 'Concert Picture'"
-            class="w-full aspect-[2/3] object-fill rounded-md"
-        />
-        <div class="space-y-2 mt-1">
-            <div class="flex flex-col">
+    <div class="w-full bg-card space-y-1 overflow-hidden">
+        <img :src="pictureUrl" :alt="props.concert.name || 'Concert Picture'"
+            class="w-full aspect-[2/3] object-fill rounded-md" />
+        <div class="space-y-2">
+            <div class="flex flex-col space-y-1">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-text-medium truncate">{{
+                    <span class="text-sm truncate text-text-medium">{{
                         formattedDate
                     }}</span>
-                    <button
-                        @click.prevent.stop="
-                            followConcert(props.concert.is_followed)
-                        "
-                        :class="{ hidden: role !== 'user' }"
-                        :disabled="isLoading"
-                    >
-                        <component
-                            :is="
-                                props.concert.is_followed
-                                    ? SolidHeartIcon
-                                    : OutlineHeartIcon
-                            "
-                            class="w-5 h-5"
-                            :class="[
-                                props.concert.is_followed
-                                    ? 'text-primary'
-                                    : 'text-text-medium hover:text-primary',
-                                'transition-colors duration-200',
-                                { 'opacity-50 cursor-not-allowed': isLoading }
-                            ]"
-                        />
+                    <button @click.prevent.stop="
+                        followConcert(props.concert.is_followed)
+                        " :class="{ hidden: role !== 'user' }">
+                        <component :is="props.concert.is_followed
+                            ? SolidHeartIcon
+                            : OutlineHeartIcon
+                            " class="w-6 h-6 p-1 stroke-current stroke-[2px]" :class="props.concert.is_followed
+                                ? 'text-primary'
+                                : 'text-text-medium hover:text-primary transition-colors duration-200'
+                                " />
                     </button>
                 </div>
-                <span class="font-semibold line-clamp-2 text-lg text-text">{{ props.concert.name }}</span>
-                
-                <div class="flex justify-between text-sm text-text-medium pt-1">
-                    <div class="flex items-center gap-1.5 min-w-0 text-accent">
-                        <TagIcon class="w-4 h-4 flex-shrink-0 stroke-[2.5px]" />
-                        <span class="truncate"> {{ eventTypeName }} </span>
+                <span class="text-sm md:text-base lg:text-lg xl:text-xl font-medium min-h-14 break-all">
+                    <span class="line-clamp-2">
+                        {{ props.concert.name }}
+                    </span>
+                </span>
+                <div class="h-1 w-full bg-card-hover rounded" />
+                <div class="flex justify-between text-sm">
+                    <div class="flex items-center gap-1">
+                        <TicketIcon
+                            class="w-6 h-6 flex-shrink-0 stroke-[2px] text-text-high p-1 border-2 border-accent-high rounded-md" />
+                        <span class="truncate"> {{ formattedPrice }} </span>
                     </div>
-                    <div class="flex items-center gap-1.5 min-w-0 text-secondary">
-                        <MusicalNoteIcon class="w-4 h-4 flex-shrink-0" />
-                        <span class="truncate"> {{ genreName }} </span>
+                    <div class="flex items-center gap-1">
+                        <span class="truncate"> {{ provinceName }} </span>
+                        <MapPinIcon
+                            class="w-6 h-6 flex-shrink-0 stroke-[2.5px] text-text-high p-1 border-2 border-secondary-high rounded-md" />
                     </div>
                 </div>
-                </div>
+            </div>
 
-            <a
-                :href="detailUrl"
-                target="_blank"
-                class="block w-full rounded-md px-3 py-1 text-center text-sm font-semibold text-white shadow-sm transition bg-primary hover:bg-primary-dark"
-            >
+            <a :href="detailUrl" target="_blank"
+                class="block w-full text-xs font-medium rounded-md py-1 text-center border-2 border-primary">
                 View Details
             </a>
         </div>

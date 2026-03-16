@@ -10,39 +10,29 @@ const props = defineProps({
 });
 
 const form = useForm({
-    // Core Infomation
     name: props.concert.name,
     description: props.concert.description,
     event_type: props.concert.event_type,
     genre: props.concert.genre,
-    picture_url: null, // Always null on edit load, preview is handled by component
-
-    // Location
+    picture_url: null,
     venue_name: props.concert.venue_name,
     province_id: props.concert.province_id,
     latitude: props.concert.latitude,
     longitude: props.concert.longitude,
-
-    // Price
     price_min: props.concert.price_min,
     price_max: props.concert.price_max,
-
-    // Date & Time
     start_show_date: props.concert.start_show_date,
     start_show_time: props.concert.start_show_time,
     end_show_date: props.concert.end_show_date,
     end_show_time: props.concert.end_show_time,
     start_sale_date: props.concert.start_sale_date,
     end_sale_date: props.concert.end_sale_date,
-
-    // Additional Information
     ticket_link: props.concert.ticket_link,
-    // Pre-populate the artist IDs from the loaded relationship
     artist_ids: props.concert.artists
         ? props.concert.artists.map((a) => a.id)
         : [],
 
-    _method: "POST", // Inertia uses POST for updates with file uploads
+    _method: "POST",
 });
 
 function submit() {
@@ -52,11 +42,6 @@ function submit() {
 
 <template>
     <PromoterLayout title="Edit Concert">
-        <ConcertForm
-            :form="form"
-            :artists="artists"
-            :concert="concert"
-            @submit="submit"
-        />
+        <ConcertForm :form="form" :artists="artists" :concert="concert" @submit="submit" />
     </PromoterLayout>
 </template>

@@ -36,22 +36,16 @@ watchEffect(() => {
 </script>
 
 <template>
-    <div
-        class="min-h-screen flex justify-center items-center pt-0 bg-card-high"
-    >
+    <div class="min-h-screen flex justify-center items-center pt-0 bg-card-high">
         <slot name="background" />
 
-        <button
-            @click="toggleDarkMode"
-            class="absolute top-4 right-4 bg-card p-2 rounded-md hover:text-primary focus:outline-none transition duration-200 ease-in-out"
-        >
+        <button @click="toggleDarkMode"
+            class="absolute top-4 right-4 bg-card p-2 rounded-md hover:text-primary focus:outline-none transition duration-200 ease-in-out">
             <SunIcon v-if="darkMode" class="h-6 w-6" />
             <MoonIcon v-else class="h-6 w-6" />
         </button>
-        
-        <div
-            class="w-full max-w-md mt-6 px-8 py-6 bg-card shadow-2xl overflow-hidden rounded-md ring-background"
-        >
+
+        <div class="w-full max-w-md mt-6 px-8 py-6 bg-card shadow-2xl overflow-hidden rounded-md ring-background">
             <div class="flex justify-center">
                 <Link :href="'/'" class="flex flex-col items-center">
                     <slot name="logo" />

@@ -29,6 +29,7 @@ watch(
 
 <template>
     <AdminLayout title="User">
+
         <Head title="User Management" />
 
         <StyledTable :items="users" v-model:search="search">
@@ -43,10 +44,7 @@ watch(
             </template>
 
             <template #body>
-                <tr
-                    v-for="user in props.users"
-                    :key="user.id"
-                >
+                <tr v-for="user in props.users" :key="user.id">
                     <td class="px-4 py-3 pl-6 whitespace-nowrap text-sm text-text">
                         {{ user.id }}
                     </td>

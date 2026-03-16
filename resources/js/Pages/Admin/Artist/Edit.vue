@@ -10,6 +10,7 @@ defineProps({
 
 <template>
     <AdminLayout title="Create Artist">
+
         <Head title="Create New Artist" />
 
         <ArtistEdit :artist="artist" />

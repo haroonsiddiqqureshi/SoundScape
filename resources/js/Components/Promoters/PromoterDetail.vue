@@ -35,11 +35,8 @@ const availableSocialLinks = computed(() => {
         <div class="bg-card rounded-md p-6 lg:px-20">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-6">
-                    <img
-                        class="h-16 w-16 border-2 border-primary rounded-full flex items-center justify-center object-cover"
-                        :src="promoterPicturePlaceholder"
-                        :alt="promoter.fullname"
-                    />
+                    <img class="h-16 w-16 border-2 border-primary rounded-full flex items-center justify-center object-cover"
+                        :src="promoterPicturePlaceholder" :alt="promoter.fullname" />
                     <div>
                         <h2 class="lg:text-2xl font-semibold text-text">
                             {{ promoter.fullname }}
@@ -50,24 +47,18 @@ const availableSocialLinks = computed(() => {
                     </div>
                 </div>
                 <div class="flex flex-col items-end space-y-2 text-xs uppercase">
-                    <span
-                        @click="emit('update-verification-status', promoter)"
-                        class="px-2 py-1 rounded-md font-bold cursor-pointer"
-                        :class="
-                            promoter.is_verified
+                    <span @click="emit('update-verification-status', promoter)"
+                        class="px-2 py-1 rounded-md font-bold cursor-pointer" :class="promoter.is_verified
                                 ? 'bg-primary text-white hover:bg-primary-hover'
                                 : 'bg-background'
-                        "
-                    >
+                            ">
                         {{ promoter.is_verified ? "Verified" : "Not Verified" }}
                     </span>
                 </div>
             </div>
         </div>
 
-        <div
-            class="bg-card rounded-md p-6 lg:px-20 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-6"
-        >
+        <div class="bg-card rounded-md p-6 lg:px-20 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-6">
             <div class="p-6 bg-background rounded-md">
                 <h3 class="text-lg font-semibold text-text mb-4">
                     Business Details
@@ -97,10 +88,8 @@ const availableSocialLinks = computed(() => {
                             <span class="max-w-xs truncate">
                                 {{ promoter.business_address }}
                             </span>
-                            <button
-                                @click="emit('show-full-address')"
-                                class="text-primary hover:text-primary-hover text-sm font-semibold ml-2"
-                            >
+                            <button @click="emit('show-full-address')"
+                                class="text-primary hover:text-primary-hover text-sm font-semibold ml-2">
                                 View
                             </button>
                         </dd>
@@ -133,11 +122,8 @@ const availableSocialLinks = computed(() => {
                             <span class="max-w-xs truncate">
                                 {{ promoter.bio || "Not provided" }}
                             </span>
-                            <button
-                                v-if="promoter.bio"
-                                @click="emit('show-full-bio')"
-                                class="text-primary hover:text-primary-hover text-sm font-semibold ml-2"
-                            >
+                            <button v-if="promoter.bio" @click="emit('show-full-bio')"
+                                class="text-primary hover:text-primary-hover text-sm font-semibold ml-2">
                                 View
                             </button>
                         </dd>
@@ -150,16 +136,11 @@ const availableSocialLinks = computed(() => {
                     Social Links
                 </h3>
                 <div class="flex flex-wrap gap-4">
-                    <a
-                        v-for="(link, platform) in availableSocialLinks"
-                        :key="platform"
-                        :href="link"
-                        target="_blank"
-                        class="text-primary hover:text-primary-hover flex items-center space-x-2 transition-colors"
-                    >
+                    <a v-for="(link, platform) in availableSocialLinks" :key="platform" :href="link" target="_blank"
+                        class="text-primary hover:text-primary-hover flex items-center space-x-2 transition-colors">
                         <span class="capitalize font-medium">{{
                             platform
-                        }}</span>
+                            }}</span>
                     </a>
                 </div>
             </div>

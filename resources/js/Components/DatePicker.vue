@@ -42,36 +42,18 @@ const format = (date) => {
 </script>
 
 <template>
-    <div
-        :style="{ width: !modelValue ? '160px' : '130px' }"
-        class="transition-all duration-300"
-    >
-        <VueDatePicker
-            :model-value="modelValue"
-            @update:model-value="emit('update:modelValue', $event)"
-            model-type="yyyy-MM-dd"
-            locale="th"
-            month-name-format="long"
-            :day-names="thaiDayNames"
-            :enable-time-picker="false"
-            :dark="isDarkMode"
-            :min-date="minDate"
-            :max-date="maxDate"
-            :start-date="minDate"
-            :year-range="yearRange"
-            auto-apply
-            input-class-name="!hidden"
-            no-today
-        >
+    <div :style="{ width: !modelValue ? '160px' : '130px' }" class="transition-all duration-300">
+        <VueDatePicker :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)"
+            model-type="yyyy-MM-dd" locale="th" month-name-format="long" :day-names="thaiDayNames"
+            :enable-time-picker="false" :dark="isDarkMode" :min-date="minDate" :max-date="maxDate" :start-date="minDate"
+            :year-range="yearRange" auto-apply input-class-name="!hidden" no-today>
             <template #dp-input="{ value }">
-                <div
-                    class="cursor-pointer bg-background rounded-md border-none focus:ring-transparent px-3 py-2"
+                <div class="cursor-pointer bg-background rounded-md border-none focus:ring-transparent px-3 py-2"
                     :class="{
                         'outline-dashed outline-primary -outline-offset-4 rounded-md':
                             error,
                         'text-text-medium font-normal': !value,
-                    }"
-                >
+                    }">
                     <span class="block truncate">
                         {{ format(value) }}
                     </span>

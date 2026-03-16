@@ -19,7 +19,7 @@ onMounted(async () => {
   try {
     const response = await axios.get('/api/provinces');
     provinces.value = response.data;
-  } catch (error)  {
+  } catch (error) {
     console.error("Failed to fetch provinces:", error);
   } finally {
     isLoading.value = false;
@@ -37,10 +37,10 @@ const filteredProvinces = computed(() => {
 });
 
 const formattedOptions = computed(() => {
-    return filteredProvinces.value.map(province => ({
-        name: province.name_th,
-        value: province.id,
-    }));
+  return filteredProvinces.value.map(province => ({
+    name: province.name_th,
+    value: province.id,
+  }));
 });
 
 const selectedProvince = computed({
@@ -49,20 +49,15 @@ const selectedProvince = computed({
 });
 
 const placeholderText = computed(() => {
-    return isLoading.value ? 'Loading...' : 'กรุณาเลือกจังหวัด';
+  return isLoading.value ? 'Loading...' : 'กรุณาเลือกจังหวัด';
 });
 
 function updateSearchQuery(query) {
-    searchQuery.value = query;
+  searchQuery.value = query;
 }
 </script>
 
 <template>
-    <DropdownSelector
-        v-model="selectedProvince"
-        :options="formattedOptions"
-        :placeholder="placeholderText"
-        :is-searchable="true"
-        @search-change="updateSearchQuery"
-    />
+  <DropdownSelector v-model="selectedProvince" :options="formattedOptions" :placeholder="placeholderText"
+    :is-searchable="true" @search-change="updateSearchQuery" />
 </template>

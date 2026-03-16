@@ -11,7 +11,6 @@ const props = defineProps({
     }
 });
 
-// Define the form state using useForm, initialized with existing promoter data
 const form = useForm({
     fullname: props.promoter?.fullname || "",
     business_name: props.promoter?.business_name || "",
@@ -61,7 +60,8 @@ const submit = () => {
             <div class="flex flex-col w-full space-y-2">
                 <span class="text-lg font-semibold text-primary">โอ๊ะ! เกิดข้อผิดพลาด</span>
                 <span class="text-sm text-text-medium">กรุณาตรวจสอบข้อมูลในช่องที่มีกรอบเส้นประอีกครั้ง</span>
-                <ul class="list-disc list-inside space-y-1 pl-5 bg-background p-4 rounded-md outline-dashed -outline-offset-4 text-primary">
+                <ul
+                    class="list-disc list-inside space-y-1 pl-5 bg-background p-4 rounded-md outline-dashed -outline-offset-4 text-primary">
                     <li v-for="(errorMessages, fieldName) in form.errors" :key="fieldName" class="text-sm text-primary">
                         <strong class="font-bold">{{ fieldLabels[fieldName] || fieldName }}:</strong>
                         <span class="ml-1 text-text">{{ errorMessages }}</span>

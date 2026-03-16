@@ -104,16 +104,39 @@ class HomeController extends Controller
 
     public function concertDetail(Concert $concert)
     {
-        $concert->load('artists');
+        $concert->load(['artists', 'comments.user', 'comments.admin', 'comments.promoter']);
+
         $provinces = Province::all()->keyBy('id');
         $followedConcerts = [];
-        if (Auth::check()) {
-            $followedConcerts = Follow::where('user_id', Auth::id())
+
+        $userId = Auth::check() ? Auth::id() : null;
+
+        if ($userId) {
+            $followedConcerts = Follow::where('user_id', $userId)
                 ->pluck('concert_id')
                 ->flip();
         }
 
         $concert->is_followed = isset($followedConcerts[$concert->id]);
+
+        $concert->comments->each(function ($comment) use ($concert, $userId) {
+            $comment->is_author = false;
+            $comment->is_owner = false;
+
+            if ($comment->admin_id) {
+                $comment->author_name = $comment->admin->name;
+                if ($concert->admin_id === $comment->admin_id) $comment->is_author = true;
+            } elseif ($comment->promoter_id) {
+                $comment->author_name = $comment->promoter->business_name ?? $comment->promoter->fullname;
+                if ($concert->promoter_id === $comment->promoter_id) $comment->is_author = true;
+            } elseif ($comment->user_id) {
+                $comment->author_name = $comment->user->name;
+
+                if ($userId && (int)$comment->user_id === (int)$userId) {
+                    $comment->is_owner = true;
+                }
+            }
+        });
 
         return Inertia::render('User/Concert/Detail', [
             'concert' => $concert,

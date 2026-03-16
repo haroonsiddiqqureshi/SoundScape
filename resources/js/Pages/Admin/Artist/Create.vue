@@ -6,6 +6,7 @@ import ArtistCreate from "@/Components/Artists/ArtistCreate.vue";
 
 <template>
     <AdminLayout title="Create Artist">
+
         <Head title="Create New Artist" />
 
         <ArtistCreate />

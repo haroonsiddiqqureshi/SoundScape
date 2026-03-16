@@ -1,11 +1,7 @@
 <script setup>
-// 1. Remove 'h' and 'createApp'.
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
-// 2. Remove the MapPopupCard import
-// import MapPopupCard from '@/Components/MapPopupCard.vue'; // <-- DELETE THIS
 
 const props = defineProps({
     concerts: {
@@ -14,14 +10,12 @@ const props = defineProps({
     }
 });
 
-// 3. Define the event we are going to emit
 const emit = defineEmits(['marker-click']);
 
 const mapContainer = ref(null);
 let map = null;
 let markerLayer = null;
 
-// --- Custom Icon Definitions (No changes here) ---
 const createIconHtml = (color) => {
     return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}" width="32px" height="32px" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
@@ -53,18 +47,16 @@ const accentIcon = L.divIcon({
     iconAnchor: [16, 32],
     popupAnchor: [0, -34]
 });
-// --- End Icon Definitions ---
 
-// --- Marker Update Function ---
 const updateMarkers = (concerts) => {
     if (!map || !markerLayer) {
         return;
     }
     markerLayer.clearLayers();
-    
+
     concerts.forEach(concert => {
         if (concert.latitude && concert.longitude) {
-            
+
             let icon;
             if (concert.admin_id !== null) {
                 icon = accentIcon;
@@ -76,13 +68,9 @@ const updateMarkers = (concerts) => {
                 icon = new L.Icon.Default();
             }
 
-            // --- 4. THIS IS THE MAJOR CHANGE ---
-            // We no longer bind a popup.
-            // We add a 'click' event listener that emits our custom event.
             L.marker([concert.latitude, concert.longitude], { icon: icon })
                 .addTo(markerLayer)
                 .on('click', () => {
-                    // Emit the event up to the parent (Index.vue)
                     emit('marker-click', concert);
                 });
 
@@ -90,7 +78,6 @@ const updateMarkers = (concerts) => {
     });
 };
 
-// --- Map Initialization (No changes) ---
 onMounted(() => {
     if (mapContainer.value) {
         map = L.map(mapContainer.value).setView([13.0, 101.55], 5);
@@ -103,12 +90,10 @@ onMounted(() => {
     }
 });
 
-// --- Watcher (No changes) ---
 watch(() => props.concerts, (newConcerts) => {
     updateMarkers(newConcerts);
 });
 
-// --- Unmount (No changes) ---
 onUnmounted(() => {
     if (map) {
         map.remove();

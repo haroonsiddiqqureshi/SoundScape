@@ -19,6 +19,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
 </script>
 
 <template>
+
     <Head title="Email Verification" />
 
     <AuthenticationCard>
@@ -27,7 +28,9 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </template>
 
         <div class="mb-4 text-sm text-text-medium">
-            Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.
+            Before continuing, could you verify your email address by clicking on the link we just emailed to you? If
+            you didn't
+            receive the email, we will gladly send you another.
         </div>
 
         <div v-if="verificationLinkSent" class="mb-4 font-medium text-sm text-secondary">
@@ -41,18 +44,12 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                 </PrimaryButton>
 
                 <div>
-                    <Link
-                        :href="route('profile.show')"
-                        class="underline text-sm text-text-medium hover:text-text rounded-md focus:outline-none focus:ring-0"
-                    >
+                    <Link :href="route('profile.show')"
+                        class="underline text-sm text-text-medium hover:text-text rounded-md focus:outline-none focus:ring-0">
                         Edit Profile</Link>
 
-                    <Link
-                        :href="route('logout')"
-                        method="post"
-                        as="button"
-                        class="underline text-sm text-text-medium hover:text-text rounded-md focus:outline-none focus:ring-0 ms-2"
-                    >
+                    <Link :href="route('logout')" method="post" as="button"
+                        class="underline text-sm text-text-medium hover:text-text rounded-md focus:outline-none focus:ring-0 ms-2">
                         Log Out
                     </Link>
                 </div>

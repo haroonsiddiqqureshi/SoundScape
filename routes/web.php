@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ConcertController as AdminConcertController;
+use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\PromoterController as AdminPromoterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\HighlightController as AdminHighlightController;
@@ -13,10 +14,13 @@ use App\Http\Controllers\Admin\ArtistController as AdminArtistController;
 // --- Promoter Controllers ---
 use App\Http\Controllers\Promoter\PromoterController;
 use App\Http\Controllers\Promoter\ConcertController as PromoterConcertController;
+use App\Http\Controllers\Promoter\CommentController as PromoterCommentController;
+
 
 // --- User Controllers ---
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\MapController;
+use App\Http\Controllers\User\CommentController;
 
 // --- Line Controller ---
 use App\Http\Controllers\LineIntegrationController;
@@ -38,7 +42,9 @@ Route::middleware([
     'role:web'
 ])->group(function () {
     Route::post('/concert/{concert}', [HomeController::class, 'followConcert'])->name('concert.follow');
-
+    Route::post('/concert/{concert}/comments', [CommentController::class, 'store'])->name('concert.comment.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('concert.comment.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('concert.comment.destroy');
     // Add other user-only routes here...
 
     Route::middleware('check_promoter')->group(function () {
@@ -55,6 +61,9 @@ Route::middleware([
             Route::get('/concert/edit/{concert}', [PromoterConcertController::class, 'edit'])->name('concert.edit');
             Route::post('/concert/{concert}', [PromoterConcertController::class, 'update'])->name('concert.update');
             Route::delete('/concert/{concert}', [PromoterConcertController::class, 'destroy'])->name('concert.delete');
+            Route::post('/concert-comments/{concert}', [PromoterCommentController::class, 'store'])->name('concert.comment.store');
+            Route::put('/concert-comments/{comment}', [PromoterCommentController::class, 'update'])->name('concert.comment.update');
+            Route::delete('/concert-comments/{comment}', [PromoterCommentController::class, 'destroy'])->name('concert.comment.destroy');
 
             // Add other promoter-only routes here...
         });
@@ -76,6 +85,9 @@ Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->na
     Route::get('/concert/edit/{concert}', [AdminConcertController::class, 'edit'])->name('concert.edit');
     Route::post('/concert/{concert}', [AdminConcertController::class, 'update'])->name('concert.update');
     Route::delete('/concert/{concert}', [AdminConcertController::class, 'destroy'])->name('concert.delete');
+    Route::post('/concert/{concert}/comments', [AdminCommentController::class, 'store'])->name('concert.comment.store');
+    Route::put('/comments/{comment}', [AdminCommentController::class, 'update'])->name('concert.comment.update');
+    Route::delete('/comments/{comment}', [AdminCommentController::class, 'destroy'])->name('concert.comment.destroy');
 
     // --- Admin User Management Routes ---
     Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');

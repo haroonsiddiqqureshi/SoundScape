@@ -109,8 +109,29 @@ class ConcertController extends Controller
 
     public function detail(Concert $concert)
     {
-        $concert->load(['artists', 'promoter.user']);
+        $concert->load(['artists', 'promoter.user', 'comments.user', 'comments.admin', 'comments.promoter']);
         $provinces = Province::all()->keyBy('id');
+
+        $adminId = Auth::guard('admin')->id();
+
+        $concert->comments->each(function ($comment) use ($concert, $adminId) {
+            $comment->is_author = false;
+            $comment->is_owner = false;
+
+            if ($comment->admin_id) {
+                $comment->author_name = $comment->admin->name;
+                if ($concert->admin_id === $comment->admin_id) $comment->is_author = true;
+
+                if ($adminId && (int)$comment->admin_id === (int)$adminId) {
+                    $comment->is_owner = true;
+                }
+            } elseif ($comment->promoter_id) {
+                $comment->author_name = $comment->promoter->business_name ?? $comment->promoter->fullname;
+                if ($concert->promoter_id === $comment->promoter_id) $comment->is_author = true;
+            } elseif ($comment->user_id) {
+                $comment->author_name = $comment->user->name;
+            }
+        });
 
         return Inertia::render('Admin/Concert/Detail', [
             'concert' => $concert,

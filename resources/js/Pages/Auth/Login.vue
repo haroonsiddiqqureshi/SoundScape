@@ -32,6 +32,7 @@ const submit = () => {
 </script>
 
 <template>
+
     <Head title="Log in" />
 
     <AuthenticationCard>
@@ -41,13 +42,8 @@ const submit = () => {
 
         <template #logo>
             <div class="flex items-center space-x-2 mb-4">
-                <ApplicationLogo
-                    class="block h-12 p-2 rounded-md w-auto bg-primary text-white"
-                />
-                <span
-                    class="flex justify-center text-pri font-bold tracking-wide text-2xl uppercase"
-                    >SoundScape</span
-                >
+                <ApplicationLogo class="block h-12 p-2 rounded-md w-auto bg-primary text-white" />
+                <span class="flex justify-center text-pri font-bold tracking-wide text-2xl uppercase">SoundScape</span>
             </div>
         </template>
 
@@ -58,63 +54,37 @@ const submit = () => {
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
+                <TextInput id="email" v-model="form.email" type="email" class="mt-1 block w-full" required autofocus
+                    autocomplete="username" />
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
                 <div class="flex justify-between">
                     <InputLabel for="password" value="Password" />
-                    <Link
-                        v-if="canResetPassword"
-                        :href="route('password.request')"
-                        class="hover:underline text-sm text-text-medium hover:text-text rounded-md"
-                        tabindex="1"
-                    >
+                    <Link v-if="canResetPassword" :href="route('password.request')"
+                        class="hover:underline text-sm text-text-medium hover:text-text rounded-md" tabindex="1">
                         Forgot your password?
                     </Link>
                 </div>
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="current-password"
-                />
+                <TextInput id="password" v-model="form.password" type="password" class="mt-1 block w-full" required
+                    autocomplete="current-password" />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="flex justify-between mt-4">
                 <label class="flex items-center">
                     <Checkbox v-model:checked="form.remember" name="remember" />
-                    <span class="ms-2 text-sm text-text-medium"
-                        >Remember me</span
-                    >
+                    <span class="ms-2 text-sm text-text-medium">Remember me</span>
                 </label>
             </div>
 
             <div class="flex items-center justify-end mt-2">
-                <Link
-                    v-if="canRegister"
-                    :href="route('register')"
-                    class="hover:underline text-sm text-text-medium hover:text-text rounded-md"
-                >
+                <Link v-if="canRegister" :href="route('register')"
+                    class="hover:underline text-sm text-text-medium hover:text-text rounded-md">
                     Don't have an account?
                 </Link>
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
+                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
                 </PrimaryButton>
             </div>

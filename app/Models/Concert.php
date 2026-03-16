@@ -56,17 +56,17 @@ class Concert extends Model
     protected function startShowDate(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
         );
     }
-    
+
     /**
      * Get and format the end_show_date.
      */
     protected function endShowDate(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
         );
     }
 
@@ -76,7 +76,7 @@ class Concert extends Model
     protected function startSaleDate(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
         );
     }
 
@@ -86,7 +86,7 @@ class Concert extends Model
     protected function endSaleDate(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
         );
     }
 
@@ -123,5 +123,10 @@ class Concert extends Model
     public function logs()
     {
         return $this->hasMany(Concert_Log::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
     }
 }

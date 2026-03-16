@@ -28,11 +28,6 @@ function submit() {
 
 <template>
     <AdminLayout title="Edit Highlight">
-        <HighlightEditForm
-            :form="form"
-            :highlight="highlight"
-            :concerts="concerts"
-            @submit="submit"
-        />
+        <HighlightEditForm :form="form" :highlight="highlight" :concerts="concerts" @submit="submit" />
     </AdminLayout>
 </template>

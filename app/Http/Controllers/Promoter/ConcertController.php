@@ -120,8 +120,31 @@ class ConcertController extends Controller
             abort(403);
         }
 
-        $concert->load('artists');
+        $concert->load(['artists', 'comments.user', 'comments.admin', 'comments.promoter']);
         $provinces = Province::all()->keyBy('id');
+        
+        $promoterId = Auth::user()->promoter->id;
+
+        $concert->comments->each(function ($comment) use ($concert, $promoterId) {
+            $comment->is_author = false;
+            $comment->is_owner = false;
+
+            if ($comment->admin_id) {
+                $comment->author_name = $comment->admin->name;
+                if ($concert->admin_id === $comment->admin_id) $comment->is_author = true;
+            } 
+            elseif ($comment->promoter_id) {
+                $comment->author_name = $comment->promoter->business_name ?? $comment->promoter->fullname;
+                if ($concert->promoter_id === $comment->promoter_id) $comment->is_author = true;
+                
+                if ($promoterId && (int)$comment->promoter_id === (int)$promoterId) {
+                    $comment->is_owner = true;
+                }
+            } 
+            elseif ($comment->user_id) {
+                $comment->author_name = $comment->user->name;
+            }
+        });
 
         return Inertia::render('Promoter/Concert/Detail', [
             'concert' => $concert,
@@ -212,7 +235,7 @@ class ConcertController extends Controller
         $concert->update($validated);
 
         if (!empty($groupedChanges)) {
-            $followers = User::whereHas('followedConcert', function($query) use ($concert) {
+            $followers = User::whereHas('followedConcert', function ($query) use ($concert) {
                 $query->where('concerts.id', $concert->id);
             })->get();
 

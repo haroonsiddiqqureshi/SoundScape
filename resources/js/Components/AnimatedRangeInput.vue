@@ -39,19 +39,14 @@ watch(
         <div class="flex flex-1 space-x-2">
             <slot name="startInput"></slot>
 
-            <Transition
-                enter-from-class="opacity-0 transform -translate-x-2"
+            <Transition enter-from-class="opacity-0 transform -translate-x-2"
                 enter-active-class="transition-all duration-300 ease-in-out"
                 leave-to-class="opacity-0 transform -translate-x-2"
-                leave-active-class="transition-all duration-300 ease-in-out"
-            >
-                <div
-                    v-if="triggerValue"
-                    class="flex items-center space-x-2 grow"
-                >
+                leave-active-class="transition-all duration-300 ease-in-out">
+                <div v-if="triggerValue" class="flex items-center space-x-2 grow">
                     <span v-if="!isLong" class="text-text font-semibold">{{
                         separator
-                    }}</span>
+                        }}</span>
                     <div class="grow">
                         <slot name="endInput"></slot>
                     </div>

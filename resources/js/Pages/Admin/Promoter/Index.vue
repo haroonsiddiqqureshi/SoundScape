@@ -45,6 +45,7 @@ const updateVerificationStatus = (promoter) => {
 
 <template>
     <AdminLayout title="Promoter">
+
         <Head title="Promoter Management" />
         <StyledTable :items="promoters" v-model:search="search">
             <template #header>
@@ -66,18 +67,12 @@ const updateVerificationStatus = (promoter) => {
                     <td class="px-4 py-3 whitespace-nowrap text-sm text-text">
                         {{ promoter.user.email }}
                     </td>
-                    <td
-                        class="px-4 py-3 text-center whitespace-nowrap text-sm uppercase"
-                    >
-                        <span
-                            @click="updateVerificationStatus(promoter)"
-                            class="px-2 py-1 rounded-md text-xs font-semibold cursor-pointer"
-                            :class="
-                                promoter.is_verified
+                    <td class="px-4 py-3 text-center whitespace-nowrap text-sm uppercase">
+                        <span @click="updateVerificationStatus(promoter)"
+                            class="px-2 py-1 rounded-md text-xs font-semibold cursor-pointer" :class="promoter.is_verified
                                     ? 'bg-primary text-white'
                                     : 'bg-card text-text'
-                            "
-                        >
+                                ">
                             {{
                                 promoter.is_verified
                                     ? "Verified"
@@ -86,16 +81,12 @@ const updateVerificationStatus = (promoter) => {
                         </span>
                     </td>
                     <td
-                        class="flex justify-end space-x-2 px-4 py-3 pr-6 whitespace-nowrap text-sm text-white font-semibold"
-                    >
-                        <Link
-                            :href="
-                                route('admin.promoter.detail', {
-                                    promoter: promoter.id,
-                                })
+                        class="flex justify-end space-x-2 px-4 py-3 pr-6 whitespace-nowrap text-sm text-white font-semibold">
+                        <Link :href="route('admin.promoter.detail', {
+                            promoter: promoter.id,
+                        })
                             "
-                            class="flex items-center px-2 h-6 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200"
-                        >
+                            class="flex items-center px-2 h-6 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200">
                             <EyeIcon class="w-4 h-4" />
                             <span class="pb-1">ดูข้อมูล</span>
                         </Link>
