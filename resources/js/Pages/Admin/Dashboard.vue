@@ -58,19 +58,27 @@ defineProps({
                                     <th scope="col" class="px-6 py-3">ชื่อคอนเสิร์ต</th>
                                     <th scope="col" class="px-6 py-3">โปรโมเตอร์</th>
                                     <th scope="col" class="px-6 py-3">วันที่แสดง</th>
+                                    <th scope="col" class="px-6 py-3">วันที่สร้าง</th>
+                                    <th scope="col" class="px-6 py-3">วันที่อัพเดท</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="concert in recentConcerts" :key="concert.id"
-                                    class="bg-card border-b hover:bg-background-hover">
+                                    class="bg-card border-b-2 border-background hover:bg-background-hover">
                                     <td class="px-6 py-4 font-medium whitespace-nowrap">
-                                        {{ concert.title }}
+                                        {{ concert.name }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ concert.promoter?.business_name || 'N/A' }}
+                                        {{ concert.promoter?.business_name || concert?.origin }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ new Date(concert.date).toLocaleDateString('th-TH') }}
+                                        {{ new Date(concert.start_show_date).toLocaleDateString('th-TH') }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ new Date(concert.created_at).toLocaleDateString('th-TH') }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ new Date(concert.updated_at).toLocaleDateString('th-TH') }}
                                     </td>
                                 </tr>
                                 <tr v-if="recentConcerts.length === 0">

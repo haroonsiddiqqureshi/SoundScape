@@ -89,7 +89,7 @@ onUnmounted(() => {
                         <div class="mt-2">
                             <button v-if="currentJob && currentJob.status === 'running'" type="button"
                                 @click.prevent="cancelScraping"
-                                class="w-full justify-center inline-flex items-center py-2 border-2 border-text-low rounded-md hover:font-bold text-sm tracking-wide transition">
+                                class="w-full justify-center inline-flex items-center py-2 border-2 border-primary rounded-md hover:font-bold text-sm tracking-wide transition">
                                 ยกเลิก
                             </button>
 
@@ -119,7 +119,7 @@ onUnmounted(() => {
                                 </span>
                             </div>
                             <div class="text-right">
-                                <span class="text-xs font-semibold inline-block text-primary">
+                                <span class="text-xs font-semibold inline-block text-accent">
                                     {{ currentJob.progress }}%
                                 </span>
                             </div>

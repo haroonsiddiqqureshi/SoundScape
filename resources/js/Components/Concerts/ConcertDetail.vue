@@ -220,6 +220,20 @@ const endShowTime = computed(() => formattedTime(props.concert.end_show_time));
 const priceMin = computed(() => formattedPrice(props.concert.price_min));
 const priceMax = computed(() => formattedPrice(props.concert.price_max));
 
+const showAllArtists = ref(false);
+const ARTIST_DISPLAY_LIMIT = 5;
+
+const displayedArtists = computed(() => {
+    if (!props.concert.artists) return [];
+    return showAllArtists.value
+        ? props.concert.artists
+        : props.concert.artists.slice(0, ARTIST_DISPLAY_LIMIT);
+});
+
+const hasMoreArtists = computed(() => {
+    return props.concert.artists && props.concert.artists.length > ARTIST_DISPLAY_LIMIT;
+});
+
 const getArtistPicture = computed(() => {
     return (artist) => {
         if (artist && artist.picture_url) {
@@ -378,7 +392,7 @@ const followConcert = (follow) => {
                             <span v-if="props.concert.end_sale_date">-</span>
                             <span v-if="props.concert.end_sale_date">{{
                                 endSaleDate
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
 
@@ -389,10 +403,10 @@ const followConcert = (follow) => {
                         </div>
                         <div class="flex items-center space-x-2">
                             <span>{{ startShowDate }}</span>
-                            <span v-if="props.concert.end_sale_date">-</span>
+                            <span v-if="props.concert.end_show_date">-</span>
                             <span v-if="props.concert.end_show_date">{{
                                 endShowDate
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
 
@@ -406,7 +420,7 @@ const followConcert = (follow) => {
                             <span v-if="props.concert.end_show_time">-</span>
                             <span v-if="props.concert.end_show_time">{{
                                 endShowTime
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
 
@@ -418,11 +432,11 @@ const followConcert = (follow) => {
                         <div class="flex items-center space-x-2">
                             <span v-if="props.concert.price_min">{{
                                 priceMin
-                                }}</span>
-                            <span v-if="props.concert.end_show_time">-</span>
+                            }}</span>
+                            <span v-if="props.concert.price_max">-</span>
                             <span v-if="props.concert.price_max">{{
                                 priceMax
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
 
@@ -471,7 +485,7 @@ const followConcert = (follow) => {
 
                 <div class="w-full h-fit space-y-4">
                     <div v-if="props.concert.artists?.length" class="flex flex-wrap items-center gap-y-2 gap-x-1 mx-2">
-                        <div v-for="artist in props.concert.artists" :key="artist.id"
+                        <div v-for="artist in displayedArtists" :key="artist.id"
                             class="flex items-center space-x-2 bg-card py-1 px-2 rounded-full border-2 border-primary">
                             <img :src="getArtistPicture(artist)" :alt="artist.name"
                                 class="w-5 h-5 rounded-full object-cover" />
@@ -479,6 +493,13 @@ const followConcert = (follow) => {
                                 artist.name
                                 }}</span>
                         </div>
+
+                        <button v-if="hasMoreArtists" @click="showAllArtists = !showAllArtists"
+                            class="ml-2 text-sm font-medium text-primary hover:text-primary-hover hover:underline transition-colors focus:outline-none">
+                            {{ showAllArtists ? 'แสดงน้อยลง' : `+${props.concert.artists.length - ARTIST_DISPLAY_LIMIT}
+                            ศิลปิน`
+                            }}
+                        </button>
                     </div>
 
                     <div class="w-full whitespace-pre-wrap">
@@ -596,8 +617,7 @@ const followConcert = (follow) => {
                                         </button>
                                     </template>
                                     <template #content>
-                                        <div
-                                            class="py-1 bg-card rounded-md shadow-xs border border-text-low">
+                                        <div class="py-1 bg-card rounded-md shadow-xs border border-text-low">
                                             <button @click="startEdit(comment)"
                                                 class="flex items-center space-x-2 w-full px-4 py-2 text-left text-sm hover:bg-background transition">
                                                 <PencilIcon class="w-4 h-4 stroke-current" />

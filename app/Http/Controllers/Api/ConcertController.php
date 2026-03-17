@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Models\Concert;
 use App\Models\Concert_Log;
 use App\Models\Artist;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Province;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\ConcertUpdatedNotification;
 use Carbon\Carbon;
 
 class ConcertController extends Controller
@@ -73,24 +76,73 @@ class ConcertController extends Controller
                     $concert->restore();
                 }
 
-                $fieldsToCheck = ['name', 'description', 'price_min', 'start_show_date', 'venue_name', 'picture_url'];
+                $logData = $data;
+                unset($logData['latitude'], $logData['longitude']);
 
-                foreach ($fieldsToCheck as $field) {
-                    $oldVal = (string)$concert->$field;
-                    $newVal = isset($data[$field]) ? (string)$data[$field] : null;
+                $groupedChanges = $this->logConcertChanges($concert, $logData, []);
 
-                    if ($newVal !== null && $oldVal !== $newVal) {
+                if (isset($data['picture_url']) && $concert->picture_url !== $data['picture_url']) {
+                    Concert_Log::create([
+                        'concert_id' => $concert->id,
+                        'field_name' => 'picture_url',
+                        'old_value' => (string)$concert->picture_url,
+                        'new_value' => (string)$data['picture_url'],
+                    ]);
+                    $groupedChanges['picture_url'] = [
+                        'old' => $concert->picture_url ?? 'None',
+                        'new' => 'อัปเดตภาพโปสเตอร์ใหม่',
+                    ];
+                }
+
+                if (!empty($artistsData)) {
+                    $artistIds = [];
+
+                    foreach ($artistsData as $artistItem) {
+                        $artist = Artist::firstOrCreate(
+                            ['name' => $artistItem['name']],
+                            ['picture_url' => $artistItem['image_url'] ?? null]
+                        );
+                        $artistIds[] = $artist->id;
+                    }
+
+                    $oldArtistIds = $concert->artists()->pluck('artists.id')->toArray();
+                    sort($oldArtistIds);
+                    $newArtistIds = $artistIds;
+                    sort($newArtistIds);
+
+                    if ($oldArtistIds !== $newArtistIds) {
                         Concert_Log::create([
                             'concert_id' => $concert->id,
-                            'field_name' => $field,
-                            'old_value' => $oldVal,
-                            'new_value' => $newVal,
+                            'field_name' => 'artist_ids',
+                            'old_value' => json_encode($oldArtistIds),
+                            'new_value' => json_encode($newArtistIds),
                         ]);
+
+                        $oldArtistNames = $concert->artists()->pluck('name')->implode(', ');
+                        $newArtistNames = Artist::whereIn('id', $newArtistIds)->pluck('name')->implode(', ');
+
+                        $groupedChanges['Artists'] = [
+                            'old' => $oldArtistNames ?: 'ไม่มีศิลปิน',
+                            'new' => $newArtistNames ?: 'ไม่มีศิลปิน'
+                        ];
                     }
+
+                    $concert->artists()->syncWithoutDetaching($artistIds);
                 }
 
                 $concert->update($data);
                 $concert->touch();
+
+                if (!empty($groupedChanges)) {
+                    $followers = User::whereHas('followedConcert', function ($query) use ($concert) {
+                        $query->where('concerts.id', $concert->id);
+                    })->get();
+
+                    if ($followers->count() > 0) {
+                        Notification::send($followers, new ConcertUpdatedNotification($concert, $groupedChanges));
+                    }
+                }
+
                 $statusMessage = 'Concert updated';
             } else {
                 // --- กรณีไม่เจอ (Create Mode) ---

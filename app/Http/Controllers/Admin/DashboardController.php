@@ -22,8 +22,8 @@ class DashboardController extends Controller
         ];
 
         $recentConcerts = Concert::with('promoter')
-            ->latest()
-            ->take(5)
+            ->orderBy('updated_at', 'desc')
+            ->take(10)
             ->get();
 
         return Inertia::render('Admin/Dashboard', [

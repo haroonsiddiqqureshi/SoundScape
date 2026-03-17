@@ -199,7 +199,6 @@ def get_page_destination_data(url, headless=False, timeout=10):
                 date_start = datetime.date(year, month, start_day)
                 date_end = datetime.date(year, month, end_day)
 
-            # NOT DONE
             elif len(date_parts) == 3:  # Case: "27 ธ.ค. 25"
                 day = int(date_parts[0])
                 month_str = date_parts[1]

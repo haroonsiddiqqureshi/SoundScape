@@ -137,7 +137,10 @@ def get_page_destination_data(url, headless=True, timeout=10):
                 clean_num = m.replace(",", "")
                 # เช็คว่าเป็นตัวเลขล้วนๆ (ป้องกันกรณีเจอเครื่องหมายแปลกๆ)
                 if clean_num.isdigit():
-                    prices.append(int(clean_num))
+                    val = int(clean_num)
+                    
+                    if val > 50 and val not in [2025, 2026, 2027, 2028, 2568, 2569, 2570, 2571]: 
+                        prices.append(val)
             
             if prices:
                 price_min = min(prices) # ราคาต่ำสุด (2000)
@@ -236,7 +239,7 @@ def get_page_destination_data(url, headless=True, timeout=10):
             date_element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, date_selector))
             )
-            date_text = date_element.text.strip()
+            date_text = date_element.text.upper().strip()
 
             date_parts = date_text.split(" ")
             date_parts = [p for p in date_parts if p.strip()]
@@ -339,6 +342,7 @@ def get_page_destination_data(url, headless=True, timeout=10):
         # PROVINCE
         province = None
         try:
+            # Note: This selector is very long and brittle. If the website changes slightly, it will break.
             province_selector = r'body > main > div > div.relative > div.relative.p-6 > div > div.flex.flex-col.gap-6.rounded-card.bg-white.p-4.lg\:flex-row.lg\:gap-10 > div.flex.flex-1.flex-col > div.mt-4.flex.flex-col.gap-2 > div:nth-child(5) > div > span.b3.text-gray-400'
             
             province_element = WebDriverWait(driver, 10).until(
@@ -346,15 +350,20 @@ def get_page_destination_data(url, headless=True, timeout=10):
             )
             raw_province_text = province_element.text.strip()
 
-            # วนลูปเช็คว่ามีจังหวัดไหนอยู่ในข้อความ raw_province_text บ้าง
-            matched_province = None
-            for p in valid_provinces:
-                # ใช้ .lower() เพื่อเปรียบเทียบแบบไม่สนตัวพิมพ์เล็กใหญ่ (Case Insensitive)
-                if p.lower() in raw_province_text.lower():
-                    matched_province = p
-                    break # เจอแล้วหยุดทันที (ได้จังหวัดแรกที่เจอ)
-            
-            province = matched_province
+            # 1. FIXED BANGKOK LOGIC: Standardize the name and assign it directly
+            if raw_province_text in ["กรุงเทพ", "กรุงเทพฯ", "กทม", "กทม."]:
+                province = "กรุงเทพมหานคร"
+            else:
+                # 2. MATCH OTHER PROVINCES: Only run the loop if it's not already identified as Bangkok
+                matched_province = None
+                for p in valid_provinces:
+                    # ใช้ .lower() เผื่อรายการมีภาษาอังกฤษ (ภาษาไทยไม่มีพิมพ์เล็ก/ใหญ่)
+                    if p.lower() in raw_province_text.lower():
+                        matched_province = p
+                        break # เจอแล้วหยุดทันที (ได้จังหวัดแรกที่เจอ)
+                
+                province = matched_province
+                
             print(f"Debug Province: Raw='{raw_province_text}' -> Extracted='{province}'")
 
         except:
@@ -416,7 +425,7 @@ def save_concert(data):
         print(f"An unexpected request error occurred: {e}")
 
 if __name__ == "__main__":
-    url = "https://www.ticketier.com/events/baekhyun2025"
+    url = "https://www.ticketier.com/events/mnst2024"
     print(f"🚀 Starting scraper test for: {url}")
 
     # แนะนำให้ลองปิด headless=False ในรอบแรกเพื่อดูว่า Browser เปิดขึ้นมาจริงไหม
