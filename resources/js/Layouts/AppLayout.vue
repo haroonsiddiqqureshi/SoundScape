@@ -21,6 +21,8 @@ import {
     MoonIcon as OutlineMoonIcon,
     SunIcon as OutlineSunIcon,
     BellIcon,
+    CheckIcon,
+    EyeIcon,
 } from "@heroicons/vue/24/outline";
 
 defineProps({
@@ -42,7 +44,7 @@ function debounce(fn, delay) {
 }
 
 const search = ref(page.props.filters?.search || "");
-const searchResults = ref([]);
+const searchResults = ref({ top_concerts: [], artists: [], concerts: [], provinces: [] });
 const isSearchFocused = ref(false);
 const isLoadingSearch = ref(false);
 
@@ -62,12 +64,6 @@ const submitSearch = () => {
 };
 
 const fetchSearchResults = async () => {
-    if (search.value.length < 2) {
-        searchResults.value = [];
-        isLoadingSearch.value = false;
-        return;
-    }
-
     isLoadingSearch.value = true;
 
     try {
@@ -77,7 +73,7 @@ const fetchSearchResults = async () => {
         searchResults.value = response.data.data;
     } catch (error) {
         console.error("Error fetching search results:", error);
-        searchResults.value = [];
+        searchResults.value = { top_concerts: [], artists: [], concerts: [], provinces: [] };
     } finally {
         isLoadingSearch.value = false;
     }
@@ -89,18 +85,16 @@ const markAsRead = (notification) => {
         {},
         {
             preserveScroll: true,
-            onSuccess: () => {
-                if (notification.data.concert_id) {
-                    router.get(
-                        route(
-                            "user.concert.detail",
-                            notification.data.concert_id,
-                        ),
-                    );
-                }
-            },
         },
     );
+};
+
+const goToConcert = (notification) => {
+    if (notification.data.concert_id) {
+        router.get(
+            route("concert.detail", notification.data.concert_id),
+        );
+    }
 };
 
 watch(
@@ -114,6 +108,9 @@ watch(search, debounce(fetchSearchResults, 300));
 
 const onSearchFocus = () => {
     isSearchFocused.value = true;
+    if (!search.value) {
+        fetchSearchResults();
+    }
 };
 
 const onSearchBlur = () => {
@@ -203,13 +200,13 @@ const logout = () => {
                                         @blur="onSearchBlur" @keyup.enter="submitSearch" />
                                 </div>
 
-                                <SearchResults v-if="isSearchFocused && search.length > 1" :is-loading="isLoadingSearch"
-                                    :results="searchResults" />
+                                <SearchResults v-if="isSearchFocused" :is-loading="isLoadingSearch"
+                                    :results="searchResults" :search-query="search" />
                             </div>
                         </div>
 
                         <div v-if="page.props.auth.user" class="relative flex items-center mr-[-6px]">
-                            <Dropdown align="right">
+                            <Dropdown align="right" width="96">
                                 <template #trigger>
                                     <button
                                         class="relative p-2 text-primary hover:text-text focus:outline-none transition duration-150 ease-in-out">
@@ -228,8 +225,7 @@ const logout = () => {
                                 </template>
 
                                 <template #content>
-                                    <div
-                                        class="block p-2 text-xs font-bold border-b-2 border-card-hover">
+                                    <div class="block p-2 text-xs font-bold border-b-2 border-card-hover">
                                         Notifications
                                     </div>
                                     <div v-if="
@@ -239,20 +235,25 @@ const logout = () => {
                                         No new notifications
                                     </div>
                                     <div v-else class="max-h-64 overflow-y-auto">
-                                        <button v-for="notification in $page.props
-                                            .auth.notifications" :key="notification.id"
-                                            @click="markAsRead(notification)"
-                                            class="w-full text-left px-4 py-3 hover:bg-primary-low border-b border-primary-low transition block">
-                                            <p class="text-sm font-semibold text-text">
-                                                {{
-                                                    notification.data
-                                                        .concert_name
-                                                }}
-                                            </p>
-                                            <p class="text-xs text-text-medium mt-1">
-                                                {{ notification.data.message }}
-                                            </p>
-                                        </button>
+                                        <div v-for="notification in $page.props.auth.notifications"
+                                            :key="notification.id"
+                                            class="w-full flex justify-between items-start px-4 py-3 border-b-2 border-card-hover transition group">
+
+                                            <button @click="goToConcert(notification)" class="flex-1 text-left">
+                                                <p
+                                                    class="text-sm font-semibold text-text group-hover:text-primary transition-colors">
+                                                    {{ notification.data.concert_name }}
+                                                </p>
+                                                <p class="text-xs text-text-medium mt-1">
+                                                    {{ notification.data.message }}
+                                                </p>
+                                            </button>
+
+                                            <button @click.stop="markAsRead(notification)" title="Mark as Read"
+                                                class="ml-3 mt-0.5 text-text-medium hover:text-primary focus:outline-none transition-colors">
+                                                <EyeIcon class="h-5 w-5 stroke-[2px]" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
                             </Dropdown>

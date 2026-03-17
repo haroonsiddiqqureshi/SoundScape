@@ -61,6 +61,14 @@ def get_page_destination_data(url, headless=True, timeout=10):
                 EC.presence_of_element_located((By.CSS_SELECTOR, name_selector))
             )
             name = name_element.text
+
+            if name:
+                if "(บัตรผ่อน)" in name:
+                    return None 
+                
+                name = name.replace("(จ่ายเต็มและบัตรกระดาษทุกชนิด)", "")
+                name = name.replace("(จ่ายเต็ม)", "")
+                name = name.strip()
         except:
             name = None
 
@@ -121,7 +129,6 @@ def get_page_destination_data(url, headless=True, timeout=10):
             
             # ใช้ Regex ค้นหาตัวเลขทั้งหมด (รวมถึงที่มีลูกน้ำ เช่น 2,000)
             # \d+ = ตัวเลข, [,]* = มี comma หรือไม่ก็ได้
-            import re
             matches = re.findall(r'[\d,]+', price_text)
             
             prices = []
@@ -174,7 +181,6 @@ def get_page_destination_data(url, headless=True, timeout=10):
 
                 current_map_url = driver.current_url
 
-                import re
                 match = re.search(r'@([-.\d]+),([-.\d]+)', current_map_url)
                 
                 if not match:

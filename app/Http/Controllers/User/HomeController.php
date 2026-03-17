@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Models\Highlight;
 use App\Models\Concert;
 use App\Models\Follow;
+use App\Models\Artist;
 use App\Models\Province;
 use Illuminate\Support\Facades\Auth;
 
@@ -85,21 +86,53 @@ class HomeController extends Controller
         ]);
     }
 
-    public function searchQuery(Request $request)
+public function searchQuery(Request $request)
     {
         $search = $request->input('q');
 
-        if (empty($search) || strlen($search) < 2) {
-            return response()->json(['data' => []]);
+        if (empty($search)) {
+            $topConcerts = Concert::with(['artists', 'province'])
+                ->orderBy('view_count', 'desc')
+                ->take(5)
+                ->get();
+
+            return response()->json([
+                'data' => [
+                    'top_concerts' => $topConcerts,
+                    'artists' => [],
+                    'concerts' => [],
+                    'provinces' => [],
+                ]
+            ]);
         }
 
-        $query = Concert::query();
-        $results = $this->buildSearchQuery($query, $search)
+        $concerts = Concert::query()
+            ->where('name', 'like', '%' . $search . '%')
+            ->orWhere('description', 'like', '%' . $search . '%')
+            ->orWhere('venue_name', 'like', '%' . $search . '%')
             ->with(['artists', 'province'])
-            ->take(7)
+            ->take(5)
             ->get();
 
-        return response()->json(['data' => $results]);
+        $artists = Artist::query()
+            ->where('name', 'like', '%' . $search . '%')
+            ->take(5)
+            ->get();
+
+        $provinces = Province::query()
+            ->where('name_th', 'like', '%' . $search . '%')
+            ->orWhere('name_en', 'like', '%' . $search . '%')
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'data' => [
+                'top_concerts' => [],
+                'artists' => $artists,
+                'concerts' => $concerts,
+                'provinces' => $provinces,
+            ]
+        ]);
     }
 
     public function concertDetail(Concert $concert)
@@ -178,7 +211,6 @@ class HomeController extends Controller
             $searchTerm = '%' . $search . '%';
 
             $subQuery->where('name', 'like', $searchTerm)
-                ->orWhere('description', 'like', $searchTerm)
                 ->orWhere('event_type', 'like', $searchTerm)
                 ->orWhere('genre', 'like', $searchTerm)
                 ->orWhere('venue_name', 'like', $searchTerm)
