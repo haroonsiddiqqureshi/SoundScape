@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { ref, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ChevronDownIcon, CheckIcon } from '@heroicons/vue/24/solid';
@@ -35,6 +35,8 @@ const startScraping = async () => {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
+        localStorage.setItem('active_scraper_job', response.data.job_id);
+
         startPolling(response.data.job_id);
     } catch (error) {
         console.error("Failed to start scraper:", error);
@@ -42,14 +44,41 @@ const startScraping = async () => {
     }
 };
 
+onMounted(() => {
+    const savedJobId = localStorage.getItem('active_scraper_job');
+    if (savedJobId) {
+        startPolling(savedJobId);
+    }
+});
+
 const startPolling = (jobId) => {
     pollingInterval = setInterval(async () => {
         const response = await axios.get(route('admin.scraper.status', jobId));
         currentJob.value = response.data;
+
         if (currentJob.value.status === 'completed' || currentJob.value.status === 'failed') {
             clearInterval(pollingInterval);
+
+            localStorage.removeItem('active_scraper_job');
         }
     }, 2000);
+};
+
+const cancelScraping = async () => {
+    if (!currentJob.value) return;
+    if (!confirm("Are you sure you want to stop the scraper?")) return;
+
+    try {
+        await axios.post(route('admin.scraper.cancel', currentJob.value.id));
+
+        clearInterval(pollingInterval);
+        localStorage.removeItem('active_scraper_job');
+
+        currentJob.value.status = 'failed';
+        currentJob.value.error_message = 'Cancelled by Admin';
+    } catch (error) {
+        console.error("Failed to cancel:", error);
+    }
 };
 
 onUnmounted(() => {
@@ -70,10 +99,10 @@ onUnmounted(() => {
 
                                 <div class="relative mt-1">
                                     <button type="button" @click="isDropdownOpen = !isDropdownOpen"
-                                        class="relative w-full cursor-pointer rounded-md border border-background-hover bg-background py-2.5 pl-3 text-left text-sm font-medium text-text shadow-sm focus:ring-0 focus:ring-offset-0 transition-colors">
+                                        class="relative w-full cursor-default rounded-md border border-background-hover bg-background py-2.5 pl-3 text-left text-sm font-medium text-text shadow-sm focus:ring-0 focus:ring-offset-0 transition-colors">
                                         <span class="block truncate">
                                             {{options.find(o => o.value === form.target_website)?.label ||
-                                            'เลือกเว็บไซต์...' }}
+                                                'เลือกเว็บไซต์...'}}
                                         </span>
                                         <span
                                             class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -87,7 +116,7 @@ onUnmounted(() => {
                                             class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-card py-1 text-sm focus:outline-none">
                                             <li v-for="option in options" :key="option.value"
                                                 @click="selectOption(option.value)"
-                                                class="relative cursor-pointer hover:text-xl font-semibold hover:text-primary select-none py-2 pl-10 pr-4 transition-all duration-150">
+                                                class="relative hover:text-xl font-semibold hover:text-primary select-none py-2 pl-10 pr-4 transition-all duration-150">
                                                 <span class="block truncate">{{ option.label }}</span>
 
                                                 <span v-if="form.target_website === option.value"
@@ -103,12 +132,16 @@ onUnmounted(() => {
                             </div>
                         </div>
 
-                        <div class="mt-4">
-                            <button type="submit"
-                                class="w-full justify-center inline-flex items-center py-2 bg-primary rounded-md font-bold text-sm text-white uppercase tracking-wide hover:bg-primary-hover transition"
-                                :disabled="currentJob && currentJob.status === 'running'">
-                                <span v-if="currentJob && currentJob.status === 'running'">กำลังทำงาน...</span>
-                                <span v-else>ดึงข้อมูลคอนเสิร์ต</span>
+                        <div class="mt-2">
+                            <button v-if="currentJob && currentJob.status === 'running'" type="button"
+                                @click.prevent="cancelScraping"
+                                class="w-full justify-center inline-flex items-center py-2 border-2 border-text-low rounded-md hover:font-bold text-sm tracking-wide transition">
+                                ยกเลิก
+                            </button>
+
+                            <button v-else type="submit"
+                                class="w-full justify-center inline-flex items-center py-2 border-2 border-primary rounded-md hover:font-bold text-sm tracking-wide transition">
+                                ดึงข้อมูลคอนเสิร์ต
                             </button>
                         </div>
                     </form>
@@ -128,7 +161,7 @@ onUnmounted(() => {
                                 <span
                                     class="text-xs font-semibold inline-block py-1 px-2 rounded-md text-white bg-secondary">
                                     {{ currentJob.status === 'running' ? 'กำลังดึงข้อมูล' : (currentJob.status ===
-                                    'completed' ? 'สำเร็จ' : 'ไม่สำเร็จ') }}
+                                        'completed' ? 'สำเร็จ' : 'ไม่สำเร็จ') }}
                                 </span>
                             </div>
                             <div class="text-right">

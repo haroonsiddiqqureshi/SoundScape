@@ -15,6 +15,14 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 def update_laravel(job_id, status=None, progress=None, new_result=None, error_message=None):
+    kill_file = os.path.join(parent_dir, '..', 'storage', 'logs', f'cancel_{job_id}.txt')
+    if os.path.exists(kill_file):
+        try:
+            os.remove(kill_file) 
+        except Exception:
+            pass
+        os._exit(1)
+        
     url = f"http://127.0.0.1:8000/api/scraper/update/{job_id}"
     data = {}
     if status: data["status"] = status

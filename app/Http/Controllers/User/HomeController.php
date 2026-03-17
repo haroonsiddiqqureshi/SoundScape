@@ -104,6 +104,13 @@ class HomeController extends Controller
 
     public function concertDetail(Concert $concert)
     {
+        $sessionKey = 'viewed_concert_' . $concert->id;
+
+        if (!session()->has($sessionKey)) {
+            $concert->increment('view_count');
+            session()->put($sessionKey, true);
+        }
+    
         $concert->load(['artists', 'comments.user', 'comments.admin', 'comments.promoter']);
 
         $provinces = Province::all()->keyBy('id');

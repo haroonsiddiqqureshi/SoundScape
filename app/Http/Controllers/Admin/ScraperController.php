@@ -69,13 +69,13 @@ class ScraperController extends Controller
         if ($isWindows) {
             $batPath = storage_path('logs/run_scraper.bat');
             
-            $batContent = "chcp 65001\n"; 
+            $batContent = "chcp 65001 > NUL\n"; 
             $batContent .= "set PYTHONIOENCODING=utf-8\n"; 
             $batContent .= "\"{$pythonPath}\" \"{$scriptPath}\" {$args} > \"{$logPath}\" 2>&1\n";
             
             file_put_contents($batPath, $batContent);
 
-            $cmd = "start /B \"\" \"{$batPath}\"";
+            $cmd = "start /B \"\" \"{$batPath}\" > NUL 2>&1";
             pclose(popen($cmd, "r"));
         } else {
             $cmd = "PYTHONIOENCODING=utf-8 \"{$pythonPath}\" \"{$scriptPath}\" {$args} > \"{$logPath}\" 2>&1 &";
@@ -111,5 +111,18 @@ class ScraperController extends Controller
 
         $job->save();
         return response()->json(['message' => 'updated']);
+    }
+
+    public function cancel($id)
+    {
+        \Illuminate\Support\Facades\DB::table('scraper_jobs')->where('id', $id)->update([
+            'status' => 'failed',
+            'error_message' => 'ยกเลิก'
+        ]);
+
+        $killSwitchPath = storage_path("logs/cancel_{$id}.txt");
+        file_put_contents($killSwitchPath, "STOP_PROCESS");
+
+        return response()->json(['status' => 'success']);
     }
 }

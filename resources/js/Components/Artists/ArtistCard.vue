@@ -93,7 +93,7 @@ const getPictureUrl = (artist) => {
                         artist: artist.id,
                     })
                         " method="delete"
-                        class="flex items-center px-2 h-6 w-fit space-x-1 bg-red-600 hover:bg-red-700 rounded-full transition-colors duration-200 text-white text-sm">
+                        class="flex items-center px-2 h-6 w-fit space-x-1 bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200 text-white text-sm">
                         <TrashIcon class="w-4 h-4" />
                         <span>ลบ</span>
                     </Link>

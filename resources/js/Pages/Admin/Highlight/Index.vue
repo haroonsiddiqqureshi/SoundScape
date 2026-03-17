@@ -135,11 +135,11 @@ const getPictureUrl = (highlight) => {
                     <td class="px-4 py-3 pl-6 text-center w-16" v-if="!search">
                         <div class="flex flex-col items-center gap-1">
                             <button @click="moveHighlight(index, 'up')" :disabled="index === 0"
-                                :class="index === 0 ? 'text-gray-400 opacity-50' : 'text-primary hover:text-primary-hover'">
+                                :class="index === 0 ? 'text-text-medium opacity-50' : 'text-primary hover:text-primary-hover'">
                                 <ChevronUpIcon class="w-5 h-5" />
                             </button>
                             <button @click="moveHighlight(index, 'down')" :disabled="index === highlights.length - 1"
-                                :class="index === highlights.length - 1 ? 'text-gray-400 opacity-50' : 'text-primary hover:text-primary-hover'">
+                                :class="index === highlights.length - 1 ? 'text-text-medium opacity-50' : 'text-primary hover:text-primary-hover'">
                                 <ChevronDownIcon class="w-5 h-5" />
                             </button>
                         </div>
@@ -168,7 +168,7 @@ const getPictureUrl = (highlight) => {
                             highlight: highlight.id,
                         })
                             "
-                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-primary hover:bg-primary-hover rounded-md transition-colors duration-200">
+                            class="flex items-center px-2 h-8 w-fit space-x-1 bg-secondary hover:bg-primary-hover rounded-md transition-colors duration-200">
                             <PencilIcon class="w-4 h-4" />
                             <span>แก้ไข</span>
                         </Link>

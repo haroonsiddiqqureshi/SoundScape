@@ -208,12 +208,12 @@ const logout = () => {
                             </div>
                         </div>
 
-                        <div v-if="page.props.auth.user" class="relative flex items-center mr-4">
-                            <Dropdown align="right" width="64">
+                        <div v-if="page.props.auth.user" class="relative flex items-center mr-[-6px]">
+                            <Dropdown align="right">
                                 <template #trigger>
                                     <button
                                         class="relative p-2 text-primary hover:text-text focus:outline-none transition duration-150 ease-in-out">
-                                        <BellIcon class="h-6 w-6 stroke-current" />
+                                        <BellIcon class="h-6 w-6 stroke-current stroke-[2px]" />
                                         <span v-if="
                                             $page.props.auth.notifications
                                                 .length > 0
@@ -229,7 +229,7 @@ const logout = () => {
 
                                 <template #content>
                                     <div
-                                        class="block px-4 py-2 text-xs text-text-medium font-bold border-b border-primary-low">
+                                        class="block p-2 text-xs font-bold border-b-2 border-card-hover">
                                         Notifications
                                     </div>
                                     <div v-if="
@@ -292,7 +292,7 @@ const logout = () => {
                                         "
                                             class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-text transition">
                                             <img class="size-8 rounded-full object-cover" :src="$page.props.auth.user
-                                                    .profile_photo_url
+                                                .profile_photo_url
                                                 " :alt="$page.props.auth.user.name
                                                     " />
                                         </button>

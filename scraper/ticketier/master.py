@@ -19,9 +19,21 @@ from utils.artist_matcher import extract_artists_from_text
 from .tester import get_page_destination_data, save_concert
 
 
-def update_laravel(
-    job_id, status=None, progress=None, new_result=None, error_message=None
-):
+def update_laravel(job_id, status=None, progress=None, new_result=None, error_message=None):
+    try:
+        current_file_path = os.path.abspath(__file__)
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+        kill_file = os.path.join(base_dir, 'storage', 'logs', f'cancel_{job_id}.txt')
+        
+        if os.path.exists(kill_file):
+            try:
+                os.remove(kill_file) 
+            except Exception:
+                pass
+            os._exit(1)
+    except Exception:
+        pass
+    
     url = f"http://127.0.0.1:8000/api/scraper/update/{job_id}"
     data = {}
     if status:
@@ -37,6 +49,7 @@ def update_laravel(
         response.raise_for_status()
     except Exception:
         pass
+
 
 def get_all_concert_links(listing_url):
     links = []
