@@ -14,13 +14,7 @@ const isDarkMode = inject("isDarkMode");
 const search = ref(props.filters?.search || "");
 
 const hasArtists = computed(() => {
-    if (Array.isArray(props.artists)) {
-        return props.artists.length > 0;
-    }
-    if (typeof props.artists === "object" && props.artists !== null) {
-        return Object.keys(props.artists).length > 0;
-    }
-    return false;
+    return props.artists?.data?.length > 0;
 });
 
 watch(

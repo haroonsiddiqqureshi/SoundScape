@@ -82,9 +82,9 @@ watch(
             </div>
         </div>
 
-        <div class="mt-8">
+        <div v-if="hasConcerts" class="mt-8">
             <ul class="flex justify-center gap-2">
-                <li v-for="link in concerts.links">
+                <li v-for="link in concerts.links" :key="link.label">
                     <Link
                         class="px-4 py-2 border border-card hover:border-primary rounded-md hover:bg-primary hover:text-white font-semibold ring-0 bg-card transition-colors duration-150"
                         :class="{

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Promoter;
 
 use App\Http\Controllers\Controller;
 use App\Models\Promoter;
+use App\Models\Concert;
+use App\Models\Comment;
+use App\Models\Follow;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -19,8 +22,26 @@ class PromoterController extends Controller
             ]);
         }
 
+        $promoterConcerts = Concert::where('promoter_id', $promoter->id);
+        $promoterConcertIds = $promoterConcerts->pluck('id');
+
+        $stats = [
+            'total_concerts' => $promoterConcertIds->count(),
+            'total_views' => (int) $promoterConcerts->sum('view_count'),
+            'total_follows' => Follow::whereIn('concert_id', $promoterConcertIds)->count(),
+            'total_comments' => Comment::whereIn('concert_id', $promoterConcertIds)->count(),
+        ];
+
+        $upcomingConcerts = Concert::where('promoter_id', $promoter->id)
+            ->where('start_show_date', '>=', now())
+            ->orderBy('start_show_date', 'asc')
+            ->take(5)
+            ->get();
+
         return Inertia::render('Promoter/Index', [
             'promoter' => $promoter,
+            'stats' => $stats,
+            'upcomingConcerts' => $upcomingConcerts,
         ]);
     }
 
@@ -87,8 +108,8 @@ class PromoterController extends Controller
             'social_links' => $validated['social_links'] ?? [],
         ]);
 
-        $message = $promoter->is_verified 
-            ? 'Promoter profile updated successfully.' 
+        $message = $promoter->is_verified
+            ? 'Promoter profile updated successfully.'
             : 'Promoter profile updated successfully. Awaiting verification.';
 
         return back()->with('success', $message);

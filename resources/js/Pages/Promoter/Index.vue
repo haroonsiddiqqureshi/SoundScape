@@ -6,6 +6,8 @@ import Dashboard from "./Components/Dashboard.vue";
 
 const props = defineProps({
     promoter: Object,
+    stats: Object,
+    upcomingConcerts: Array,
 });
 
 const isVerified = computed(() => {

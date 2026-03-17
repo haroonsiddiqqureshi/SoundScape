@@ -21,8 +21,7 @@ import {
     MoonIcon as OutlineMoonIcon,
     SunIcon as OutlineSunIcon,
     BellIcon,
-    CheckIcon,
-    EyeIcon,
+    EyeSlashIcon,
 } from "@heroicons/vue/24/outline";
 
 defineProps({
@@ -251,7 +250,7 @@ const logout = () => {
 
                                             <button @click.stop="markAsRead(notification)" title="Mark as Read"
                                                 class="ml-3 mt-0.5 text-text-medium hover:text-primary focus:outline-none transition-colors">
-                                                <EyeIcon class="h-5 w-5 stroke-[2px]" />
+                                                <EyeSlashIcon class="h-5 w-5 stroke-[2px]" />
                                             </button>
                                         </div>
                                     </div>
