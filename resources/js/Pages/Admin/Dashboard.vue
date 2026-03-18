@@ -56,8 +56,7 @@ defineProps({
                             <thead class="text-xs text-text-high uppercase bg-card-hover">
                                 <tr>
                                     <th scope="col" class="px-6 py-3">ชื่อคอนเสิร์ต</th>
-                                    <th scope="col" class="px-6 py-3">โปรโมเตอร์</th>
-                                    <th scope="col" class="px-6 py-3">วันที่แสดง</th>
+                                    <th scope="col" class="px-6 py-3">เจ้าของ</th>
                                     <th scope="col" class="px-6 py-3">วันที่สร้าง</th>
                                     <th scope="col" class="px-6 py-3">วันที่อัพเดท</th>
                                 </tr>
@@ -71,9 +70,6 @@ defineProps({
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ concert.promoter?.business_name || concert?.origin }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        {{ new Date(concert.start_show_date).toLocaleDateString('th-TH') }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ new Date(concert.created_at).toLocaleDateString('th-TH') }}
