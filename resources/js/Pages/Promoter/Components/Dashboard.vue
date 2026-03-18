@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import DashboardStatCard from '@/Components/DashboardStatCard.vue';
 import {
     MusicalNoteIcon,
@@ -32,9 +32,6 @@ defineProps({
 <template>
     <div>
         <div class="space-y-2">
-            <p class="bg-card overflow-hidden shadow-sm rounded-md px-6 py-4">ยินดีต้อนรับ, <strong>{{
-                promoter?.fullname }}</strong> ({{ promoter?.business_name }})</p>
-
             <div class="grid grid-cols-2 xl:grid-cols-4 gap-2">
                 <DashboardStatCard title="คอนเสิร์ตของคุณทั้งหมด" :value="stats.total_concerts"
                     border-color="shadow-sm border-indigo-500">
@@ -75,15 +72,17 @@ defineProps({
                             </thead>
                             <tbody>
                                 <tr v-for="concert in upcomingConcerts" :key="concert.id"
-                                    class="bg-card border-b hover:bg-background-hover">
+                                    @click="router.get(route('promoter.concert.detail', concert.id))"
+                                    class="bg-card border-b-2 border-background hover:bg-background-hover cursor-pointer">
                                     <td class="px-6 py-4 font-medium whitespace-nowrap">
-                                        {{ concert.title }}
+                                        {{ concert.name }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ new Date(concert.start_show_date).toLocaleDateString('th-TH') }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        <Link :href="route('promoter.concerts.edit', concert.id)"
+                                        <Link :href="route('promoter.concert.edit', concert.id)"
+                                            @click.stop
                                             class="text-primary hover:text-primary-hover">
                                             แก้ไข
                                         </Link>

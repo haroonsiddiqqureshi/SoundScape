@@ -35,7 +35,7 @@ class PromoterController extends Controller
         $upcomingConcerts = Concert::where('promoter_id', $promoter->id)
             ->where('start_show_date', '>=', now())
             ->orderBy('start_show_date', 'asc')
-            ->take(5)
+            ->take(10)
             ->get();
 
         return Inertia::render('Promoter/Index', [

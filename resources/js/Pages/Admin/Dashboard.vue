@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import DashboardStatCard from '@/Components/DashboardStatCard.vue';
 import {
@@ -64,7 +64,8 @@ defineProps({
                             </thead>
                             <tbody>
                                 <tr v-for="concert in recentConcerts" :key="concert.id"
-                                    class="bg-card border-b-2 border-background hover:bg-background-hover">
+                                    @click="router.get(route('admin.concert.detail', concert.id))"
+                                    class="bg-card border-b-2 border-background hover:bg-background-hover cursor-pointer">
                                     <td class="px-6 py-4 font-medium whitespace-nowrap">
                                         {{ concert.name }}
                                     </td>
@@ -82,7 +83,7 @@ defineProps({
                                     </td>
                                 </tr>
                                 <tr v-if="recentConcerts.length === 0">
-                                    <td colspan="3" class="px-6 py-4 text-center text-text-medium">ไม่มีข้อมูล</td>
+                                    <td colspan="5" class="px-6 py-4 text-center text-text-medium">ไม่มีข้อมูล</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -16,7 +16,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="bg-card overflow-hidden shadow-sm rounded-md px-4 py-6 border-l-4" :class="borderColor">
+    <div class="bg-card overflow-hidden shadow-sm rounded-md px-4 py-6 border-b-4" :class="borderColor">
         <div class="flex items-center">
             <div class="flex-shrink-0">
                 <slot name="icon"></slot>
