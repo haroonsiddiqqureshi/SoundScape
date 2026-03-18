@@ -1,92 +1,110 @@
-# SoundScape
+# 🎶 SoundScape
 
-A web application for an immersive audio experience based on location, built with Laravel, Vue.js, and Inertia.js.
+**SoundScape** เป็นเว็บแอปพลิเคชันแพลตฟอร์มสำหรับรวบรวม ค้นหา และติดตามคอนเสิร์ตต่างๆ แบบครบวงจร ช่วยให้ผู้ใช้งานไม่พลาดทุกงานดนตรีที่น่าสนใจ พร้อมแสดงตำแหน่งการจัดงานบนแผนที่แบบอินเทอร์แอกทีฟ นอกจากนี้ยังมีระบบจัดการสำหรับผู้จัดงาน (Promoter) และระบบดึงข้อมูลอัตโนมัติจากผู้ให้บริการทิคเก็ตชั้นนำ
 
-## ✨ Core Technologies
+> ⚠️ **หมายเหตุ:** โปรเจกต์นี้เป็นเพียงโปรเจกต์ของนักศึกษาที่จัดทำขึ้นเพื่อการศึกษาและการเรียนรู้เท่านั้น ไม่ได้มีจุดประสงค์เพื่อการแสวงหากำไรหรือใช้งานในเชิงพาณิชย์จริงแต่อย่างใด
 
--   **Backend**: Laravel 12
--   **Frontend**: Vue.js 3 & Vite
--   **Styling**: Tailwind CSS
--   **Scaffolding**: Laravel Jetstream
--   **Adapter**: Inertia.js
+---
 
-## 🚀 Getting Started
+## ✨ ฟีเจอร์หลัก (Key Features)
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+### 🗺️ 1. แผนที่คอนเสิร์ต (Interactive Map)
+- แสดงตำแหน่งของคอนเสิร์ตและสถานที่จัดงานบนแผนที่แบบอินเทอร์แอกทีฟ (ใช้งานผ่านพิกัดละติจูด/ลองจิจูดด้วย Leaflet.js)
+- ผู้ใช้สามารถค้นหาคอนเสิร์ตตามพื้นที่และดูรายละเอียดของงานได้โดยตรงจากหมุดบนแผนที่
 
-### Prerequisites
+### 🎫 2. ระบบผู้จัดงาน (Promoter Management)
+- **แดชบอร์ดสำหรับโปรโมเตอร์**: มีพื้นที่เฉพาะสำหรับโปรโมเตอร์ (Promoter Dashboard) เพื่อให้ผู้จัดงานเข้ามาจัดการคอนเสิร์ตของตนเอง
+- **การจัดการคอนเสิร์ต**: สามารถ เพิ่ม/แก้ไข/ลบ ข้อมูลคอนเสิร์ต อัปเดตสถานะ และจัดการรายละเอียดศิลปินที่เข้าร่วมงานได้
 
-Make sure you have the following installed on your system:
--   PHP (^8.2)
--   [Composer](https://getcomposer.org/)
--   [Node.js](https://nodejs.org/) and npm
+### 🔔 3. ระบบการแจ้งเตือน (Notifications & LINE Integration)
+- **การแจ้งเตือนภายในระบบ**: แจ้งเตือนผู้ใช้เมื่อมีการเปลี่ยนแปลงข้อมูลคอนเสิร์ตที่ติดตาม หรือมีประกาศสำคัญ
+- **LINE Integration**: รองรับการเชื่อมต่อและแจ้งเตือนผ่านแอปพลิเคชัน LINE (LINE Flex Messages) เพื่อให้ผู้ใช้รับทราบข่าวสารได้อย่างรวดเร็ว
 
-### Installation
+### 🤖 4. ระบบดึงข้อมูลอัตโนมัติ (Web Scraper)
+- มีชุดสคริปต์ Python อัจฉริยะ (Scraper) ที่ทำงานแยกส่วน เพื่อดึงข้อมูลคอนเสิร์ตจากเว็บไซต์ผู้จำหน่ายตั๋วชั้นนำแบบอัตโนมัติ เช่น:
+  - **AllTicket**
+  - **TheConcert**
+  - **Ticketier**
+- มีระบบ Admin Panel ไว้สำหรับควบคุมและตรวจสอบสถานะการทำงานของ Scraper (Scraper Jobs) 
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/haroonsiddiqqureshi/SoundScape.git
-    ```
+### 👥 5. ระบบผู้ใช้งานและคอมเมนต์ (Users & Interactions)
+- ระบบสมัครสมาชิก จัดการโปรไฟล์ (ทำงานร่วมกับ Laravel Jetstream / Fortify)
+- ผู้ใช้สามารถกดติดตามคอนเสิร์ต และร่วมแสดงความคิดเห็น (Comments) ในหน้าคอนเสิร์ตต่างๆ ได้
 
-2.  **Navigate to the project directory:**
-    ```bash
-    cd SoundScape
-    ```
+### 👑 6. ระบบแอดมิน (Admin Panel)
+- จัดการข้อมูลทั้งหมดในระบบ รวมถึง ผู้ใช้งาน, โปรโมเตอร์ที่รอการอนุมัติ, คอนเสิร์ต, ข้อมูลศิลปิน, และไฮไลท์ (Highlight Banner) บนหน้าแรก
 
-3.  **Install PHP dependencies:**
-    ```bash
-    composer install
-    ```
+---
 
-4.  **Install JavaScript dependencies:**
-    ```bash
-    npm install
-    ```
+## 🛠️ โครงสร้างเทคโนโลยี (Tech Stack)
 
-5.  **Set up your environment file:**
-    Copy the `.env.example` file to a new file named `.env`.
+**Backend:**
+- [Laravel 11](https://laravel.com/) (PHP)
+- MySQL / MariaDB (Database)
 
-    *For Windows:*
-    ```bash
-    copy .env.example .env
-    ```
-    *For macOS/Linux:*
+**Frontend:**
+- [Vue.js 3](https://vuejs.org/)
+- [Inertia.js](https://inertiajs.com/) (Server-Driven Single Page App)
+- [Tailwind CSS](https://tailwindcss.com/) (Styling)
+
+**Scraper:**
+- [Python 3](https://www.python.org/) (Selenium, BeautifulSoup)
+
+---
+
+## 🚀 การติดตั้งและรันโปรเจกต์ (Installation & Setup)
+
+### ข้อกำหนดเบื้องต้น (Prerequisites)
+- PHP >= 8.2
+- Composer
+- Node.js & npm
+- MySQL หรือฐานข้อมูลที่รองรับ
+- Python 3.x (สำหรับการรัน Scraper)
+
+### ขั้นตอนการติดตั้ง
+
+1. **โคลนโปรเจกต์และติดตั้ง Dependencies ฝั่ง PHP/Node.js**
+   ```bash
+   git clone <repository-url>
+   cd soundscape
+   composer install
+   npm install
+   ```
+2. **คัดลอกไฟล์ Environment และสร้าง App Key**
     ```bash
     cp .env.example .env
-    ```
-
-6.  **Generate your application key:**
-    ```bash
     php artisan key:generate
     ```
-
-7.  **Configure your `.env` file:**
-    Open the `.env` file and update the database credentials (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and other environment-specific settings.
-
-8.  **Run database migrations:**
+3. **ตั้งค่าฐานข้อมูล (Database):** เปิดไฟล์ .env และกำหนดค่าการเชื่อมต่อฐานข้อมูลของคุณ
     ```bash
-    php artisan migrate
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=soundscape
+    DB_USERNAME=root
+    DB_PASSWORD=
     ```
-
-### Running the Development Servers
-
-This project includes a convenient script to run all necessary development servers concurrently.
-
-1.  **Start the servers (Laravel, Vite, and Queue):**
+4. **รัน Migration และ Seeder:** (เพื่อสร้างตารางและข้อมูลจำลอง)
     ```bash
-    composer run dev
+    php artisan migrate --seed
     ```
-    This command will start the PHP development server, the Vite server for hot-reloading, and the queue listener.
+5. **รันเซิร์ฟเวอร์:** เปิด 2 Terminal เพื่อรันฝั่ง Backend และ Frontend:
+    ```bash
+    # Terminal 1: เริ่มต้น Laravel Development Server
+    php artisan serve
 
-2.  **Access the application:**
-    Open your web browser and navigate to:
+    # Terminal 2: เริ่มต้น Vite สำหรับการพัฒนา Frontend
+    npm run dev
     ```
-    http://127.0.0.1:8000
-    ```
 
-### Building for Production
+---
 
-To compile and bundle your assets for production, run the following command:
+## 🐍 การติดตั้งระบบ Scraper (Python)
+
+หากต้องการใช้งานระบบดึงข้อมูลอัตโนมัติ ให้เข้าไปที่โฟลเดอร์ scraper และติดตั้งไลบรารีที่จำเป็น
 ```bash
-npm run build
+cd scraper
+pip install -r requirements.txt
+cp .env.example .env
 ```
+(คุณอาจต้องติดตั้ง WebDriver เช่น msedgedriver.exe ให้ตรงกับเบราว์เซอร์ของคุณเพื่อใช้งาน Selenium)
